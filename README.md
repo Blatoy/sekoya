@@ -10,4 +10,4 @@ As linked above it is inspired by Ronimo's one but I found their editor to be la
 Fun fact: I requested a lot of time to be able to close a setting window using enter because you always have to move your mouse to close it (you can't even use tab!) and this may be the main reason on why I'm making a new one.
 
 # What is going to be specifically made for Awesomenauts
-- Listing AI from the path-to-folder/mod-name/Behaviours/xyz.xml
+- Listing AI from the \<path-to-folder>/\<mod-name>/Behaviours/xyz.xml
