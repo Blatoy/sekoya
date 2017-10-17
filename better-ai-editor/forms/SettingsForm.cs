@@ -8,11 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace better_ai_editor
+namespace better_ai_editor.forms
 {
-    public partial class MainForm : Form
+    public partial class SettingsForm : Form
     {
-        public MainForm()
+        public SettingsForm()
         {
             InitializeComponent();
         }
