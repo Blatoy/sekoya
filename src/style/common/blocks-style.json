@@ -1,0 +1,10 @@
+{
+  "colours": {
+    "blocks": {
+      "root": "#61AFEF",
+      "conditions": "#98C379",
+      "actions": "#ABB2BF"
+    },
+    "lines": "#FFFFFF"
+  }
+}

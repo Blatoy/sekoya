@@ -1,0 +1,32 @@
+#block-list {
+  background-color: #21252B;
+  color: #949BAA;
+  border-right: 1px solid black;
+}
+
+.block-header, .block-title {
+  color: white;
+}
+
+.block:hover {
+  background-color: #3A3F4B;
+}
+
+::-webkit-scrollbar {
+    width: 0px;  /* remove scrollbar space */
+    background: transparent;  /* optional: just make scrollbar invisible */
+}
+
+#tab-list {
+  background-color: #21252B;
+  color: #D7DAE0;
+  border-bottom: 1px solid black;
+}
+
+.tab-element {
+  border-right: 1px solid black;
+}
+
+.tab-selected {
+  background-color: #282C34;
+}
