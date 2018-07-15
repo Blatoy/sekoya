@@ -28,5 +28,6 @@
 }
 
 .tab-selected {
+  color: white;
   background-color: #282C34;
 }

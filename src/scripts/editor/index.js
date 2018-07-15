@@ -1,7 +1,9 @@
 const {remote} = require('electron');
 const basePath = remote.app.getAppPath();
+const config = require(basePath + '/config/general.json');
+const actionHandler = require(basePath + "/src/scripts/utils/action-handler.js");
 
-let canvasMousePos = {x: 0, y: 0}, isMouseDown = false;
+let canvasMousePos = {x: 0, y: 0}, mousePos = {x: 0, y: 0}, mouseButtons = [false, false, false];
 let canvas = document.getElementById("main-canvas");
 
 const dataManager = require(basePath + '/src/scripts/editor/data-manager.js');
@@ -23,3 +25,11 @@ window.addEventListener("resize", () => {
 });
 
 setCanvasSize();
+
+if(config.playFrenchSoundOnError) {
+  let errorAudio = new Audio();
+  errorAudio.src = "https://orikaru.net/dl/cul.mp3";
+  window.onerror = () => {
+    errorAudio.play();
+  };
+}

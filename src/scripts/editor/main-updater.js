@@ -1,49 +1,109 @@
+const config = require(basePath + '/config/general.json');
+const actionHandler = require(basePath + "/src/scripts/utils/action-handler.js");
+
 let selectedBlock = false;
+let hoveredBlock = false;
+let linkingBlock = false;
+let blocks = require(basePath + '/src/scripts/editor/data-manager.js').getBlocks();
+
+
+actionHandler.addAction("auto block layout", () => {
+  const BASE_X = 15, BASE_Y = 15, BLOCK_SPACING = 30;
+
+  for(let i = 0; i < blocks.length; ++i) {
+    blocks[i].position.x = BASE_X;
+    blocks[i].position.y = BASE_Y + i * (blocks[i].getFullHeight() + BLOCK_SPACING);
+    blocks[i].autoLayout();
+  }
+});
+
+actionHandler.addAction("cancel block linking", () => {
+  if(linkingBlock) {
+    linkingBlock.linkingType = 0;
+    linkingBlock = false;
+  }
+});
+
+actionHandler.addAction("delete selected block and children", () => {
+  if(hoveredBlock && hoveredBlock.type !== "root") {
+    if(hoveredBlock.parent) {
+      hoveredBlock.destroy();
+    }
+    else {
+      // We have to remove it manually if it's not connected to root
+      blocks.splice(blocks.indexOf(hoveredBlock), 1);
+    }
+    hoveredBlock = false;
+  }
+});
+
+actionHandler.addAction("delete selected block", () => {
+  if(hoveredBlock && hoveredBlock.type !== "root") {
+    // If the items has no parent, delete cannot delete it
+    if(!hoveredBlock.delete(blocks)) {
+      blocks.splice(blocks.indexOf(hoveredBlock), 1);
+      hoveredBlock = false;
+    }
+  }
+});
 
 function update() {
-  let blocks = require(basePath + '/src/scripts/editor/data-manager.js').getBlocks();
+  document.getElementById("main-canvas").style.cursor = "default";
 
-  // Unselect all blocks
-  if(!isMouseDown && selectedBlock) {
-    selectedBlock.isSelected = false;
-    selectedBlock = false;
-  }
-
-  if(selectedBlock) {
-    let blockSize = selectedBlock.getSize();
-    selectedBlock.position.x = canvasMousePos.x - blockSize.w / 2;
-    selectedBlock.position.y = canvasMousePos.y - blockSize.h / 2;
-  }
-
+  // Check for mouse over blocks
   for (let i = 0; i < blocks.length; ++i) {
-    let hoveredBlock = blocks[i].getBlockAtMousePos(canvasMousePos);
-    // If nothing is selected and hover a block and mouse down select the current bock
-    if(!selectedBlock && hoveredBlock && isMouseDown && hoveredBlock.type != "root") {
+    hoveredBlock = blocks[i].getBlockAtMousePos(canvasMousePos);
+    if (!linkingBlock && !selectedBlock && hoveredBlock && mouseButtons[1] && hoveredBlock.type !== "root") {
+      // If nothing is selected and hover a block and mouse down select the current bock
       selectedBlock = hoveredBlock;
+    }
+    else if (!linkingBlock && !selectedBlock && hoveredBlock && mouseButtons[3] && config.conditionsTypes.includes(hoveredBlock.type)) {
+      // Start block linking
+      hoveredBlock.linkingType = 1;
+      linkingBlock = hoveredBlock;
+    }
+    else if(linkingBlock !== false && hoveredBlock && (mouseButtons[3] || mouseButtons[1])) {
+      // Link blocks
+      if(linkingBlock.linkTo(hoveredBlock)) {
+        blocks.splice(blocks.indexOf(hoveredBlock), 1); // Remove block from its roots
+        linkingBlock.linkingType = 0;
+        linkingBlock = false;
+      }
     }
 
     // Prevent selecting multiple main node block
-    if(hoveredBlock != false) {
+    if (hoveredBlock != false) {
+      document.getElementById("main-canvas").style.cursor = "pointer";
       break;
     }
   }
 
-/*
-  if(selectedBlock && isMouseDown) {
+  // Mouse up => remove current selection
+  if (!mouseButtons[1] && selectedBlock) {
+    selectedBlock.selected = false;
+    let parentBlock = selectedBlock.parent;
+
+    if (parentBlock) {
+      let blockSize = selectedBlock.getSize();
+      let parentPosition = parentBlock.getPosition();
+      selectedBlock.position.x = canvasMousePos.x - blockSize.w / 2 - parentPosition.x;
+      selectedBlock.position.y = canvasMousePos.y - blockSize.h / 2 - parentPosition.y;
+    }
+    selectedBlock = false;
+  }
+
+  // Move selected block
+  if (selectedBlock) {
+    let blockSize = selectedBlock.getSize();
     selectedBlock.selected = true;
-
-
     selectedBlock.position.x = canvasMousePos.x - blockSize.w / 2;
     selectedBlock.position.y = canvasMousePos.y - blockSize.h / 2;
   }
 
-  if(selectedBlock.selected) {
-
-  }*/
 }
 
 function startUpdateTimer() {
-  setInterval(update, 10);
+  setInterval(update, 5);
 }
 
 module.exports.startUpdating = function() {

@@ -1,6 +1,10 @@
 
 function setMousePosition(e) {
   var rect = canvas.getBoundingClientRect();
+  mousePos = {
+    x: e.clientX,
+    y: e.clientY
+  };
   canvasMousePos = {
     x: e.clientX - rect.left,
     y: e.clientY - rect.top
@@ -8,11 +12,11 @@ function setMousePosition(e) {
 }
 
 window.addEventListener("mousedown", (e) => {
-  isMouseDown = true;
+  mouseButtons[e.which] = true;
 });
 
 window.addEventListener("mouseup", (e) => {
-  isMouseDown = false;
+  mouseButtons[e.which] = false;
 });
 
 window.addEventListener("mousemove", (e) => {

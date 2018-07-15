@@ -64,7 +64,7 @@ body {
 
 .tab-selected {
   background-color: lightgray;
-  color: white;
+  color: black;
 }
 
 main {

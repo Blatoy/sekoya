@@ -1,4 +1,8 @@
 {
   "theme": "dark",
-  "blockDefinitionFile": "awesomenauts.xml"
+  "blockDefinitionFile": "awesomenauts.xml",
+  "connectionsTypes": ["normal", "else"],
+  "conditionsTypes": ["conditions", "root"],
+  "actionsName": "actions",
+  "playFrenchSoundOnError": false
 }
