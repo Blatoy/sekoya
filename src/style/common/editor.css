@@ -59,10 +59,12 @@ body {
   border-right: 1px solid lightgray;
   text-align: center;
   cursor: pointer;
+  color: gray;
 }
 
 .tab-selected {
   background-color: lightgray;
+  color: white;
 }
 
 main {

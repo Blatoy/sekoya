@@ -1,7 +1,8 @@
 {
   "connections": {
     "colour": "black",
-    "lineWidth": 1
+    "lineWidth": 1,
+    "baseLength": 50
   },
   "blocks": {
     "size": {

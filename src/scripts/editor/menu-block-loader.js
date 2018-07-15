@@ -6,7 +6,6 @@ module.exports.load = function() {
   // Get file specified in the settings
   fs.readFile(basePath + '/block-definitions/' + config.blockDefinitionFile, 'utf-8', function(err, xml) {
     xml2js.parseString(xml, function(err, result) {
-      console.log(result);
       // Light frormat check
       if (result.blockdefinitions) {
         for (let blockGroupKey in result.blockdefinitions) {
