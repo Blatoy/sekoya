@@ -1,0 +1,21 @@
+{
+  "connections": {
+    "colour": "white",
+    "lineWidth": 1
+  },
+  "blocks": {
+    "size": {
+      "width": 225,
+      "height": 30
+    },
+    "font": {
+      "size": 14,
+      "family": "Trebuchet MS"
+    },
+    "colours": {
+      "root": "#61AFEF",
+      "conditions": "#98C379",
+      "actions": "#ABB2BF"
+    }
+  }
+}

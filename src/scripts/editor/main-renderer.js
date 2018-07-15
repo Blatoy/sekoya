@@ -1,12 +1,18 @@
 const canvas = document.getElementById("main-canvas");
 const ctx = canvas.getContext("2d");
 
-const blockStyle = require(basePath + '/src/scripts/utils/theme-loader.js').blockStyle;
+let blocks = [];
 
 function render() {
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, 50, 50);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for(let i = 0; i < blocks.length; ++i) {
+    blocks[i].render(ctx);
+  }
   requestAnimationFrame(render);
+}
+
+module.exports.setBlocks = function(blocks_) {
+  blocks = blocks_;
 }
 
 module.exports.startRendering = function() {

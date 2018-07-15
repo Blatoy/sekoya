@@ -16,12 +16,12 @@ if (config.theme != "default") {
   }
 }
 
-let blockStyle = {};
+let canvasStyle = {};
 
-if (fs.existsSync(basePath + "/src/style/themes/" + config.theme + "/blocks-style.json")) {
-  blockStyle = require(basePath + "/src/style/themes/" + config.theme + "/blocks-style.json");
+if (fs.existsSync(basePath + "/src/style/themes/" + config.theme + "/canvas.json")) {
+  canvasStyle = require(basePath + "/src/style/themes/" + config.theme + "/canvas.json");
 } else {
-  blockStyle = require(basePath + "/src/style/common/blocks-style.json");
+  canvasStyle = require(basePath + "/src/style/common/canvas.json");
 }
 
-module.exports.blockStyle = blockStyle;
+module.exports.canvasStyle = canvasStyle;

@@ -8,7 +8,8 @@ require(basePath + '/src/scripts/editor/menu.js').setMenu();
 require(basePath + '/src/scripts/editor/menu-block-loader.js').load();
 
 
-//renderer.setBlocks(currentBlocks);
+renderer.setBlocks(dataManager.getBlocks());
+renderer.startRendering();
 
 // Make sure the canvas is always using max space, called on resize
 function setCanvasSize() {
