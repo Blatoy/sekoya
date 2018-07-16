@@ -5,6 +5,14 @@
     "baseLength": 50
   },
   "blocks": {
+    "rootPosition": {
+      "x": 15,
+      "y": 15
+    },
+    "margin": {
+      "x": 300,
+      "y": 50
+    },
     "size": {
       "width": 225,
       "height": 30

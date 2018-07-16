@@ -1,5 +1,6 @@
 const config = require(basePath + '/config/general.json');
 const actionHandler = require(basePath + "/src/scripts/utils/action-handler.js");
+const canvasStyle = require(basePath + '/src/scripts/utils/theme-loader.js').canvasStyle;
 
 let selectedBlock = false;
 let hoveredBlock = false;
@@ -8,11 +9,10 @@ let blocks = require(basePath + '/src/scripts/editor/data-manager.js').getBlocks
 
 
 actionHandler.addAction("auto block layout", () => {
-  const BASE_X = 15, BASE_Y = 15, BLOCK_SPACING = 30;
-
   for(let i = 0; i < blocks.length; ++i) {
-    blocks[i].position.x = BASE_X;
-    blocks[i].position.y = BASE_Y + i * (blocks[i].getFullHeight() + BLOCK_SPACING);
+    blocks[i].selected = false;
+    blocks[i].position.x = canvasStyle.blocks.rootPosition.x;
+    blocks[i].position.y = canvasStyle.blocks.rootPosition.y + i * canvasStyle.blocks.margin.y;
     blocks[i].autoLayout();
   }
 });
@@ -68,6 +68,7 @@ function update() {
         blocks.splice(blocks.indexOf(hoveredBlock), 1); // Remove block from its roots
         linkingBlock.linkingType = 0;
         linkingBlock = false;
+        mouseButtons[3] = false; // Make sure we don't restart path immetiately
       }
     }
 

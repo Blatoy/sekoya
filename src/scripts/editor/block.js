@@ -1,5 +1,14 @@
 const canvasStyle = require(basePath + '/src/scripts/utils/theme-loader.js').canvasStyle;
 
+function yPositionSort(a, b) {
+  if(a.position.y > b.position.y) {
+    return 1;
+  }
+  else {
+    return -1;
+  }
+}
+
 class Block {
   constructor(name, type, position = {
     x: 0,
@@ -42,43 +51,41 @@ class Block {
     }
   }
 
-  getFullHeight(depth = 0) {
+  getMaxRecursiveDepth(previousDepth = 0) {
     if(this.children.length <= 0) {
-      return depth * this.getSize().h;
+      return 0;
     }
     else {
-      let maxHeight = 0;
+      let maxChildrenCount = this.children.length - 1;
       for(let i = 0; i < this.children.length; ++i) {
-        maxHeight += this.children[i].getFullHeight(i);
+        let maxChildChildrenCount = this.children[i].getMaxRecursiveDepth(maxChildrenCount);
+          if(maxChildChildrenCount > maxChildrenCount) {
+            maxChildrenCount = maxChildChildrenCount;
+          }
       }
-      return maxHeight;
+      return maxChildrenCount + previousDepth;
     }
-    /*if(this.children.length > 0) {
-      return this.getSize().h; // TODO: Take into account the text line below AND all the children
-    }
-    else {
-      // Only the last child matters
-      return this.children[this.children.length - 1].getFullHeight();
-      /*for(let i = 0; i < this.children.length; ++i) {
-        return this.ch
-      }*/
-  //  }
-    return this.getSize().h;
+  }
+
+  sortChildrenUsingPosition() {
+    this.children.sort(yPositionSort);
   }
 
   autoLayout() {
+    // Make sure everything is in the intended order
+    this.selected = false;
+    this.sortChildrenUsingPosition();
     // TODO: Sort array by position.y before doing anything
-    const BLOCK_SPACING_X = 300;
-    const BLOCK_SPACING_Y = 50;
 
+    let totalRecursiveDepthCount = 0;
     for(let i = 0; i < this.children.length; ++i) {
-      this.children[i].position.x = BLOCK_SPACING_X;
-      if(i == 0) {
-        this.children[i].position.y = BLOCK_SPACING_Y * i;
+      this.children[i].position.x = canvasStyle.blocks.margin.x;
+      this.children[i].position.y = canvasStyle.blocks.margin.y * i;
+      if(i > 0) {
+        totalRecursiveDepthCount += this.children[i - 1].getMaxRecursiveDepth();
       }
-      else {
-        this.children[i].position.y =  i * (BLOCK_SPACING_Y + this.children[i - 1].getFullHeight());
-      }
+
+      this.children[i].position.y = canvasStyle.blocks.margin.y * (i + totalRecursiveDepthCount);
       this.children[i].autoLayout();
     }
   }
@@ -240,7 +247,7 @@ class Block {
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
 
-    ctx.fillText(this.name,
+    ctx.fillText(this.name + "(" + (this.getMaxRecursiveDepth() + 1) + ")",
       position.x + size.w / 2,
       position.y + size.h / 2, size.w);
 
