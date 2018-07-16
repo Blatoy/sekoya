@@ -42,6 +42,13 @@ body {
 }
 
 #tab-list {
+  display: inline-block;
+  height: 25px;
+  max-width: calc(100% - 40px);
+  overflow: hidden;
+}
+
+#tab-list-container {
   float: right;
   display: inline-block;
   width: calc(100% - 251px);
@@ -49,17 +56,22 @@ body {
   border-bottom: 1px solid lightgray;
 }
 
-.tab-element {
+.tab-element, #new-tab {
   display: inline-block;
   font-size: 0.8em;
   height: 25px;
   line-height: calc(25px);
-  width: 100px;
+  min-width: 100px;
   overflow: hidden;
   border-right: 1px solid lightgray;
   text-align: center;
   cursor: pointer;
   color: gray;
+}
+
+#new-tab {
+  min-width: 30px;
+  width: 30px;
 }
 
 .tab-selected {
@@ -70,6 +82,7 @@ body {
 main {
   float: right;
   display: inline-block;
+  overflow: hidden;
   width: calc(100% - 251px);
   height: calc(100vh - 26px);
 }

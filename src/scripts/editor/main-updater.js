@@ -1,14 +1,14 @@
 const config = require(basePath + '/config/general.json');
 const actionHandler = require(basePath + "/src/scripts/utils/action-handler.js");
 const canvasStyle = require(basePath + '/src/scripts/utils/theme-loader.js').canvasStyle;
+const dataManager = require(basePath + '/src/scripts/editor/data-manager.js');
 
 let selectedBlock = false;
 let hoveredBlock = false;
 let linkingBlock = false;
-let blocks = require(basePath + '/src/scripts/editor/data-manager.js').getBlocks();
-
 
 actionHandler.addAction("auto block layout", () => {
+  let blocks = dataManager.getBlocks();
   for(let i = 0; i < blocks.length; ++i) {
     blocks[i].selected = false;
     blocks[i].position.x = canvasStyle.blocks.rootPosition.x;
@@ -18,6 +18,7 @@ actionHandler.addAction("auto block layout", () => {
 });
 
 actionHandler.addAction("cancel block linking", () => {
+  let blocks = dataManager.getBlocks();
   if(linkingBlock) {
     linkingBlock.linkingType = 0;
     linkingBlock = false;
@@ -25,6 +26,7 @@ actionHandler.addAction("cancel block linking", () => {
 });
 
 actionHandler.addAction("delete selected block and children", () => {
+  let blocks = dataManager.getBlocks();
   if(hoveredBlock && hoveredBlock.type !== "root") {
     if(hoveredBlock.parent) {
       hoveredBlock.destroy();
@@ -38,6 +40,7 @@ actionHandler.addAction("delete selected block and children", () => {
 });
 
 actionHandler.addAction("delete selected block", () => {
+  let blocks = dataManager.getBlocks();
   if(hoveredBlock && hoveredBlock.type !== "root") {
     // If the items has no parent, delete cannot delete it
     if(!hoveredBlock.delete(blocks)) {
@@ -47,7 +50,20 @@ actionHandler.addAction("delete selected block", () => {
   }
 });
 
+let currentTab = dataManager.getCurrentTab();
+
 function update() {
+  let blocks = dataManager.getBlocks();
+  // List of things to reset on tab change
+  if(currentTab != dataManager.getCurrentTab()) {
+    if(linkingBlock) {
+      linkingBlock.linkingType = 0;
+    }
+    selectedBlock = false;
+    hoveredBlock = false;
+    linkingBlock = false;
+    currentTab = dataManager.getCurrentTab();
+  }
   document.getElementById("main-canvas").style.cursor = "default";
 
   // Check for mouse over blocks

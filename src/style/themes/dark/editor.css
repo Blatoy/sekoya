@@ -17,13 +17,13 @@
     background: transparent;  /* optional: just make scrollbar invisible */
 }
 
-#tab-list {
+#tab-list-container {
   background-color: #21252B;
   color: #D7DAE0;
   border-bottom: 1px solid black;
 }
 
-.tab-element {
+.tab-element, #new-tab {
   border-right: 1px solid black;
 }
 
