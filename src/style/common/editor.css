@@ -86,3 +86,67 @@ main {
   width: calc(100% - 251px);
   height: calc(100vh - 26px);
 }
+
+#quick-access-bar-background {
+  cursor: pointer;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+#quick-access-bar-container {
+  cursor: default;
+  padding: 10px;
+  position: fixed;
+  top: 10%;
+  left: 33%;
+  right: 33%;
+  background-color: white;
+  border-radius: 1px;
+  border: 1px solid lightgray;
+}
+
+#quick-access-bar-input {
+  display: block;
+  margin-top: 10px;
+  width: calc(100% - 10px);
+  padding: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  box-sizing: border-box;
+}
+
+#quick-access-bar-results {
+  margin-top: 20px;
+  max-height: 300px;
+  overflow-x: auto;
+}
+
+.quick-access-bar-result {
+  box-sizing: border-box;
+  border-radius: 1px;
+  width: calc(100% - 10px);
+  padding: 5px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border: 1px solid #aaa;
+  border-top: none;
+  background-color: #eee;
+  cursor: pointer;
+}
+
+.quick-access-bar-result:hover, .quick-access-bar-result .selected {
+  background-color: lightgray;
+}
+
+.quick-access-bar-result:first-child {
+  border-top: 1px solid #aaa;
+}
+
+.quick-access-bar-result-character-match {
+  font-weight: bold;
+/*  color: #61AFEF;*/
+}

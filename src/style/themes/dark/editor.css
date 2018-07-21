@@ -31,3 +31,50 @@
   color: white;
   background-color: #282C34;
 }
+
+#quick-access-bar-background {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#quick-access-bar-container {
+  color: white;
+  background-color: #252830;
+  border: 1px solid #222;
+}
+
+#quick-access-bar-input {
+  border: none;
+  background-color: #111;
+  color: white;
+}
+
+#quick-access-bar-results {
+
+}
+
+.quick-access-bar-result {
+  box-sizing: border-box;
+  border-radius: 1px;
+  width: calc(100% - 10px);
+  padding: 5px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border: 1px solid #111;
+  border-top: none;
+  background-color: #21252B;
+  cursor: pointer;
+}
+
+.quick-access-bar-result:hover, .quick-access-bar-result.selected {
+  background-color: #3E4551;
+}
+
+.quick-access-bar-result:first-child {
+  border-top: 1px solid #111;
+}
+
+.quick-access-bar-result-character-match {
+  font-weight: bold;
+  color: #759EF2;
+/*  color: #61AFEF;*/
+}

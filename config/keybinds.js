@@ -18,42 +18,42 @@
 // Escape         => cancel block linking
 
 module.exports = [{
-    key: 'z',
+    key: 'KeyZ',
     ctrl: true,
     alt: false,
     shift: false,
     action: "undo"
   },
   {
-    key: 'y',
+    key: 'KeyY',
     ctrl: true,
     alt: false,
     shift: false,
     action: "redo"
   },
   {
-    key: 's',
+    key: 'KeyS',
     ctrl: true,
     alt: false,
     shift: false,
     action: "save"
   },
   {
-    key: 'r',
+    key: 'KeyR',
     ctrl: false,
     alt: false,
     shift: false,
     action: "auto block layout"
   },
   {
-    key: 't',
+    key: 'KeyT',
     ctrl: true,
     alt: false,
     shift: false,
     action: "open new tab"
   },
   {
-    key: 'w',
+    key: 'KeyW',
     ctrl: true,
     alt: false,
     shift: false,
@@ -100,5 +100,89 @@ module.exports = [{
     alt: false,
     shift: false,
     action: "cancel block linking"
+  },
+  {
+    key: 'KeyP',
+    ctrl: true,
+    alt: false,
+    shift: true,
+    action: "quick access bar display"
+  },
+  {
+    key: 'Enter',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "quick access bar add linked block"
+  },
+  {
+    key: 'Enter',
+    ctrl: false,
+    alt: false,
+    shift: true,
+    action: "quick access bar add linked else block"
+  },
+  {
+    key: 'Enter',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "quick access bar add block"
+  },
+  {
+    key: 'Enter',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "quick access bar select action"
+  },
+  {
+    key: 'Escape',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "quick access bar hide"
+  },
+  {
+    key: 'ArrowUp',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "quick access bar previous result"
+  },
+  {
+    key: 'ArrowDown',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "quick access bar next result"
+  },
+  {
+    key: 'ArrowDown',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "block select down"
+  },
+  {
+    key: 'ArrowUp',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "block select up"
+  },
+  {
+    key: 'ArrowLeft',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "block select parent"
+  },
+  {
+    key: 'ArrowRight',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "block select child"
   }
 ];

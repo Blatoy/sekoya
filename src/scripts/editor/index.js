@@ -13,6 +13,7 @@ require(basePath + '/src/scripts/utils/theme-loader.js');
 require(basePath + '/src/scripts/editor/menu.js').setMenu();
 require(basePath + '/src/scripts/editor/menu-block-loader.js').load();
 require(basePath + '/src/scripts/editor/mouse-handler.js');
+require(basePath + '/src/scripts/editor/quick-access-bar.js');
 
 // Make sure the canvas is always using max space, called on resize
 function setCanvasSize() {

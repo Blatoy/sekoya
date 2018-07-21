@@ -21,6 +21,7 @@ class Block {
     this.properties = properties;
     this.children = children;
     this.parent = parent;
+    this.lastSelected = false;
     this.selected = selected;
     this._isMouseOver = false;
     this.linkingType = 0;
@@ -120,6 +121,10 @@ class Block {
     }
   }
 
+  getName() {
+    return this.name;
+  }
+
   getBlockAtMousePos(mousePos) {
     this._isMouseOver = false;
     // Give priority to the deepest child
@@ -175,13 +180,15 @@ class Block {
     ctx.strokeStyle = canvasStyle.connections.colour;
     ctx.lineWidth = canvasStyle.connections.lineWidth;
 
+    ctx.setLineDash([]);
+
     if (this.type == "root") {
       ctx.beginPath();
       ctx.moveTo(0, position.y + size.h / 2);
       ctx.lineTo(position.x, position.y + size.h / 2);
       ctx.stroke();
     }
-
+    // TODO: Handle linking type
     if(this.linkingType != 0) {
       ctx.beginPath();
       // Block end
@@ -229,7 +236,14 @@ class Block {
       size.h
     );
 
-    if(this._isMouseOver) {
+    if(this.lastSelected) {
+      ctx.strokeStyle = canvasStyle.blocks.colours[this.type];
+      ctx.setLineDash([10]);
+      ctx.lineDashOffset = tick / 5;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(position.x - 1, position.y -1, size.w + 2, size.h + 2);
+    }
+    else if(this._isMouseOver) {
       ctx.fillRect(position.x - 2, position.y - 2, size.w + 4, size.h + 4);
     }
 
@@ -247,7 +261,7 @@ class Block {
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
 
-    ctx.fillText(this.name + "(" + (this.getMaxRecursiveDepth() + 1) + ")",
+    ctx.fillText(this.name/* + "(" + (this.getMaxRecursiveDepth() + 1) + ")"*/,
       position.x + size.w / 2,
       position.y + size.h / 2, size.w);
 

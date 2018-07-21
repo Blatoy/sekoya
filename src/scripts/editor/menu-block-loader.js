@@ -7,6 +7,10 @@ const canvasStyle = require(basePath + '/src/scripts/utils/theme-loader.js').can
 
 let blockDefinitionList = {};
 
+module.exports.getBlockDefinitionList = () => {
+  return blockDefinitionList;
+};
+
 module.exports.load = function() {
   // Get file specified in the settings
   fs.readFile(basePath + '/block-definitions/' + config.blockDefinitionFile, 'utf-8', function(err, xml) {
