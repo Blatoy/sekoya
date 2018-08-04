@@ -36,6 +36,9 @@ module.exports.addEditorEvents = () => {
     actionHandler.handleKeyUp(e);
   });
 
+  window.addEventListener("wheel", (e) => {
+    camera.onScroll(e.deltaX, e.deltaY, e.ctrlKey);
+  });
 
   window.addEventListener("resize", (e) => {
     setCanvasSize();

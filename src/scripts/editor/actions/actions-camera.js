@@ -28,7 +28,7 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction("camera: reset zoom", () => {
-    camera.resetPosition();
+    camera.resetZoom();
   });
 };
 
