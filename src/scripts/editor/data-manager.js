@@ -12,28 +12,6 @@ const root = new Block("root", "root", {
 let blocks = [];
 let historyStack = [];
 
-// Tab list
-let tabs = [];
-
-function updateTabListView() {
-  let tabListDiv = document.getElementById("tab-list");
-  tabListDiv.innerHTML = "";
-  for (let i = 0; i < tabs.length; ++i) {
-    let tabElement = document.createElement("span");
-    tabElement.classList.add("tab-element");
-
-    if (tabs[i].selected) {
-      tabElement.classList.add("tab-selected");
-    }
-
-    tabElement.textContent = tabs[i].name;
-    tabElement.onclick = (e) => {
-      // TODO: switch button and edit/close
-      selectTab(i);
-    };
-    tabListDiv.appendChild(tabElement);
-  }
-}
 
 function selectTab(index) {
   // Allow cycling using switchTab
@@ -122,22 +100,6 @@ module.exports.getBlocks = () => {
 }
 
 module.exports.addTab = addTab;
-
-actionHandler.addAction("open new tab", () => {
-  addTab("untitled" + tabs.length + ".xml", [], true);
-});
-
-actionHandler.addAction("close current tab", () => {
-  closeTab(tabs.indexOf(getCurrentTab()));
-});
-
-actionHandler.addAction("switch to next tab", () => {
-  switchTab();
-});
-
-actionHandler.addAction("switch to previous tab", () => {
-  switchTab(true);
-});
 
 document.getElementById("new-tab").onclick = () => {
   addTab("untitled" + tabs.length + ".xml", [], true);

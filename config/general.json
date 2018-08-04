@@ -1,8 +1,30 @@
 {
-  "theme": "dark",
-  "blockDefinitionFile": "awesomenauts.xml",
-  "connectionsTypes": ["normal", "else"],
-  "conditionsTypes": ["conditions", "root"],
-  "actionsName": "actions",
-  "playFrenchSoundOnError": false
+  "//": "Name of the theme located in themes, uses default values if not found",
+    "theme": "dark",
+  "//": "Filename of the file to use in block-definitions",
+    "blockDefinitionFile": "awesomenauts.xml",
+  "//" : "name of the block to create followed by the block type it can be attached to. Use an empty array for no blocks. First one is the default one for some actions and must be connectable to root",
+    "connectionsTypes": [
+      {"name": "normal", "linkableTo": ["conditions", "root"]},
+      {"name": "else", "linkableTo": ["conditions"]},
+      {"name": "or", "linkableTo":  ["logic"]}
+    ],
+  "//" : "Used when loading a block to set a default value when it's not specified in the definition. You can add custom ones. If missing, empty string is set a default",
+    "defaultEmptyValues": {
+      "float": 0,
+      "number": 0,
+      "int": 0,
+      "short": 0,
+      "long": 0,
+      "double": 0.0,
+      "bool": 0,
+      "boolean": 0,
+      "string": "",
+      "text": "",
+      "char": ""
+    },
+  "//": "This allows to automatically add an attribute with a custom name that will be used for comments. Leave empty for none",
+    "commentAttributeName": "Comment",
+  "//" : "Do not enable if you don't want to get scare in case of an AI editor fatal error",
+    "playFrenchSoundOnError": false
 }

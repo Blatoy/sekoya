@@ -1,0 +1,37 @@
+{
+  "all": {
+    "rootPosition": {
+      "x": 15,
+      "y": 15
+    },
+    "color": "#666",
+    "size": {
+      "width": 225,
+      "height": 30
+    },
+    "margin": {
+      "x": 300,
+      "y": 50
+    },
+    "font": {
+      "size": 14,
+      "family": "Trebuchet MS, Helvetica, sans-serif"
+    },
+    "border": {},
+    "selectedBorder": {
+      "dashInterval": 10,
+      "width": 3,
+      "padding": 1,
+      "speedDivider": 5
+    }
+  },
+  "root": {
+    "color": "#61AFEF"
+  },
+  "condition": {
+    "color": "#98C379"
+  },
+  "action": {
+    "color": "#ABB2BF"
+  }
+}

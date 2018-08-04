@@ -42,6 +42,7 @@ body {
 }
 
 #tab-list {
+  margin-left: -5px;
   display: inline-block;
   height: 25px;
   max-width: calc(100% - 40px);
@@ -62,11 +63,26 @@ body {
   height: 25px;
   line-height: calc(25px);
   min-width: 100px;
-  overflow: hidden;
+  max-width: 250px;
+  overflow-x: hidden;
   border-right: 1px solid lightgray;
   text-align: center;
   cursor: pointer;
   color: gray;
+}
+
+.tab-element {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.tab-input {
+  outline: none;
+  border: none;
+  background-color: transparent;
+  /*height: 100%;*/
+  width: 90px;
+  padding-left: 10px;
 }
 
 #new-tab {

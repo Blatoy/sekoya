@@ -1,0 +1,24 @@
+{
+  "all": {
+    "lineWidth": 2,
+    "color": "black",
+    "dashInterval": 0,
+    "baseLength": 40
+  },
+  "normal": {
+    "lineWidth": 2,
+    "color": "black",
+    "dashInterval": 0
+  },
+  "else": {
+    "lineWidth": 2,
+    "color": "#D3D3D3",
+    "dashInterval": 0,
+    "baseLength": 50
+  },
+  "or": {
+    "lineWidth": 2,
+    "color": "#D3D3D3",
+    "dashInterval": 4
+  }
+}

@@ -1,6 +1,6 @@
-{
+/*{
   "connections": {
-    "colour": "black",
+    "colour": "white",
     "lineWidth": 1,
     "baseLength": 50
   },
@@ -28,3 +28,4 @@
     }
   }
 }
+*/

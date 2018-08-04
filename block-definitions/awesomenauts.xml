@@ -5,14 +5,14 @@
   <predefined_values id="alignmentToCharacterHorizontal">
     <value>Left</value>
     <value>Right</value>
-	<value>FacingDirection</value>
-	<value>Centre</value>
+    <value>FacingDirection</value>
+    <value>Centre</value>
   </predefined_values>
 
   <predefined_values id="alignmentToCharacterVertical">
     <value>Top</value>
     <value>Bottom</value>
-	<value>Centre</value>
+    <value>Centre</value>
   </predefined_values>
 
   <predefined_values id="animationLocation">
@@ -39,55 +39,55 @@
   </predefined_values>
 
   <predefined_values id="actionButtons">
-	<value>ABT_NONE</value>
-	<value>ABT_BACK</value>
-	<value>ABT_START</value>
-	<value>ABT_CONFIRM</value>
-	<value>ABT_CANCEL</value>
-	<value>ABT_SHOULDER_LEFT</value>
-	<value>ABT_SHOULDER_RIGHT</value>
-	<value>ABT_TRIGGER_LEFT</value>
-	<value>ABT_TRIGGER_RIGHT</value>
-	<value>ABT_UP</value>
-	<value>ABT_DOWN</value>
-	<value>ABT_LEFT</value>
-	<value>ABT_RIGHT</value>
-	<value>ABT_FACE_TOP</value>
-	<value>ABT_FACE_BOTTOM</value>
-	<value>ABT_FACE_LEFT</value>
-	<value>ABT_FACE_RIGHT</value>
-	<value>ABT_UP_2</value>
-	<value>ABT_DOWN_2</value>
-	<value>ABT_LEFT_2</value>
-	<value>ABT_RIGHT_2</value>
-	<value>ABT_DOWNJUMP</value>
-	<value>ABT_TOGGLE_JUMP_SKILL</value>
-	<value>ABT_GAME_COMMAND_UP</value>
-	<value>ABT_GAME_COMMAND_RIGHT</value>
-	<value>ABT_GAME_COMMAND_DOWN</value>
-	<value>ABT_GAME_COMMAND_LEFT</value>
-	<value>ABT_HELP</value>
-	<value>ABT_OPEN_PAUSE_MENU</value>
-	<value>ABT_CLOSE_PAUSE_MENU</value>
-	<value>ABT_OPEN_SHOP</value>
-	<value>ABT_CLOSE_SHOP</value>
-	<value>ABT_TOGGLE_SCOREBOARD</value>
-	<value>ABT_OPEN_CHAT</value>
-	<value>ABT_SHOW_PROFILE</value>
-	<value>ABT_MUTE_PLAYER</value>
+    <value>ABT_NONE</value>
+    <value>ABT_BACK</value>
+    <value>ABT_START</value>
+    <value>ABT_CONFIRM</value>
+    <value>ABT_CANCEL</value>
+    <value>ABT_SHOULDER_LEFT</value>
+    <value>ABT_SHOULDER_RIGHT</value>
+    <value>ABT_TRIGGER_LEFT</value>
+    <value>ABT_TRIGGER_RIGHT</value>
+    <value>ABT_UP</value>
+    <value>ABT_DOWN</value>
+    <value>ABT_LEFT</value>
+    <value>ABT_RIGHT</value>
+    <value>ABT_FACE_TOP</value>
+    <value>ABT_FACE_BOTTOM</value>
+    <value>ABT_FACE_LEFT</value>
+    <value>ABT_FACE_RIGHT</value>
+    <value>ABT_UP_2</value>
+    <value>ABT_DOWN_2</value>
+    <value>ABT_LEFT_2</value>
+    <value>ABT_RIGHT_2</value>
+    <value>ABT_DOWNJUMP</value>
+    <value>ABT_TOGGLE_JUMP_SKILL</value>
+    <value>ABT_GAME_COMMAND_UP</value>
+    <value>ABT_GAME_COMMAND_RIGHT</value>
+    <value>ABT_GAME_COMMAND_DOWN</value>
+    <value>ABT_GAME_COMMAND_LEFT</value>
+    <value>ABT_HELP</value>
+    <value>ABT_OPEN_PAUSE_MENU</value>
+    <value>ABT_CLOSE_PAUSE_MENU</value>
+    <value>ABT_OPEN_SHOP</value>
+    <value>ABT_CLOSE_SHOP</value>
+    <value>ABT_TOGGLE_SCOREBOARD</value>
+    <value>ABT_OPEN_CHAT</value>
+    <value>ABT_SHOW_PROFILE</value>
+    <value>ABT_MUTE_PLAYER</value>
   </predefined_values>
 
   <predefined_values id="characterVariables">
-	<value>character.width</value>
-	<value>character.height</value>
-	<value>character.position.x</value>
-	<value>character.position.y</value>
-	<value>character.maxHealth</value>
-	<value>target.width</value>
-	<value>target.height</value>
-	<value>target.position.x</value>
-	<value>target.position.y</value>
-	<value>target.maxHealth</value>
+    <value>character.width</value>
+    <value>character.height</value>
+    <value>character.position.x</value>
+    <value>character.position.y</value>
+    <value>character.maxHealth</value>
+    <value>target.width</value>
+    <value>target.height</value>
+    <value>target.position.x</value>
+    <value>target.position.y</value>
+    <value>target.maxHealth</value>
   </predefined_values>
 
   <predefined_values id="collison groups">
@@ -115,9 +115,9 @@
     <value>CREEP</value>
     <value>TURRET</value>
     <value>BASE</value>
-	<value>WORM</value>
-	<value>DAMAGE_AREA</value>
-	<value>ANY</value>
+    <value>WORM</value>
+    <value>DAMAGE_AREA</value>
+    <value>ANY</value>
   </predefined_values>
 
   <predefined_values id="goldPickupType">
@@ -159,7 +159,7 @@
   <predefined_values id="target relatives">
     <value>TARGET_IS_UNRELATED</value>
     <value>TARGET_IS_PARENT</value>
-	<value>TARGET_IS_CHILD</value>
+    <value>TARGET_IS_CHILD</value>
   </predefined_values>
 
   <predefined_values id="directions">
@@ -219,7 +219,7 @@
     <value>NEUTRAL_TEAM</value>
     <value>ZERO_TEAM</value>
     <value>ONE_TEAM</value>
-	<value>ANY_TEAM</value>
+    <value>ANY_TEAM</value>
   </predefined_values>
 
   <predefined_values id="timeunits">
@@ -239,7 +239,7 @@
     <value>target</value>
   </predefined_values>
 
- <predefined_values id="flagtoggle">
+  <predefined_values id="flagtoggle">
     <value>no</value>
     <value>yes</value>
     <value>toggle</value>
@@ -251,13 +251,13 @@
     <value>CREEPKILLS</value>
   </predefined_values>
 
-	<predefined_values id="valuecompare">
-		<value>less</value>
-		<value>less or equal</value>
-		<value>equal</value>
-		<value>greater or equal</value>
-		<value>greater</value>
-	</predefined_values>
+  <predefined_values id="valuecompare">
+    <value>less</value>
+    <value>less or equal</value>
+    <value>equal</value>
+    <value>greater or equal</value>
+    <value>greater</value>
+  </predefined_values>
 
   <predefined_values id="valuecompare2">
     <value>less</value>
@@ -287,10 +287,10 @@
     <value>health</value>
     <value>health percentage</value>
     <value>gold</value>
-	<value>gold_total_earned</value>
+    <value>gold_total_earned</value>
     <value>AI skill</value>
-	<value>health minus dot</value>
-	<value>health minus dot percentage</value>
+    <value>health minus dot</value>
+    <value>health minus dot percentage</value>
   </predefined_values>
 
   <predefined_values id="targetvalues">
@@ -308,8 +308,8 @@
     <value>TOP FRONT</value>
     <value>BOTTOM BACK</value>
     <value>BOTTOM FRONT</value>
-	<value>BACK</value>
-	<value>FRONT</value>
+    <value>BACK</value>
+    <value>FRONT</value>
   </predefined_values>
 
   <predefined_values id="emitvalues">
@@ -323,25 +323,25 @@
     <value>isStunned</value>
     <value>isBlinded</value>
     <value>isSlowed</value>
-	<value>isSnared</value>
+    <value>isSnared</value>
     <value>isUnderAnyEffect</value>
-	<value>isStealth</value>
-	<value>isChained</value>
-	<value>hasDotEffect</value>
-	<value>isOutofCombat</value>
-	<value>ignoresCharacterCollision</value>
-	<value>isUnderStealthRevealingEffect</value>
+    <value>isStealth</value>
+    <value>isChained</value>
+    <value>hasDotEffect</value>
+    <value>isOutofCombat</value>
+    <value>ignoresCharacterCollision</value>
+    <value>isUnderStealthRevealingEffect</value>
   </predefined_values>
 
   <predefined_values id="variableTypes">
-	<value>bool</value>
-	<value>int</value>
-	<value>float</value>
+    <value>bool</value>
+    <value>int</value>
+    <value>float</value>
   </predefined_values>
 
-  <actions>
+  <action>
 
-	<action name="addAmmo">
+    <action name="addAmmo">
       <int name="amount"/>
       <string name="ammoSettingsIdentifier"/>
     </action>
@@ -352,10 +352,10 @@
       <string name="adjust method" values="valueadjust" defaultvalue="set"/>
     </action>
 
-	<action name="adjustAIVariable">
-	  <string name="example character variables" values="characterVariables"/>
-	  <string name="variable type" values="variableTypes" defaultvalue="float"/>
-	  <string name="variable"/>
+    <action name="adjustAIVariable">
+      <string name="example character variables" values="characterVariables"/>
+      <string name="variable type" values="variableTypes" defaultvalue="float"/>
+      <string name="variable"/>
       <string name="value"/>
       <string name="adjust method" values="valueadjust" defaultvalue="set"/>
     </action>
@@ -373,17 +373,17 @@
     </action>
 
     <action name="aimStickAtTarget">
-      <float name="duration seconds" />
+      <float name="duration seconds"/>
       <string name="only aim when needed" values="yesno" defaultvalue="no"/>
-	  <string name="use rotation speed limits" values="yesno" defaultvalue="no" shortName="use limits" />
-	  <float name="min rotation speed per second in degrees" shortName="min speed" />
-	  <float name="max rotation speed per second in degrees" shortName="max speed" />
-	  <float name="use min rotation speed when angle to target under" shortName="min to target under" />
-	  <float name="use max rotation speed when angle to target over" shortName="max to target over" />
+      <string name="use rotation speed limits" values="yesno" defaultvalue="no" shortName="use limits"/>
+      <float name="min rotation speed per second in degrees" shortName="min speed"/>
+      <float name="max rotation speed per second in degrees" shortName="max speed"/>
+      <float name="use min rotation speed when angle to target under" shortName="min to target under"/>
+      <float name="use max rotation speed when angle to target over" shortName="max to target over"/>
     </action>
 
     <action name="buyUpgrade">
-      <string name="upgrade name" shortName="upgrade" />
+      <string name="upgrade name" shortName="upgrade"/>
     </action>
 
     <action name="completeMission">
@@ -393,18 +393,18 @@
     <action name="emitMessageInArea">
       <string name="id"/>
       <string name="receive groups" values="target receive groups" multiselect="true"/>
-	  <string name="receive relatives" values="target relatives" multiselect="true"/>
+      <string name="receive relatives" values="target relatives" multiselect="true"/>
       <string name="teams" values="teamswithtarget" multiselect="true"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
       <string name="width"/>
       <string name="height"/>
-	  <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
-	  <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
-	  <string name="debugAreaColour" defaultvalue="255 0 0 51"/>
-	  <string name="ignore invisibility" values="yesno" defaultvalue="yes"/>
-	  <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
-	  <string name="check line of sight" values="yesno" defaultvalue="no"/>
+      <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
+      <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
+      <string name="debugAreaColour" defaultvalue="255 0 0 51"/>
+      <string name="ignore invisibility" values="yesno" defaultvalue="yes"/>
+      <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
+      <string name="check line of sight" values="yesno" defaultvalue="no"/>
     </action>
 
     <action name="emitTargetInArea">
@@ -414,21 +414,21 @@
       <float name="yOffset"/>
       <string name="width"/>
       <string name="height"/>
-	  <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
-	  <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
-	  <string name="debugAreaColour" defaultvalue="0 255 0 51"/>
+      <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
+      <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
+      <string name="debugAreaColour" defaultvalue="0 255 0 51"/>
     </action>
 
     <action name="enableUpgrade">
       <string name="condition" values="yesno" defaultvalue="yes"/>
-      <string name="upgrade name" shortName="upgrade" />
+      <string name="upgrade name" shortName="upgrade"/>
     </action>
 
     <action name="executeBehaviourTree">
-      <string name="fileName" shortName="file" />
+      <string name="fileName" shortName="file"/>
     </action>
 
-	<action name="generateLoadout">
+    <action name="generateLoadout">
       <string name="isTutorial" values="yesno" defaultvalue="no"/>
       <string name="className" defaultvalue="cowboy"/>
     </action>
@@ -442,7 +442,7 @@
       <string name="shouldLock" values="yesno" defaultvalue="no"/>
     </action>
 
-	<action name="lockPlayerInputSpecificButtons">
+    <action name="lockPlayerInputSpecificButtons">
       <string name="shouldLock" values="yesno" defaultvalue="no"/>
       <string name="buttons to (un)lock" values="actionButtons" multiselect="true"/>
     </action>
@@ -453,14 +453,14 @@
       <string name="bool"/>
     </action>
 
-	<action name="logMetric">
+    <action name="logMetric">
       <string name="MetricIdentifier"/>
-	  <string name="AdditionalKeyValuePairsString"/>
-	  <string name="AdditionalKeyValuePairsInt"/>
-	  <string name="AdditionalKeyValuePairsBool"/>
-	  <string name="AdditionalKeyValuePairsFloat"/>
-	  <string name="addReplayID" values="yesno" defaultvalue="yes"/>
-	  <string name="countersToAdd" defaultvalue=""/>
+      <string name="AdditionalKeyValuePairsString"/>
+      <string name="AdditionalKeyValuePairsInt"/>
+      <string name="AdditionalKeyValuePairsBool"/>
+      <string name="AdditionalKeyValuePairsFloat"/>
+      <string name="addReplayID" values="yesno" defaultvalue="yes"/>
+      <string name="countersToAdd" defaultvalue=""/>
     </action>
 
     <action name="missionGetScore">
@@ -473,7 +473,7 @@
       <string name="endOnButtonPress" values="yesno" defaultvalue="yes"/>
       <string name="endOnAnimationFinished" values="yesno" defaultvalue="no"/>
       <string name="endOnTimeElapsed" values="yesno" defaultvalue="no"/>
-	  <float name="endOnTimeElapsedTime"/>
+      <float name="endOnTimeElapsedTime"/>
       <string name="animationName"/>
       <string name="loopAnimation" values="yesno" defaultvalue="no"/>
       <float name="animationXPosition"/>
@@ -486,7 +486,7 @@
     <action name="playAnimation">
       <string name="animationName"/>
       <string name="location" values="animationLocation" defaultvalue="HUD"/>
-	  <string name="dummyToFollow"/>
+      <string name="dummyToFollow"/>
       <float name="xPosition"/>
       <float name="yPosition"/>
       <float name="xHudOnlyAnchorPosition"/>
@@ -495,8 +495,8 @@
       <float name="depth"/>
       <string name="mirrorX" values="yesno" defaultvalue="no"/>
       <string name="team" values="teams" defaultvalue="OWN_TEAM"/>
-	  <string name="addOverlayPrefix" values="yesno" defaultvalue="no"/>
-	  <string name="allowRotating" values="yesno" defaultvalue="yes"/>
+      <string name="addOverlayPrefix" values="yesno" defaultvalue="no"/>
+      <string name="allowRotating" values="yesno" defaultvalue="yes"/>
       <string name="textReplace1TextID"/>
       <string name="textReplace1Replacement"/>
       <string name="textReplace1ReplacementIsLocalizationID" values="yesno" defaultvalue="yes"/>
@@ -511,16 +511,16 @@
 
     <action name="playSound">
       <string name="soundGroup"/>
-	  <string name="forcePlay"/>
+      <string name="forcePlay"/>
     </action>
 
     <action name="pressButton">
-      <string name="button" values="buttons" defaultvalue = "FACE_BOTTOM"/>
+      <string name="button" values="buttons" defaultvalue="FACE_BOTTOM"/>
       <float name="duration in seconds"/>
     </action>
 
     <action name="pressStick">
-      <string name="direction" values="directions" defaultvalue ="UP"/>
+      <string name="direction" values="directions" defaultvalue="UP"/>
       <float name="duration in seconds"/>
     </action>
 
@@ -530,23 +530,20 @@
       <string name="high"/>
     </action>
 
-    <action name="receiveTarget">
-    </action>
+    <action name="receiveTarget"></action>
 
-    <action name="removeTarget">
-    </action>
+    <action name="removeTarget"></action>
 
-    <action name="resetMissionVariables">
-    </action>
+    <action name="resetMissionVariables"></action>
 
     <action name="selectDestWaypoint">
       <string name="name"/>
       <string name="team" values="ownenemy" defaultvalue="ENEMY_TEAM"/>
     </action>
 
-	<action name="selectLocalPlayerTarget">
-		<int name="localPlayerIndex" defaultvalue="0"/>
-	</action>
+    <action name="selectLocalPlayerTarget">
+      <int name="localPlayerIndex" defaultvalue="0"/>
+    </action>
 
     <action name="selectPingWaypoint">
       <string name="ping" values="ping" defaultvalue="ATTACK"/>
@@ -556,32 +553,31 @@
       <string name="groups to select" values="target groups" multiselect="true"/>
       <string name="teams" values="teams" multiselect="true"/>
       <string name="class"/>
-	  <string name="only check parent" values="yesno" defaultvalue="no"/>
+      <string name="only check parent" values="yesno" defaultvalue="no"/>
       <string name="remove if not found" values="yesno" defaultvalue="no"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
       <string name="width"/>
       <string name="height"/>
-	  <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
-	  <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
-	  <string name="debugAreaColour" defaultvalue="0 255 255 51"/>
-      <string name="compare method" values="valuecompare2" defaultvalue="greater or equal" shortName="compare" />
+      <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
+      <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
+      <string name="debugAreaColour" defaultvalue="0 255 255 51"/>
+      <string name="compare method" values="valuecompare2" defaultvalue="greater or equal" shortName="compare"/>
       <string name="health value"/>
       <string name="distance check" values="distance check" defaultvalue="NONE"/>
       <string name="check line of sight" values="yesno" defaultvalue="no"/>
       <string name="ignore invisibility" values="yesno" defaultvalue="no"/>
-	  <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
+      <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
     </action>
 
-    <action name="selectTargetWaypoint">
-    </action>
+    <action name="selectTargetWaypoint"></action>
 
     <action name="setBool">
       <string name="id"/>
       <string name="value" values="flagtoggle" defaultvalue="no"/>
     </action>
 
-	<action name="setLevelButton">
+    <action name="setLevelButton">
       <string name="button"/>
       <string name="down" values="yesno" defaultvalue="no"/>
     </action>
@@ -593,33 +589,33 @@
 
     <action name="spawnCharacter">
       <string name="className"/>
-	  <string name="aiFileName"/>
+      <string name="aiFileName"/>
       <string name="team" values="teamswithnumbers" defaultvalue="OWN_TEAM"/>
       <float name="count"/>
-	  <string name="spawnPositionNodeID"/>
-	  <float name="spawnPositionOffsetX"/>
-	  <float name="spawnPositionOffsetY"/>
+      <string name="spawnPositionNodeID"/>
+      <float name="spawnPositionOffsetX"/>
+      <float name="spawnPositionOffsetY"/>
     </action>
 
     <action name="startCameraSequence">
-	  <string name="areaNames"/>
-	  <string name="transitionTimes"/>
-	  <string name="holdTimes"/>
-	  <string name="cameraHeights"/>
-	</action>
+      <string name="areaNames"/>
+      <string name="transitionTimes"/>
+      <string name="holdTimes"/>
+      <string name="cameraHeights"/>
+    </action>
 
-	<action name="stopAnimation">
+    <action name="stopAnimation">
       <string name="animationName"/>
-	</action>
+    </action>
 
     <action name="stopSound">
       <string name="soundGroup"/>
     </action>
 
-	<action name="triggerSkill">
+    <action name="triggerSkill">
       <string name="skillSettingsIdentifier"/>
-	  <string name="skillActionButton" values="actionButtons" defaultvalue="ABT_NONE"/>
-	  <float name="triggerDuration"/>
+      <string name="skillActionButton" values="actionButtons" defaultvalue="ABT_NONE"/>
+      <float name="triggerDuration"/>
     </action>
 
     <action name="wait">
@@ -632,36 +628,35 @@
       <string name="texture"/>
       <float name="duration"/>
     </action>
-  </actions>
+  </action>
 
-  <conditions>
+  <condition>
 
     <condition name="areGoldCoinsInArea">
-      <string name="compare value" />
-      <string name="compare method" values="valuecompare" defaultvalue="greater or equal" shortName="compare" />
+      <string name="compare value"/>
+      <string name="compare method" values="valuecompare" defaultvalue="greater or equal" shortName="compare"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
       <string name="width"/>
       <string name="height"/>
-	  <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
-	  <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
-	  <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
+      <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
+      <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
+      <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
       <string name="check line of sight" values="yesno" defaultvalue="no"/>
     </condition>
 
-	<condition name="branch">
-	</condition>
+    <condition name="branch"></condition>
 
-    <conditions name="canPayUpgrade">
-      <string name="upgrade name" shortName="upgrade" />
-    </conditions>
+    <condition name="canPayUpgrade">
+      <string name="upgrade name" shortName="upgrade"/>
+    </condition>
 
-	<condition name="checkBaseHealth">
-		<string name="BaseTeam" values="ownenemy"/>
-		<string name="check health percentage" values="yesno" defaultvalue="yes"/>
-		<string name="comparison" values="valuecompare" defaultvalue="equal" shortName="compare" />
-		<string name="value"/>
-	</condition>
+    <condition name="checkBaseHealth">
+      <string name="BaseTeam" values="ownenemy"/>
+      <string name="check health percentage" values="yesno" defaultvalue="yes"/>
+      <string name="comparison" values="valuecompare" defaultvalue="equal" shortName="compare"/>
+      <string name="value"/>
+    </condition>
 
     <condition name="checkCharacterFlag">
       <string name="property" values="characterflags" defaultvalue="isUnderAnyEffect"/>
@@ -672,71 +667,71 @@
     <condition name="checkCharacterValue">
       <string name="property" values="charactervaluesCheckable" defaultvalue="health"/>
       <string name="value"/>
-      <string name="compare method" values="valuecompare" defaultvalue="equal" shortName="compare" />
+      <string name="compare method" values="valuecompare" defaultvalue="equal" shortName="compare"/>
       <string name="check on" values="targetself" defaultvalue="self"/>
     </condition>
 
-	<condition name="checkClass">
-		<string name="check on" values="targetself" defaultvalue="self"/>
-		<string name="class"/>
-	</condition>
+    <condition name="checkClass">
+      <string name="check on" values="targetself" defaultvalue="self"/>
+      <string name="class"/>
+    </condition>
 
     <condition name="checkCounter">
       <string name="id"/>
       <string name="value"/>
-      <string name="compare method" values="valuecompare" defaultvalue="equal" shortName="compare" />
+      <string name="compare method" values="valuecompare" defaultvalue="equal" shortName="compare"/>
     </condition>
 
     <condition name="checkGameTime">
       <float name="time in seconds"/>
-      <string name="compare method" values="valuecompare" defaultvalue="equal" shortName="compare" />
+      <string name="compare method" values="valuecompare" defaultvalue="equal" shortName="compare"/>
     </condition>
 
     <condition name="checkMissionCounter">
       <string name="id"/>
       <string name="value"/>
-      <string name="compare method" values="valuecompare" defaultvalue="equal" shortName="compare" />
+      <string name="compare method" values="valuecompare" defaultvalue="equal" shortName="compare"/>
     </condition>
 
-	<condition name="checkSkin">
-		<string name="check on" values="targetself" defaultvalue="self"/>
-		<string name="class"/>
-		<string name="skinIdentifier"/>
-	</condition>
+    <condition name="checkSkin">
+      <string name="check on" values="targetself" defaultvalue="self"/>
+      <string name="class"/>
+      <string name="skinIdentifier"/>
+    </condition>
 
-	<condition name="checkTurretArea">
-		<string name="minimum Count For Success"/>
-		<string name="result counter"/>
-		<string name="TurretLocations" values="TurretLocations" multiselect="true"/>
-		<string name="TurretTeams" values="ownenemy" multiselect="true"/>
-		<string name="Live Turrets Only" values="yesno" defaultvalue="yes"/>
+    <condition name="checkTurretArea">
+      <string name="minimum Count For Success"/>
+      <string name="result counter"/>
+      <string name="TurretLocations" values="TurretLocations" multiselect="true"/>
+      <string name="TurretTeams" values="ownenemy" multiselect="true"/>
+      <string name="Live Turrets Only" values="yesno" defaultvalue="yes"/>
 
-		<string name="surroundingGroups" values="target receive groups" multiselect="true"/>
-		<string name="surroundingTeams" values="ownenemy" multiselect="true"/>
-		<string name="surroundingClasses"/>
-		<string name="count characters out of combat" values="yesno" defaultvalue="yes" shortName="count out of combat" />
-		<string name="debugAreaColour" defaultvalue="153 255 76 51"/>
-		<string name="check line of sight" values="yesno" defaultvalue="no" />
-		<string name="ignore invisibility" values="yesno" defaultvalue="no"/>
-		<string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
-	</condition>
+      <string name="surroundingGroups" values="target receive groups" multiselect="true"/>
+      <string name="surroundingTeams" values="ownenemy" multiselect="true"/>
+      <string name="surroundingClasses"/>
+      <string name="count characters out of combat" values="yesno" defaultvalue="yes" shortName="count out of combat"/>
+      <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
+      <string name="check line of sight" values="yesno" defaultvalue="no"/>
+      <string name="ignore invisibility" values="yesno" defaultvalue="no"/>
+      <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
+    </condition>
 
-	<condition name="checkTurretHealth">
-		<string name="TurretLocation" values="TurretLocations"/>
-		<string name="TurretTeam" values="ownenemy"/>
-		<string name="check health percentage" values="yesno" defaultvalue="yes"/>
-		<string name="comparison" values="valuecompare" defaultvalue="equal" shortName="compare" />
-		<string name="value"/>
-	</condition>
+    <condition name="checkTurretHealth">
+      <string name="TurretLocation" values="TurretLocations"/>
+      <string name="TurretTeam" values="ownenemy"/>
+      <string name="check health percentage" values="yesno" defaultvalue="yes"/>
+      <string name="comparison" values="valuecompare" defaultvalue="equal" shortName="compare"/>
+      <string name="value"/>
+    </condition>
 
     <condition name="compareBools">
       <string name="id1"/>
       <string name="id2"/>
     </condition>
 
-	<condition name="compareCounters">
+    <condition name="compareCounters">
       <string name="counter1"/>
-	  <string name="comparison" values="valuecompare" defaultvalue="equal" shortName="compare" />
+      <string name="comparison" values="valuecompare" defaultvalue="equal" shortName="compare"/>
       <string name="counter2"/>
     </condition>
 
@@ -764,49 +759,47 @@
       <string name="value" values="yesno" defaultvalue="no"/>
     </condition>
 
-    <conditions name="hasDestWaypoint">
-    </conditions>
+    <condition name="hasDestWaypoint"></condition>
 
-    <conditions name="hasTarget">
+    <condition name="hasTarget">
       <string name="condition" values="yesno" defaultvalue="yes"/>
-    </conditions>
-
-	<conditions name="hasUpgrade">
-		<string name="class" />
-		<string name="team" values="teamswithnumbers" defaultvalue="OWN_TEAM" />
-		<string name="upgrade name" shortName="upgrade" />
-	</conditions>
-
-    <conditions name="isAtDestWaypoint">
-    </conditions>
-
-    <condition name="isButtonDown">
-      <string name="button" values="buttons" defaultvalue="FACE_BOTTOM" />
-      <string name="actionButton" values="actionButtons" defaultvalue="ABT_NONE" />
     </condition>
 
-    <conditions name="isCharacterInArea">
+    <condition name="hasUpgrade">
+      <string name="class"/>
+      <string name="team" values="teamswithnumbers" defaultvalue="OWN_TEAM"/>
+      <string name="upgrade name" shortName="upgrade"/>
+    </condition>
+
+    <condition name="isAtDestWaypoint"></condition>
+
+    <condition name="isButtonDown">
+      <string name="button" values="buttons" defaultvalue="FACE_BOTTOM"/>
+      <string name="actionButton" values="actionButtons" defaultvalue="ABT_NONE"/>
+    </condition>
+
+    <condition name="isCharacterInArea">
       <string name="groups" values="target receive groups" multiselect="true"/>
       <string name="teams" values="teams" multiselect="true"/>
       <string name="class"/>
-	  <string name="only check parent" values="yesno" defaultvalue="no"/>
-	  <string name="only check children" values="yesno" defaultvalue="no"/>
-	  <string name="count characters out of combat" values="yesno" defaultvalue="yes" shortName="count out of combat" />
+      <string name="only check parent" values="yesno" defaultvalue="no"/>
+      <string name="only check children" values="yesno" defaultvalue="no"/>
+      <string name="count characters out of combat" values="yesno" defaultvalue="yes" shortName="count out of combat"/>
       <string name="condition" values="charactervaluesCheckable" defaultvalue="health"/>
-      <string name="comparison" values="valuecompare" defaultvalue="greater or equal" shortName="compare" />
+      <string name="comparison" values="valuecompare" defaultvalue="greater or equal" shortName="compare"/>
       <string name="value"/>
       <string name="character minimum"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
       <string name="width"/>
       <string name="height"/>
-	  <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
-	  <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
-	  <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
-      <string name="check line of sight" values="yesno" defaultvalue="no" />
-	  <string name="ignore invisibility" values="yesno" defaultvalue="no"/>
-	  <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
-    </conditions>
+      <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
+      <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
+      <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
+      <string name="check line of sight" values="yesno" defaultvalue="no"/>
+      <string name="ignore invisibility" values="yesno" defaultvalue="no"/>
+      <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
+    </condition>
 
     <condition name="isCustomMatch"/>
 
@@ -818,45 +811,45 @@
     <condition name="isInArea">
       <string name="condition" values="yesno" defaultvalue="yes"/>
       <string name="collision groups" values="collison groups" multiselect="true"/>
-      <string name="check green obstacles only" values="yesno" defaultvalue="no" shortName="green obstacles only" />
-	  <string name="count characters out of combat" values="yesno" defaultvalue="yes" shortName="count out of combat" />
+      <string name="check green obstacles only" values="yesno" defaultvalue="no" shortName="green obstacles only"/>
+      <string name="count characters out of combat" values="yesno" defaultvalue="yes" shortName="count out of combat"/>
       <string name="teams" values="teams" multiselect="true"/>
       <string name="areaName" defaultvalue=""/>
       <float name="xOffset"/>
       <float name="yOffset"/>
       <string name="width"/>
       <string name="height"/>
-	  <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
-	  <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
-	  <string name="debugAreaColour" defaultvalue="255 255 255 51"/>
+      <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
+      <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
+      <string name="debugAreaColour" defaultvalue="255 255 255 51"/>
       <string name="check line of sight" values="yesno" defaultvalue="no"/>
       <string name="ignore invisibility" values="yesno" defaultvalue="no"/>
-	  <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
+      <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
     </condition>
 
     <condition name="isInNamedArea">
-      <string name="area name" />
-      <string name="team" values="ownenemy" defaultvalue="OWN_TEAM" />
-      <string name="who" values="targetself" defaultvalue="self" />
+      <string name="area name"/>
+      <string name="team" values="ownenemy" defaultvalue="OWN_TEAM"/>
+      <string name="who" values="targetself" defaultvalue="self"/>
     </condition>
 
-	<condition name="IsLevelButtonDown">
-		<string name="buttons"/>
-	</condition>
+    <condition name="IsLevelButtonDown">
+      <string name="buttons"/>
+    </condition>
 
-	<condition name="isMissionCompleted">
+    <condition name="isMissionCompleted">
       <string name="mission"/>
     </condition>
 
-    <conditions name="isNextWaypointInArea">
+    <condition name="isNextWaypointInArea">
       <float name="xOffset"/>
       <float name="yOffset"/>
       <string name="width"/>
       <string name="height"/>
-	  <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
-	  <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
-	  <string name="debugAreaColour" defaultvalue="255 255 127 255"/>
-    </conditions>
+      <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
+      <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
+      <string name="debugAreaColour" defaultvalue="255 255 127 255"/>
+    </condition>
 
     <condition name="isNextWaypointPosition">
       <string name="position" values="offsetposition" defaultvalue="back"/>
@@ -867,10 +860,10 @@
       <string name="direction" values="forwardbackward" defaultvalue="FORWARD"/>
     </condition>
 
-    <conditions name="isOnGround">
+    <condition name="isOnGround">
       <string name="condition" values="yesno" defaultvalue="yes"/>
       <string name="check on" values="targetself" defaultvalue="self"/>
-    </conditions>
+    </condition>
 
     <condition name="isOnlineMatch"/>
 
@@ -887,44 +880,44 @@
       <string name="button" values="buttons" defaultvalue="FACE_BOTTOM"/>
     </condition>
 
-	<condition name="isSlowWolfUnlocked"/>
+    <condition name="isSlowWolfUnlocked"/>
 
-    <conditions name="isTargetInArea">
+    <condition name="isTargetInArea">
       <string name="condition" values="yesno" defaultvalue="yes"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
       <string name="width"/>
       <string name="height"/>
-	  <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
-	  <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
-	  <string name="debugAreaColour" defaultvalue="0 0 255 51"/>
+      <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
+      <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
+      <string name="debugAreaColour" defaultvalue="0 0 255 51"/>
       <string name="check line of sight" values="yesno" defaultvalue="no"/>
       <string name="ignore invisibility" values="yesno" defaultvalue="no"/>
-	  <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
-    </conditions>
+      <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
+    </condition>
 
-	<conditions name="isTargetInSkillRange">
+    <condition name="isTargetInSkillRange">
       <string name="condition" values="yesno" defaultvalue="yes"/>
-	  <string name="skillSettingsIdentifier"/>
-	  <string name="skillActionButton" values="actionButtons" defaultvalue="ABT_NONE"/>
-	  <string name="rangeFractionToSucceed" defaultvalue="1"/>
-	  <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
+      <string name="skillSettingsIdentifier"/>
+      <string name="skillActionButton" values="actionButtons" defaultvalue="ABT_NONE"/>
+      <string name="rangeFractionToSucceed" defaultvalue="1"/>
+      <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
       <string name="check line of sight" values="yesno" defaultvalue="no"/>
       <string name="ignore invisibility" values="yesno" defaultvalue="no"/>
-	  <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
-    </conditions>
+      <string name="never detect invisible targets without character collision" values="yesno" defaultvalue="no" shortName="ignr invis no cllsn"/>
+    </condition>
 
-    <conditions name="isTargetPosition">
+    <condition name="isTargetPosition">
       <string name="condition" values="yesno" defaultvalue="yes"/>
       <string name="target position" values="offsetposition" defaultvalue="back"/>
-    </conditions>
+    </condition>
 
-    <conditions name="isTargetType">
+    <condition name="isTargetType">
       <string name="condition" values="yesno" defaultvalue="yes"/>
       <string name="target groups" values="target groups" multiselect="true"/>
-    </conditions>
+    </condition>
 
-    <conditions name="isTurretInArea">
+    <condition name="isTurretInArea">
       <string name="teams" values="teams" multiselect="true"/>
       <string name="health comparison" values="valuecompare" defaultvalue="less"/>
       <string name="health"/>
@@ -932,45 +925,43 @@
       <float name="yOffset"/>
       <string name="width"/>
       <string name="height"/>
-	  <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
-	  <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
-	  <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
+      <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
+      <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
+      <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
       <string name="check line of sight" values="yesno" defaultvalue="no"/>
-    </conditions>
+    </condition>
 
     <condition name="isTutorialMatch"/>
 
-    <conditions name="isUpgradeEnabled">
+    <condition name="isUpgradeEnabled">
       <string name="condition" values="yesno" defaultvalue="yes"/>
-      <string name="upgrade name" shortName="upgrade" />
-    </conditions>
-
-    <conditions name="once">
-    </conditions>
-
-	<condition name="onEffectivePrestigeLevel">
-      <string name="compare method" values="valuecompare" defaultvalue="less or equal" shortName="compare" />
-      <string name="value"/>
-	</condition>
-
-	<condition name="onGameStarted">
+      <string name="upgrade name" shortName="upgrade"/>
     </condition>
+
+    <condition name="once"></condition>
+
+    <condition name="onEffectivePrestigeLevel">
+      <string name="compare method" values="valuecompare" defaultvalue="less or equal" shortName="compare"/>
+      <string name="value"/>
+    </condition>
+
+    <condition name="onGameStarted"></condition>
 
     <condition name="onGoldCollected">
       <string name="collector" values="missionTarget" defaultvalue="SELF"/>
       <string name="team" values="teamswithnumbers" defaultvalue="OWN_TEAM"/>
       <string name="class"/>
       <string name="type" values="goldPickupType" defaultvalue="ANY"/>
-      <string name="compare method" values="valuecompare" defaultvalue="greater" shortName="compare" />
+      <string name="compare method" values="valuecompare" defaultvalue="greater" shortName="compare"/>
       <string name="value" defaultvalue="0"/>
       <string name="store in"/>
     </condition>
 
-	<condition name="onGoldSpent">
+    <condition name="onGoldSpent">
       <string name="spender" values="missionTarget" defaultvalue="SELF"/>
       <string name="team" values="teamswithnumbers" defaultvalue="OWN_TEAM"/>
       <string name="class"/>
-      <string name="compare method" values="valuecompare" defaultvalue="greater" shortName="compare" />
+      <string name="compare method" values="valuecompare" defaultvalue="greater" shortName="compare"/>
       <string name="value" defaultvalue="0"/>
       <string name="store in"/>
     </condition>
@@ -979,12 +970,12 @@
       <string name="killer" values="missionTarget" defaultvalue="SELF"/>
       <string name="killer team" values="teamswithnumbers" defaultvalue="OWN_TEAM"/>
       <string name="killer class"/>
-	  <string name="killer skin"/>
+      <string name="killer skin"/>
       <string name="victim" values="missionTarget" defaultvalue="HERO"/>
       <string name="victim team" values="teamswithnumbers" defaultvalue="ENEMY_TEAM"/>
       <string name="victim class"/>
-	  <string name="victim skin"/>
-      <string name="compare method" values="valuecompare" defaultvalue="greater" shortName="compare" />
+      <string name="victim skin"/>
+      <string name="compare method" values="valuecompare" defaultvalue="greater" shortName="compare"/>
       <string name="value" defaultvalue="0"/>
       <string name="store in"/>
     </condition>
@@ -1023,9 +1014,18 @@
     <condition name="timer">
       <string name="timeunit" values="timeunits" defaultvalue="seconds"/>
       <float name="time"/>
-	  <string name="execute first time" values="yesno" defaultvalue="no"/>
+      <string name="execute first time" values="yesno" defaultvalue="no"/>
     </condition>
+  </condition>
 
-  </conditions>
+  <other>
+    <other name="Sequence">
+      <string name="Is blocking" values="yesno" defaultvalue="no"/>
+    </other>
+    <other name="orblock" useNameAttributeAsTagName="1" displayName="Or">
+    </other>
+    <other name="andblock" useNameAttributeAsTagName="1" displayName="And">
+    </other>
+  </other>
 
 </blockdefinitions>

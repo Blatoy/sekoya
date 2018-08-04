@@ -1,4 +1,4 @@
-const config = require(basePath + '/config/general.json');
+/*const config = require(basePath + '/config/general.json');
 const actionHandler = require(basePath + "/src/scripts/utils/action-handler.js");
 const canvasStyle = require(basePath + '/src/scripts/utils/theme-loader.js').canvasStyle;
 const dataManager = require(basePath + '/src/scripts/editor/data-manager.js');
@@ -11,80 +11,6 @@ let mousePositionWhenSelected = {
   x: 0,
   y: 0
 };
-
-actionHandler.addAction("auto block layout", () => {
-  let blocks = dataManager.getBlocks();
-  for (let i = 0; i < blocks.length; ++i) {
-    blocks[i].selected = false;
-    blocks[i].position.x = canvasStyle.blocks.rootPosition.x;
-    blocks[i].position.y = canvasStyle.blocks.rootPosition.y + i * canvasStyle.blocks.margin.y;
-    blocks[i].autoLayout();
-  }
-});
-
-actionHandler.addAction("block select up", () => {
-  if(lastSelectedBlock && lastSelectedBlock.parent && lastSelectedBlock.parent.children.indexOf(lastSelectedBlock) > 0) {
-    lastSelectedBlock.lastSelected = false;
-    lastSelectedBlock = lastSelectedBlock.parent.children[lastSelectedBlock.parent.children.indexOf(lastSelectedBlock) -1 ];
-    lastSelectedBlock.lastSelected = true;
-  }
-});
-
-actionHandler.addAction("block select down", () => {
-  if(lastSelectedBlock && lastSelectedBlock.parent && lastSelectedBlock.parent.children.indexOf(lastSelectedBlock) < lastSelectedBlock.parent.children.length - 1) {
-    lastSelectedBlock.lastSelected = false;
-    lastSelectedBlock = lastSelectedBlock.parent.children[lastSelectedBlock.parent.children.indexOf(lastSelectedBlock) + 1];
-    lastSelectedBlock.lastSelected = true;
-  }
-});
-
-actionHandler.addAction("block select parent", () => {
-  if(lastSelectedBlock && lastSelectedBlock.parent) {
-    lastSelectedBlock.lastSelected = false;
-    lastSelectedBlock = lastSelectedBlock.parent;
-    lastSelectedBlock.lastSelected = true;
-  }
-});
-
-actionHandler.addAction("block select child", () => {
-  if(lastSelectedBlock && lastSelectedBlock.children[0]) {
-    lastSelectedBlock.lastSelected = false;
-    lastSelectedBlock = lastSelectedBlock.children[0];
-    lastSelectedBlock.lastSelected = true;
-  }
-});
-
-actionHandler.addAction("cancel block linking", () => {
-  let blocks = dataManager.getBlocks();
-  if (linkingBlock) {
-    linkingBlock.linkingType = 0;
-    linkingBlock = false;
-  }
-});
-
-actionHandler.addAction("delete selected block and children", () => {
-  let blocks = dataManager.getBlocks();
-  if (hoveredBlock && hoveredBlock.type !== "root") {
-    if (hoveredBlock.parent) {
-      hoveredBlock.destroy();
-    } else {
-      // We have to remove it manually if it's not connected to root
-      blocks.splice(blocks.indexOf(hoveredBlock), 1);
-    }
-    hoveredBlock = false;
-  }
-});
-
-actionHandler.addAction("delete selected block", () => {
-  let blocks = dataManager.getBlocks();
-  if (hoveredBlock && hoveredBlock.type !== "root") {
-    // If the items has no parent, delete cannot delete it
-    if (!hoveredBlock.delete(blocks)) {
-      blocks.splice(blocks.indexOf(hoveredBlock), 1);
-      hoveredBlock = false;
-    }
-  }
-});
 
 let currentTab = dataManager.getCurrentTab();
 
@@ -119,7 +45,8 @@ function update() {
       lastSelectedBlock = hoveredBlock;
       lastSelectedBlock.lastSelected = true;
       selectedBlock = hoveredBlock;
-    } else if (!linkingBlock && !selectedBlock && hoveredBlock && mouseButtons[3] && config.conditionsTypes.includes(hoveredBlock.type)) {
+      // TODO: Check what type of linking can be made using the new config
+    } else if (!linkingBlock && !selectedBlock && hoveredBlock && mouseButtons[3]/* && config.conditionsTypes.includes(hoveredBlock.type)*//*) {
       // Start block linking
       hoveredBlock.linkingType = 1;
       linkingBlock = hoveredBlock;
@@ -171,9 +98,6 @@ function update() {
 
 }
 
-function startUpdateTimer() {
-  setInterval(update, 5);
-}
 
 module.exports.setLastSelectedBlock = (block) => {
   lastSelectedBlock.lastSelected = false;
@@ -184,6 +108,16 @@ module.exports.setLastSelectedBlock = (block) => {
 module.exports.getLastSelectedBlock = () => {
   return lastSelectedBlock;
 };
+
+*/
+
+function update() {
+  //rootBlock.update();
+}
+
+function startUpdateTimer() {
+  setInterval(update, 5);
+}
 
 module.exports.startUpdating = function() {
   startUpdateTimer();

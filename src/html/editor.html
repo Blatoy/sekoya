@@ -10,7 +10,8 @@
 
 <body>
   <section id="tab-list-container">
-    <span id="new-tab">+</span><div id="tab-list"></div>
+    <span onclick="actionHandler.trigger('tabs: create new tab')" id="new-tab">+</span>
+    <div id="tab-list"></div>
   </section>
   <section id="block-list">
     <span class="block-title">Blocks</span>
@@ -22,10 +23,7 @@
     <div id="quick-access-bar-container">
       <span id="quick-access-bar-caption"></span>
       <input type="text" placeholder="Type anything..." id="quick-access-bar-input">
-      <div id="quick-access-bar-results">
-        <div class="quick-access-bar-result"><span class="quick-access-bar-result-character-match">add</span>Ammo</div>
-        <div class="quick-access-bar-result selected"><span class="quick-access-bar-result-character-match">add</span>Ammo</div>
-      </div>
+      <div id="quick-access-bar-results"></div>
     </div>
   </div>
   <script src="../scripts/editor/index.js"></script>

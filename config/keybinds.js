@@ -1,7 +1,8 @@
 // Change keybinds here
-// Available actions: undo, redo, save, autoLayout
-// Key must be a valid "event.key" char
-// You can get the "event.key" value of any key there: http://keycode.info/
+// The key item must be one of the following:
+// A character: 'a', 'b', ... , 'z', '+', '1', etc
+// A key code: 'KeyA', 'Digit1', 'Escape' etc
+// Note: the only reason to use a keycode is if you want to use shift and a number
 
 // Default:
 // ctrl-z         => undo
@@ -18,67 +19,67 @@
 // Escape         => cancel block linking
 
 module.exports = [{
-    key: 'KeyZ',
+    key: 'z',
     ctrl: true,
     alt: false,
     shift: false,
-    action: "undo"
+    action: "core: undo"
   },
   {
-    key: 'KeyY',
+    key: 'y',
     ctrl: true,
     alt: false,
     shift: false,
-    action: "redo"
+    action: "core: redo"
   },
   {
-    key: 'KeyS',
+    key: 's',
     ctrl: true,
     alt: false,
     shift: false,
-    action: "save"
+    action: "core: save"
   },
   {
-    key: 'KeyR',
+    key: 'r',
     ctrl: false,
     alt: false,
     shift: false,
-    action: "auto block layout"
+    action: "blocks: auto layout"
   },
   {
-    key: 'KeyT',
+    key: 't',
     ctrl: true,
     alt: false,
     shift: false,
-    action: "open new tab"
+    action: "tabs: create new tab"
   },
   {
-    key: 'KeyW',
+    key: 'w',
     ctrl: true,
     alt: false,
     shift: false,
-    action: "close current tab"
+    action: "tabs: close current tab"
   },
   {
     key: 'Tab',
     ctrl: true,
     alt: false,
     shift: false,
-    action: "switch to next tab"
+    action: "tabs: switch to next tab"
   },
   {
     key: 'Tab',
     ctrl: true,
     alt: false,
     shift: true,
-    action: "switch to previous tab"
+    action: "tabs: switch to previous tab"
   },
   {
     key: 'Delete',
     ctrl: false,
     alt: false,
     shift: false,
-    action: "delete selected block"
+    action: "blocks: delete selected"
   },
   {
     key: 'Delete',
@@ -102,19 +103,19 @@ module.exports = [{
     action: "cancel block linking"
   },
   {
-    key: 'KeyP',
+    key: 'p',
     ctrl: true,
     alt: false,
     shift: true,
-    action: "quick access bar display"
+    action: "quick access bar: execute action dialog"
   },
   {
     key: 'Enter',
     ctrl: false,
     alt: false,
     shift: false,
-    action: "quick access bar add linked block"
-  },
+    action: "quick access bar: add block dialog"
+  },/*
   {
     key: 'Enter',
     ctrl: false,
@@ -128,61 +129,124 @@ module.exports = [{
     alt: false,
     shift: false,
     action: "quick access bar add block"
-  },
+  },*/
   {
     key: 'Enter',
     ctrl: false,
     alt: false,
     shift: false,
-    action: "quick access bar select action"
+    action: "quick access bar: execute selected result"
   },
   {
     key: 'Escape',
     ctrl: false,
     alt: false,
     shift: false,
-    action: "quick access bar hide"
+    action: "quick access bar: hide dialog"
   },
   {
     key: 'ArrowUp',
     ctrl: false,
     alt: false,
     shift: false,
-    action: "quick access bar previous result"
+    action: "quick access bar: previous result"
   },
   {
     key: 'ArrowDown',
     ctrl: false,
     alt: false,
     shift: false,
-    action: "quick access bar next result"
+    action: "quick access bar: next result"
+  },
+  {
+    key: 'ArrowDown',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "blocks: select last sibling"
+  },
+  {
+    key: 'ArrowUp',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "blocks: select first sibling"
   },
   {
     key: 'ArrowDown',
     ctrl: false,
     alt: false,
     shift: false,
-    action: "block select down"
+    action: "blocks: select next sibling"
   },
   {
     key: 'ArrowUp',
     ctrl: false,
     alt: false,
     shift: false,
-    action: "block select up"
+    action: "blocks: select previous sibling"
   },
   {
     key: 'ArrowLeft',
     ctrl: false,
     alt: false,
     shift: false,
-    action: "block select parent"
+    action: "blocks: select parent"
   },
   {
     key: 'ArrowRight',
     ctrl: false,
     alt: false,
     shift: false,
-    action: "block select child"
-  }
+    action: "blocks: select child"
+  },
+  {
+    key: 'KeyW',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "camera: move up"
+  },
+  {
+    key: 'KeyS',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "camera: move down"
+  },
+  {
+    key: 'KeyA',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "camera: move left"
+  },
+  {
+    key: 'KeyD',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "camera: move right"
+  },
+  {
+    key: 'Home',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "camera: reset position"
+  },
+  {
+    key: '0',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "camera: reset zoom"
+  },
+  {
+    key: 'r',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "debug: reload"
+  },
 ];
