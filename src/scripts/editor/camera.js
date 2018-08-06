@@ -14,16 +14,42 @@ module.exports.setMoveDown = (state) => {
   moveDown = state;
 };
 
+module.exports.setMoveRight = (state) => {
+  moveRight = state;
+};
+
+module.exports.setMoveLeft = (state) => {
+  moveLeft = state;
+};
+
 module.exports.resetPosition = () => {
   position.x = 0;
   position.y = 0;
 };
 
-module.exports.onScroll = (deltaX, deltaY, ctrlPressed) => {
+module.exports.resetZoom = () => {
+  scaling = 1;
+};
+
+module.exports.centerOn = (x, y) => {
+  position.x = x * scaling - (canvas.width / 2);
+  position.y = y * scaling - (canvas.height / 2);
+};
+
+module.exports.getBounds = () => {
+  return {x: position.x, y: position.y, width: canvas.width / scaling, height: canvas.height / scaling};
+};
+
+module.exports.onScroll = (deltaX, deltaY, ctrlPressed, shiftPressed) => {
   if(!ctrlPressed) {
     // Scroll the view
-    position.x -= deltaX;
-    position.y -= deltaY;
+    if(shiftPressed) {
+      position.x += deltaY;
+    }
+    else {
+      position.x += deltaX;
+      position.y += deltaY;
+    }
   }
   else {
     let targetScaling = scaling;
@@ -41,48 +67,32 @@ module.exports.onScroll = (deltaX, deltaY, ctrlPressed) => {
       y: (global.mouse.canvasY)
     };
 
-    position.x = -(-position.x * relativeScaling + scalingPoint.x * (relativeScaling - 1));
-    position.y = -(-position.y * relativeScaling + scalingPoint.y * (relativeScaling - 1));
+    position.x = (position.x * relativeScaling + scalingPoint.x * (relativeScaling - 1));
+    position.y = (position.y * relativeScaling + scalingPoint.y * (relativeScaling - 1));
 
     scaling = targetScaling;
   }
 };
 
-module.exports.resetZoom = () => {
-  scaling = 1;
-};
-
-module.exports.setMoveRight = (state) => {
-  moveRight = state;
-};
-
-module.exports.setMoveLeft = (state) => {
-  moveLeft = state;
-};
-
 module.exports.update = () => {
-  if(moveUp) position.y += SPEED;
-  if(moveDown) position.y -= SPEED;
-  if(moveLeft) position.x += SPEED;
-  if(moveRight) position.x -= SPEED;
+  if(moveUp) position.y -= SPEED;
+  if(moveDown) position.y += SPEED;
+  if(moveLeft) position.x -= SPEED;
+  if(moveRight) position.x += SPEED;
 
-  position.x = Math.min(position.x, 0);
-  position.y = Math.min(position.y, 0);
-
-  global.mouse.cameraX = (global.mouse.canvasX - position.x) / scaling;
-  global.mouse.cameraY = (global.mouse.canvasY - position.y) / scaling;
-};
-
-module.exports.getBounds = () => {
-
+  global.mouse.cameraX = (global.mouse.canvasX + position.x) / scaling;
+  global.mouse.cameraY = (global.mouse.canvasY + position.y) / scaling;
 };
 
 module.exports.applyTransforms = (ctx) => {
-  ctx.translate(position.x, position.y);
+/*  position.x = Math.max(position.x, 0);
+  position.y = Math.max(position.y, 0);
+*/
+  ctx.save();
+  ctx.translate(-position.x, -position.y);
   ctx.scale(scaling, scaling);
 };
 
 module.exports.resetTransforms = (ctx) => {
-  ctx.scale(1 / scaling, 1 / scaling);
-  ctx.translate(-position.x, -position.y);
+  ctx.restore();
 };
