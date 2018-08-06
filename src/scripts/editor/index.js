@@ -31,13 +31,14 @@ blockLoader.loadBlockDefinitions(() => {
   // DEBUG
 
   let r = new Block({type: "root", name: "root"});
-  let c = new Block(blockLoader.getBlockDefinitions().action.selectTarget, r);
-  let d= new Block(blockLoader.getBlockDefinitions().action.selectTarget, r);
+  let c = new Block(blockLoader.getBlockDefinitions().test["1"], r);
+  let d= new Block(blockLoader.getBlockDefinitions().test["2"], r);
+  new Block(blockLoader.getBlockDefinitions().test["3"], r);
   new Block(blockLoader.getBlockDefinitions().condition.branch);
-  new Block(blockLoader.getBlockDefinitions().condition.branch, r);
-  new Block(blockLoader.getBlockDefinitions().condition.branch, c);
-  new Block(blockLoader.getBlockDefinitions().condition.branch, c);
-  new Block(blockLoader.getBlockDefinitions().condition.branch, c);
+  new Block(blockLoader.getBlockDefinitions().test["1"], c);
+  new Block(blockLoader.getBlockDefinitions().test["2"], c);
+  new Block(blockLoader.getBlockDefinitions().test["3"], c);
+  new Block(blockLoader.getBlockDefinitions().test["4"], c);
   c.getRoot().autoLayout()
 });
 

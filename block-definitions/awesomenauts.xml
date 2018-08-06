@@ -1018,6 +1018,25 @@
     </condition>
   </condition>
 
+  <test>
+    <test name="1">
+      <string name="Is blocking" values="yesno" defaultvalue="no"/>
+    </test>
+    <test name="2">
+      <string name="Is blocking" values="yesno" defaultvalue="no"/>
+    </test>
+    <test name="3">
+      <string name="Is blocking" values="yesno" defaultvalue="no"/>
+    </test>
+    <test name="4">
+      <string name="Is blocking" values="yesno" defaultvalue="no"/>
+    </test>
+    <test name="5">
+      <string name="Is blocking" values="yesno" defaultvalue="no"/>
+    </test>
+
+  </test>
+
   <other>
     <other name="Sequence">
       <string name="Is blocking" values="yesno" defaultvalue="no"/>
