@@ -3,6 +3,81 @@ module.exports.registerActions = () => {
     rootBlock.autoLayout();
   });
 
+  actionHandler.addAction("blocks: delete selected", (data) => {
+    data.block.delete();
+    rootBlock.autoLayout();
+  }, () => {
+    let children = [];
+    let selectedBlock = Block.getSelectedBlock();
+    // We have to restore it at the right position
+    let blockIndex = selectedBlock.parent.children.indexOf(selectedBlock);
+
+    // We must track a reference to all the children since they are manually deleted from the block
+    for(let i = 0; i < selectedBlock.children.length; ++i) {
+      children.push({child: selectedBlock.children[i], linkToParentType: selectedBlock.children[i].linkToParentType});
+    }
+
+    return {block: selectedBlock, children: children, index: blockIndex};
+  }, (data) => {
+
+    // Using addChild is fine here since the block is deleted
+    data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
+
+    for(let i = 0; i < data.children.length; ++i) {
+      data.children[i].child.changeParent(data.block, data.children[i].linkToParentType);
+    }
+
+    data.block.setSelected();
+    rootBlock.autoLayout();
+  });
+
+  actionHandler.addAction("blocks: delete selected and children", (data) => {
+    data.block.deleteRecursive();
+    rootBlock.autoLayout();
+  }, () => {
+    let selectedBlock = Block.getSelectedBlock();
+
+    return {block: selectedBlock, index: selectedBlock.parent.children.indexOf(selectedBlock)};
+  }, (data) => {
+    data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
+    data.block.setSelected();
+    rootBlock.autoLayout();
+  });
+
+  actionHandler.addAction("blocks: exchange block order", (data) => {
+
+  }, () => {
+
+  }, (data) => {
+
+  });
+
+  actionHandler.addAction("blocks: sort children using position", (data) => {
+    data.parentBlock.children = data.newChildOrder;
+    data.parentBlock.autoLayout();
+  }, (data) => {
+    let originalChildOrder = [];
+    let newChildOrder = [];
+
+    for(let i = 0; i < data.parentBlock.children.length; ++i) {
+      originalChildOrder.push(data.parentBlock.children[i]);
+    }
+
+    data.parentBlock.sortChildrenByYPosition();
+
+    for(let i = 0; i < data.parentBlock.children.length; ++i) {
+      newChildOrder.push(data.parentBlock.children[i]);
+    }
+
+    return {parentBlock: data.parentBlock, newChildOrder: newChildOrder, originalChildOrder: originalChildOrder};
+  }, (data) => {
+    data.parentBlock.children = data.originalChildOrder;
+    data.parentBlock.autoLayout();
+  });
+
+  // TODO: To tomorrow self, u fucking idiot, quick-access-block should trigger an action with an args
+  // otherwise it CANNOT be undoable
+
   actionHandler.addAction("blocks: select parent", () => {
     Block.getSelectedBlock().moveSelectedLeftRight(-1);
   });
