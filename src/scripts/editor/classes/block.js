@@ -3,18 +3,30 @@
 // Note: do not confuse the "displayed" root that is specific to awesomenauts block definition and
 // the hidden root that all blocks must be attached to
 let root;
-let selectedBlock = root;
+let selectedBlock;
 
 let mouseIsOverBlock = false;
 let anyBlockBeingDragged = false;
-let mouseClickPosition = {
-  x: 0,
-  y: 0
-};
+
 let mouseClickPositionRelativeToBlock = {
   x: 0,
   y: 0
 };
+
+let mouseClickPosition = {
+  x: 0,
+  y: 0
+};
+
+function blockLinkToParentComparison(a, b) {
+  // TODO: Allows to set a custom order for block type as it's super sad, or just use the order in the def file
+  // TODO: Fix that block margin may be by "all" instead of allowing or block to works as expected
+  if (a.linkToParentType < b.linkToParentType) {
+    return 1;
+  } else {
+    return -1;
+  }
+}
 
 function blockPositionYComparison(a, b) {
   if (a.position.y > b.position.y) {
@@ -56,8 +68,8 @@ class Block {
     this.selected = false;
     this.dragged = false;
     this.position = position;
-    this.size = getBlockStyleProperty(this.type, "size");
 
+    this.size = getBlockStyleProperty(this.type, "size");
     this.color = getBlockStyleProperty(this.type, "color");
     this.font = getBlockStyleProperty(this.type, "font");
     this.margin = getBlockStyleProperty(this.type, "margin");
@@ -69,7 +81,7 @@ class Block {
     }
 
     if (this.parent) {
-      this.parent.addChild(this);
+      this.parent.addChild(this, linkToParentType);
     }
 
     this.setLinkToParentType(linkToParentType);
@@ -80,6 +92,7 @@ class Block {
         if (!this.attributes[type]) {
           this.attributes[type] = [];
         }
+
         let templateAttribute = blockDefinition.blockPropertiesGroupedByType[type][i];
         let defaultValue = templateAttribute.defaultvalue;
 
@@ -115,6 +128,7 @@ class Block {
     }
   }
 
+
   getRoot() {
     if (this.parent === false) {
       return this;
@@ -133,11 +147,12 @@ class Block {
     }
   }
 
+  // Used to auto layout the blocks
   getMaxRecursiveDepth(previousDepth = 0) {
     if (this.children.length <= 0) {
       return 0;
     } else {
-      let maxChildCount = this.children.length - 1; // "-1" because we don't need to increase the y pos if there's only 1 child
+      let maxChildCount = this.children.length - 1;
       for (let i = 0; i < this.children.length; ++i) {
         let maxRecursiveDepth = this.children[i].getMaxRecursiveDepth(maxChildCount);
         if (maxRecursiveDepth > maxChildCount) {
@@ -148,47 +163,93 @@ class Block {
     }
   }
 
+  // Almost like the one above, but returns block height instead
+  getMaxRecursiveHeight(previousHeight = 0) {
+    if(this.children.length <= 0) {
+      return this.getFullHeight();
+    }
+    else {
+      let childrenTotalHeight = 0;
+      this.children.map((child) => {
+        childrenTotalHeight += child.getMaxRecursiveHeight();
+      });
+      return childrenTotalHeight;
+    }
+  }
+// getFullHeight
+  // Changes the link linking this block to its parent
+  // Note that a "false" link doesn't means there's no link
   setLinkToParentType(linkToParentType = false) {
     if (!linkToParentType) {
+      // If not link specified, use the default one or false
       if (config.connectionsTypes[0]) {
         this.linkToParentType = config.connectionsTypes[0].name;
       } else {
         this.linkToParentType = false;
       }
+    } else {
+      this.linkToParentType = linkToParentType;
     }
   }
 
-  addChild(child, linkToParentType = false) {
-    child.setLinkToParentType(linkToParentType);
+  changeParent(newParent, linkToParentType = false) {
+    if(newParent === this || newParent === this.parent || !newParent) return false;
+
+    // Removes from current parent
+    this.parent.children.splice(this.parent.children.indexOf(this), 1);
+
+    this.parent = newParent;
+    newParent.children.push(this);
+    this.setLinkToParentType(linkToParentType);
+  }
+
+  // Should not really be used except in the constructor
+  // Use changeParent instead! This will duplicate block and add sadness if used
+  addChild(child, linkToParentType = false, insertionIndex = -1) {
     child.parent = this;
-    this.children.push(child);
+    if(insertionIndex === -1) {
+      this.children.push(child);
+    }
+    else {
+      this.children.splice(insertionIndex, 0, child);
+    }
   }
 
   // Removes the block and all children
   deleteRecursive() {
     // root cannot be deleted
     if (this.parent) {
-      this.parent.children.splice(this.parent.children.indexOf(this), 1);
+      if (this.selected) {
+        this.parent.setSelected();
+      }
+      return this.parent.children.splice(this.parent.children.indexOf(this), 1);
     }
   }
 
   // Delete the block and attach the orphan to root
   delete() {
+    if(this.isRoot) return false; // no
+
     let root = this.getRoot();
+
     while (this.children.length > 0) {
-      root.addChild(this.children.splice(0, 1)[0]);
+      this.children[0].changeParent(root);
     }
 
-    this.destroy();
+    // Note: delete recusive only delete this block since we removed all children
+    this.deleteRecursive();
   }
 
   sortChildrenByYPosition() {
     this.children.sort(blockPositionYComparison);
+    this.children.sort(blockLinkToParentComparison);
   }
 
   autoLayout() {
     // Make sure everything is in the intended order
-    this.sortChildrenByYPosition();
+    // NOTE: This has been commented out as it SHOULD be callsed using a trigger action because it is undoable
+    // this should not change anything or it means there's a bug
+    // this.sortChildrenByYPosition();
 
     if (this.isRoot) {
       const rootPosition = getBlockStyleProperty("all", "rootPosition");
@@ -196,19 +257,23 @@ class Block {
       this.position.y = rootPosition.y;
     }
 
-    let totalRecursiveDepthCount = 0;
+    let totalRecursiveHeightCount = 0;
     for (let i = 0; i < this.children.length; ++i) {
-
       if (i > 0) {
-        totalRecursiveDepthCount += this.children[i - 1].getMaxRecursiveDepth();
+        totalRecursiveHeightCount += this.children[i - 1].getMaxRecursiveHeight();
+        if(this.children[i].linkToParentType != this.children[i - 1].linkToParentType) {
+          totalRecursiveHeightCount += getLinkStyleProperty(this.children[i].linkToParentType, "firstBlockMargin");
+        }
       }
 
+
       this.children[i].position.x = this.margin.x + this.position.x;
-      this.children[i].position.y = this.margin.y * (i + totalRecursiveDepthCount) + this.position.y;
+      this.children[i].position.y = totalRecursiveHeightCount + this.position.y;
 
       this.children[i].autoLayout();
     }
   }
+
 
   isPositionOver(position) {
     return position.x > this.position.x && position.y > this.position.y &&
@@ -216,53 +281,92 @@ class Block {
   }
 
   setSelected() {
-    if(this.isRoot) {
+    if (this.isRoot) {
       return;
     }
-    if(selectedBlock) {
+
+    if (selectedBlock) {
       selectedBlock.selected = false;
     }
 
+    // camera.centerOn(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2);
     this.selected = true;
     selectedBlock = this;
   }
 
+  // Prevent root being selected and select its first child instead
+  handleSelectionChangeForRoot() {
+    if (this.isRoot) {
+      if (this.children[0]) {
+        this.children[0].setSelected();
+      }
+      return false;
+    }
+    return true;
+  }
+
+  // Move to previous / next sibling
   moveSelectedUpDown(direction) {
+    if (!this.handleSelectionChangeForRoot()) {
+      return false;
+    }
+
     let indexInParentArray = this.parent.children.indexOf(this);
-    console.log(indexInParentArray);
-    if(direction < 0 && indexInParentArray > 0) {
+
+    if (direction < 0 && indexInParentArray > 0) {
       this.parent.children[indexInParentArray - 1].setSelected();
     }
-    if(direction > 0 && indexInParentArray < this.parent.children.length - 1) {
+    if (direction > 0 && indexInParentArray < this.parent.children.length - 1) {
       this.parent.children[indexInParentArray + 1].setSelected();
     }
   }
 
+  // Move to parent / first child
   moveSelectedLeftRight(direction) {
-    if(direction < 0 && !this.parent.isRoot) {
-      this.parent.setSelected();
+    if (!this.handleSelectionChangeForRoot()) {
+      return false;
     }
-    else if(direction > 0 && this.children.length > 0) {
+
+    if (direction < 0 && !this.parent.isRoot) {
+      this.parent.setSelected();
+    } else if (direction > 0 && this.children.length > 0) {
       this.children[0].setSelected();
     }
   }
 
   setSelectedLastSibling() {
+    if (!this.handleSelectionChangeForRoot()) {
+      return false;
+    }
+
     this.parent.children[this.parent.children.length - 1].setSelected();
   }
 
   setSelectedFirstSibling() {
+    if (!this.handleSelectionChangeForRoot()) {
+      return false;
+    }
+
     this.parent.children[0].setSelected();
+  }
+
+  // TODO: Make it take into account comment and properties
+  getFullHeight() {
+    return this.size.height + this.margin.y;
   }
 
   handleMouseOverBlock(mousePosition) {
     this.mouseOver = false;
+
+    // Found a block that is hovered, no need to proceed further
     if (mouseIsOverBlock) {
       return;
     } else {
       if (this.isPositionOver(mousePosition)) {
-        this.mouseOver = true;
-        mouseIsOverBlock = true;
+        if(!this.isRoot) {
+          this.mouseOver = true;
+          mouseIsOverBlock = true;
+        }
         return;
       }
     }
@@ -272,11 +376,22 @@ class Block {
     });
   }
 
+  setChildrenPositionRelative() {
+    this.children.map((child, i) => {
+      child.position.x = this.margin.x + this.position.x;
+      child.position.y = this.margin.y * i + this.position.y;
+      child.setChildrenPositionRelative();
+    });
+  }
+
+  // Handle block clicking and block double-clicking
   handleBlockSelection(mousePosition, leftClickState) {
+    // No need to look into details if a block is already selected
     if (!anyBlockBeingDragged || this.dragged) {
       if (this.dragged && !leftClickState) {
         // Stop block dragging
-        this.parent.sortChildrenByYPosition();
+        actionHandler.trigger("blocks: sort children using position", {parentBlock: this.parent});
+        // this.parent.sortChildrenByYPosition();
         this.dragged = false;
         anyBlockBeingDragged = false;
       } else if (!this.dragged && leftClickState && this.mouseOver) {
@@ -284,10 +399,26 @@ class Block {
         this.dragged = true;
         this.setSelected();
         anyBlockBeingDragged = true;
+        mouseClickPosition = {
+          x: this.position.x,
+          y: this.position.y
+        };
         mouseClickPositionRelativeToBlock = {
           x: this.position.x - mousePosition.x,
           y: this.position.y - mousePosition.y
         };
+      }
+      else if(this.dragged && leftClickState) {
+        this.setChildrenPositionRelative();
+        // TODO: Make it so blocks are automatically moved up / down
+        /*if(config.forceAutoLayout) {
+          let currentOrder = [];
+          this.parent.children.map((child) => {
+            currentOrder.push(child);
+          });
+          this.parent.children;
+          this.parent.autoLayout();
+        }*/
       }
     }
 
@@ -311,18 +442,22 @@ class Block {
     mouseIsOverBlock = false;
 
     this.children.map((child) => {
+
       this.handleMouseOverBlock({
         x: global.mouse.cameraX,
         y: global.mouse.cameraY
       });
+
       this.handleBlockSelection({
         x: global.mouse.cameraX,
         y: global.mouse.cameraY
       }, global.mouse.buttons[1]);
+
       this.handleBlockDragging({
         x: global.mouse.cameraX,
         y: global.mouse.cameraY
       });
+
     });
 
 
@@ -331,17 +466,6 @@ class Block {
     } else {
       document.getElementById("main-canvas").style.cursor = "default";
     }
-
-    /*mouseIsOverBlock = false;
-
-    this.children.map((child) => {
-      if(!mouseIsOverBlock && child.isPositionOver()) {
-        document.getElementById("main-canvas").style.cursor = "pointer";
-        mouseIsOverBlock = true;
-      }
-
-      child.update();
-    });*/
   }
 
   render(ctx) {
@@ -362,13 +486,17 @@ class Block {
           this.position.y - this.selectedStyle.padding,
           this.size.width + this.selectedStyle.padding * 2,
           this.size.height + this.selectedStyle.padding * 2);
+
+        ctx.lineDashOffset = 0;
       }
 
+      // Mouse over colour
       if (this.mouseOver) {
         ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
         ctx.fillRect(this.position.x, this.position.y, this.size.width, this.size.height);
       }
 
+      // Text
       // White or black depending on the colour of the block
       const textColour = ((
           parseInt(ctx.fillStyle.slice(1, 3), 16) +
@@ -383,37 +511,39 @@ class Block {
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
 
-      ctx.fillText(this.name, this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
+      ctx.fillText(this.name + " - " + this.getMaxRecursiveHeight(), this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
 
     }
 
 
     this.children.map((child, i) => {
       // Render links
-      const childSize = getBlockStyleProperty(child.type, "size");
+      // TODO: Allows "unconnected" effect selection in config since it's not always great
+      if (!this.isRoot || i == 0) {
+        const childSize = getBlockStyleProperty(child.type, "size");
 
-      ctx.strokeStyle = getLinkStyleProperty(child.linkToParentType, "color");
-      ctx.lineWidth = getLinkStyleProperty(child.linkToParentType, "lineWidth");
+        ctx.strokeStyle = getLinkStyleProperty(child.linkToParentType, "color");
+        ctx.lineWidth = getLinkStyleProperty(child.linkToParentType, "lineWidth");
 
-      const dashInterval = getLinkStyleProperty(child.linkToParentType, "dashInterval");
+        const dashInterval = getLinkStyleProperty(child.linkToParentType, "dashInterval");
 
-      if (dashInterval == 0) {
-        ctx.setLineDash([]);
-      } else {
-        ctx.setLineDash([dashInterval]);
+        if (dashInterval == 0) {
+          ctx.setLineDash([]);
+        } else {
+          ctx.setLineDash([dashInterval]);
+        }
+
+        const baseLinkLength = getLinkStyleProperty(child.linkToParentType, "baseLength");
+
+        ctx.beginPath();
+
+        ctx.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
+        ctx.lineTo(this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
+        ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
+        ctx.lineTo(child.position.x, child.position.y + childSize.height * 0.5);
+
+        ctx.stroke();
       }
-
-      const baseLinkLength = getLinkStyleProperty(child.linkToParentType, "baseLength");
-
-      // Render links
-      ctx.beginPath();
-
-      ctx.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
-      ctx.lineTo(this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
-      ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
-      ctx.lineTo(child.position.x, child.position.y + childSize.height * 0.5);
-
-      ctx.stroke();
 
       child.render(ctx);
     });
@@ -430,6 +560,7 @@ root = new Block({
   isRoot: true
 }, false);
 
+selectedBlock = root;
 
 module.exports.rootBlock = root;
 module.exports.Block = Block;
