@@ -1,7 +1,7 @@
 {
   "all": {
     "lineWidth": 2,
-    "color": "#D3D3D3",
+    "color": "pink",
     "dashInterval": 0
   },
   "normal": {
@@ -11,12 +11,12 @@
   },
   "else": {
     "lineWidth": 2,
-    "color": "#D3D3D3",
-    "dashInterval": 0
+    "color": "#aaa",
+    "dashInterval": 8
   },
   "or": {
     "lineWidth": 2,
-    "color": "#D3D3D3",
-    "dashInterval": 4
+    "color": "yellow",
+    "dashInterval": 0
   }
 }
