@@ -86,7 +86,7 @@ module.exports = [{
     ctrl: true,
     alt: false,
     shift: false,
-    action: "delete selected block and children"
+    action: "blocks: delete selected and children"
   },
   {
     key: 'Delete',
@@ -115,21 +115,28 @@ module.exports = [{
     alt: false,
     shift: false,
     action: "quick access bar: add block dialog"
-  },/*
-  {
-    key: 'Enter',
-    ctrl: false,
-    alt: false,
-    shift: true,
-    action: "quick access bar add linked else block"
   },
   {
     key: 'Enter',
     ctrl: true,
     alt: false,
     shift: false,
-    action: "quick access bar add block"
-  },*/
+    action: "quick access bar: add linked normal block dialog"
+  },
+  {
+    key: 'Enter',
+    ctrl: false,
+    alt: false,
+    shift: true,
+    action: "quick access bar: add linked else block dialog"
+  },
+  {
+    key: 'Enter',
+    ctrl: false,
+    alt: true,
+    shift: false,
+    action: "quick access bar: add linked or block dialog"
+  },
   {
     key: 'Enter',
     ctrl: false,
@@ -231,6 +238,13 @@ module.exports = [{
   {
     key: 'Home',
     ctrl: false,
+    alt: false,
+    shift: false,
+    action: "camera: reset position"
+  },
+  {
+    key: 'h',
+    ctrl: true,
     alt: false,
     shift: false,
     action: "camera: reset position"
