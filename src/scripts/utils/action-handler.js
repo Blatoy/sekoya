@@ -106,7 +106,7 @@ function redo() {
   }
 }
 
-function trigger(name, args) {
+function trigger(name, args, ignoreCommandHistory = false) {
   if (actions[name] !== undefined) {
     let action = actions[name];
 
@@ -116,7 +116,7 @@ function trigger(name, args) {
 
     let parameters = action.setData(args);
 
-    if (action.undoAction) {
+    if (action.undoAction && !ignoreCommandHistory) {
       undoStack.push({
         actionName: name,
         parameters: parameters
