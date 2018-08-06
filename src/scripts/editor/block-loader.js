@@ -8,6 +8,17 @@ module.exports.getPredefinedValues = () => {
   return predefinedValues;
 };
 
+module.exports.getDefinitionByName = (name) => {
+  for(let type in blockDefinitions) {
+    for(let blockName in blockDefinitions[type]) {
+      if(blockName === name) {
+        return blockDefinitions[type][blockName];
+      }
+    }
+  }
+  return false;
+};
+
 module.exports.getBlockDefinitions = () => {
   return blockDefinitions;
 };
