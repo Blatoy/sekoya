@@ -1037,13 +1037,16 @@
 
   </test>
 
+  <logic>
+    <logic name="orblock" useNameAttributeAsTagName="1" displayName="Or">
+    </logic>
+    <logic name="andblock" useNameAttributeAsTagName="1" displayName="And">
+    </logic>
+  </logic>
+
   <other>
     <other name="Sequence">
       <string name="Is blocking" values="yesno" defaultvalue="no"/>
-    </other>
-    <other name="orblock" useNameAttributeAsTagName="1" displayName="Or">
-    </other>
-    <other name="andblock" useNameAttributeAsTagName="1" displayName="And">
     </other>
   </other>
 
