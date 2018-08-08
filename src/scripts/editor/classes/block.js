@@ -66,6 +66,7 @@ class Block {
 
     this.attributeCount = 0;
 
+    this.isNewDraggedBlock = false;
     this.mouseOver = false;
     this.selected = false;
     this.dragged = false;
@@ -168,12 +169,11 @@ class Block {
   }
 
   linkableTo(linkType) {
-    if(config.connectionsTypes.length === 0) {
+    if (config.connectionsTypes.length === 0) {
       return true;
-    }
-    else {
-      for(let i = 0; i < config.connectionsTypes.length; ++i) {
-        if(config.connectionsTypes[i].name === linkType) {
+    } else {
+      for (let i = 0; i < config.connectionsTypes.length; ++i) {
+        if (config.connectionsTypes[i].name === linkType) {
           return config.connectionsTypes[i].linkableTo.includes(this.type);
         }
       }
@@ -231,7 +231,7 @@ class Block {
     }
 
     if (this.isRoot && this.children.length === 1) {
-      child.setSelected();
+      child.setSelected(true);
     }
   }
 
@@ -260,7 +260,7 @@ class Block {
         } else if (previousSibling !== false) {
           previousSibling.setSelected();
         } else {
-          this.parent.setSelected();
+          this.parent.setSelected(true);
         }
       }
 
@@ -335,7 +335,7 @@ class Block {
         selectedBlock.selected = false;
       }
 
-      if(moveCamera) {
+      if (moveCamera) {
         camera.centerOnSmooth(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2);
       }
 
@@ -343,6 +343,27 @@ class Block {
       selectedBlock = this;
     }
   }
+
+  isTerminalNode() {
+    // TODO: Check for stuff like orblock that also has terminal nodes
+    // and implement htis in the linking part
+    //  let isTerminalNode = true;
+    if (config.connectionsTypes.length <= 0) {
+      return false;
+    } else {
+      for (let i = 0; i < config.connectionsTypes.length; ++i) {
+        if (config.connectionsTypes[i].linkableTo.includes(this.type)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+  /*
+  {"name": "normal", "linkableTo": ["condition", "root", "other"]},
+  {"name": "else", "linkableTo": ["condition", "other"]},
+  {"name": "or", "linkableTo":  ["logic"], "allowedChildTypes": ["condition"], "childrenAreTerminalNodes": 1}
+  */
 
   // Move to previous / next sibling
   moveSelectedUpDown(direction) {
@@ -423,9 +444,16 @@ class Block {
     if (!anyBlockBeingDragged || this.dragged) {
       if (this.dragged && !leftClickState) {
         // Stop block dragging
-        actionHandler.trigger("blocks: sort children using position", {
-          parentBlock: this.parent
-        });
+        if (this.isNewDraggedBlock) {
+          this.isNewDraggedBlock = false;
+          actionHandler.trigger("blocks: sort children using position - no undo", {
+            parentBlock: this.parent
+          });
+        } else {
+          actionHandler.trigger("blocks: sort children using position", {
+            parentBlock: this.parent
+          });
+        }
         // this.parent.sortChildrenByYPosition();
         this.dragged = false;
         anyBlockBeingDragged = false;
@@ -554,12 +582,13 @@ class Block {
       let lineCounter = 0;
       for (let type in this.attributes) {
         for (let i = 0; i < this.attributes[type].length; ++i) {
-          ctx.fillText(this.attributes[type][i].name, this.position.x, this.size.height + this.position.y + this.font.size * lineCounter);
-          lineCounter++;
+          if (this.attributes[type][i].name !== config.commentAttributeName) {
+            ctx.fillText(this.attributes[type][i].shortName || this.attributes[type][i].name, this.position.x, this.size.height + this.position.y + this.font.size * lineCounter);
+            lineCounter++;
+          }
         }
       }
     }
-
 
     this.children.map((child, i) => {
       // Render links
