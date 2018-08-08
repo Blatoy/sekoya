@@ -6,9 +6,9 @@
     "blockDefinitionFile": "awesomenauts.xml",
   "//" : "name of the block to create followed by the block type it can be attached to. Use an empty array for no blocks. First one is the default one for some actions and must be connectable to root",
     "connectionsTypes": [
-      {"name": "normal", "linkableTo": ["conditions", "root"]},
-      {"name": "else", "linkableTo": ["conditions"]},
-      {"name": "or", "linkableTo":  ["logic"]}
+      {"name": "normal", "linkableTo": ["condition", "root", "other"]},
+      {"name": "else", "linkableTo": ["condition", "other"]},
+      {"name": "or", "linkableTo":  ["logic"], "allowedChildTypes": ["condition"], "childrenAreTerminalNodes": 1}
     ],
   "//" : "Used when loading a block to set a default value when it's not specified in the definition. You can add custom ones. If missing, empty string is set a default",
     "defaultEmptyValues": {
