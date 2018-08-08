@@ -33,5 +33,11 @@
   },
   "action": {
     "color": "#ABB2BF"
+  },
+  "other": {
+    "color": "#F0706A"
+  },
+  "logic": {
+    "color": "#D6C040"
   }
 }
