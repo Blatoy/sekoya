@@ -64,6 +64,8 @@ class Block {
     this.isRoot = blockDefinition.isRoot || false;
     this.attributes = {};
 
+    this.attributeCount = 0;
+
     this.mouseOver = false;
     this.selected = false;
     this.dragged = false;
@@ -112,6 +114,7 @@ class Block {
           predefinedValues: templateAttribute.values,
         };
 
+        this.attributeCount++;
         this.attributes[type].push(attribute);
       }
     }
@@ -121,6 +124,7 @@ class Block {
       if (this.attributes["string"] === undefined) {
         this.attributes["string"] = [];
       }
+      this.attributeCount++;
       this.attributes["string"].push({
         value: "",
         name: config.commentAttributeName
@@ -163,12 +167,25 @@ class Block {
     }
   }
 
-  // Almost like the one above, but returns block height instead
-  getMaxRecursiveHeight(previousHeight = 0) {
-    if(this.children.length <= 0) {
-      return this.getFullHeight();
+  linkableTo(linkType) {
+    if(config.connectionsTypes.length === 0) {
+      return true;
     }
     else {
+      for(let i = 0; i < config.connectionsTypes.length; ++i) {
+        if(config.connectionsTypes[i].name === linkType) {
+          return config.connectionsTypes[i].linkableTo.includes(this.type);
+        }
+      }
+    }
+    return false;
+  }
+
+  // Almost like the one above, but returns block height instead
+  getMaxRecursiveHeight(previousHeight = 0) {
+    if (this.children.length <= 0) {
+      return this.getFullHeight();
+    } else {
       let childrenTotalHeight = 0;
       this.children.map((child) => {
         childrenTotalHeight += child.getMaxRecursiveHeight();
@@ -176,7 +193,7 @@ class Block {
       return childrenTotalHeight;
     }
   }
-// getFullHeight
+  // getFullHeight
   // Changes the link linking this block to its parent
   // Note that a "false" link doesn't means there's no link
   setLinkToParentType(linkToParentType = false) {
@@ -193,7 +210,7 @@ class Block {
   }
 
   changeParent(newParent, linkToParentType = false) {
-    if(newParent === this || newParent === this.parent || !newParent) return false;
+    if (newParent === this || newParent === this.parent || !newParent) return false;
 
     // Removes from current parent
     this.parent.children.splice(this.parent.children.indexOf(this), 1);
@@ -204,14 +221,28 @@ class Block {
   }
 
   // Should not really be used except in the constructor
-  // Use changeParent instead! This will duplicate block and add sadness if used
+  // Use changeParent instead! This will duplicate block and add sadness if used badly
   addChild(child, linkToParentType = false, insertionIndex = -1) {
     child.parent = this;
-    if(insertionIndex === -1) {
+    if (insertionIndex === -1) {
       this.children.push(child);
-    }
-    else {
+    } else {
       this.children.splice(insertionIndex, 0, child);
+    }
+
+    if (this.isRoot && this.children.length === 1) {
+      child.setSelected();
+    }
+  }
+
+  getSibling(direction) {
+    if (this.parent) {
+      let blockIndex = this.parent.children.indexOf(this);
+      if (this.parent.children[blockIndex + direction] !== undefined) {
+        return this.parent.children[blockIndex + direction];
+      } else {
+        return false;
+      }
     }
   }
 
@@ -219,16 +250,27 @@ class Block {
   deleteRecursive() {
     // root cannot be deleted
     if (this.parent) {
+      this.isDeleted = true; // Used by undo add block to track what wants to be done
       if (this.selected) {
-        this.parent.setSelected();
+        let nextSibling = this.getSibling(1);
+        let previousSibling = this.getSibling(-1);
+
+        if (nextSibling !== false) {
+          nextSibling.setSelected();
+        } else if (previousSibling !== false) {
+          previousSibling.setSelected();
+        } else {
+          this.parent.setSelected();
+        }
       }
+
       return this.parent.children.splice(this.parent.children.indexOf(this), 1);
     }
   }
 
   // Delete the block and attach the orphan to root
   delete() {
-    if(this.isRoot) return false; // no
+    if (this.isRoot) return false; // no
 
     let root = this.getRoot();
 
@@ -261,9 +303,6 @@ class Block {
     for (let i = 0; i < this.children.length; ++i) {
       if (i > 0) {
         totalRecursiveHeightCount += this.children[i - 1].getMaxRecursiveHeight();
-        if(this.children[i].linkToParentType != this.children[i - 1].linkToParentType) {
-          totalRecursiveHeightCount += getLinkStyleProperty(this.children[i].linkToParentType, "firstBlockMargin");
-        }
       }
 
 
@@ -280,79 +319,68 @@ class Block {
       position.x < this.position.x + this.size.width && position.y < this.position.y + this.size.height;
   }
 
-  setSelected() {
+  setSelected(moveCamera = false) {
     if (this.isRoot) {
-      return;
-    }
-
-    if (selectedBlock) {
-      selectedBlock.selected = false;
-    }
-
-    // camera.centerOn(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2);
-    this.selected = true;
-    selectedBlock = this;
-  }
-
-  // Prevent root being selected and select its first child instead
-  handleSelectionChangeForRoot() {
-    if (this.isRoot) {
-      if (this.children[0]) {
-        this.children[0].setSelected();
+      if (this.children[1]) {
+        if (selectedBlock) {
+          selectedBlock.selected = false;
+        }
+        this.children[1].setSelected();
+        return;
+      } else {
+        return false;
       }
-      return false;
+    } else {
+      if (selectedBlock) {
+        selectedBlock.selected = false;
+      }
+
+      if(moveCamera) {
+        camera.centerOnSmooth(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2);
+      }
+
+      this.selected = true;
+      selectedBlock = this;
     }
-    return true;
   }
 
   // Move to previous / next sibling
   moveSelectedUpDown(direction) {
-    if (!this.handleSelectionChangeForRoot()) {
-      return false;
-    }
-
     let indexInParentArray = this.parent.children.indexOf(this);
 
     if (direction < 0 && indexInParentArray > 0) {
-      this.parent.children[indexInParentArray - 1].setSelected();
+      this.parent.children[indexInParentArray - 1].setSelected(true);
     }
     if (direction > 0 && indexInParentArray < this.parent.children.length - 1) {
-      this.parent.children[indexInParentArray + 1].setSelected();
+      this.parent.children[indexInParentArray + 1].setSelected(true);
     }
   }
 
   // Move to parent / first child
   moveSelectedLeftRight(direction) {
-    if (!this.handleSelectionChangeForRoot()) {
-      return false;
-    }
-
     if (direction < 0 && !this.parent.isRoot) {
-      this.parent.setSelected();
+      this.parent.setSelected(true);
     } else if (direction > 0 && this.children.length > 0) {
-      this.children[0].setSelected();
+      this.children[0].setSelected(true);
     }
   }
 
   setSelectedLastSibling() {
-    if (!this.handleSelectionChangeForRoot()) {
-      return false;
-    }
-
-    this.parent.children[this.parent.children.length - 1].setSelected();
+    this.parent.children[this.parent.children.length - 1].setSelected(true);
   }
 
   setSelectedFirstSibling() {
-    if (!this.handleSelectionChangeForRoot()) {
-      return false;
-    }
-
-    this.parent.children[0].setSelected();
+    this.parent.children[0].setSelected(true);
   }
 
   // TODO: Make it take into account comment and properties
   getFullHeight() {
-    return this.size.height + this.margin.y;
+    let extraHeight = 0;
+    let nextSibling = this.parent.children[this.parent.children.indexOf(this) + 1];
+    if (nextSibling && nextSibling.linkToParentType != this.linkToParentType) {
+      extraHeight += getLinkStyleProperty(nextSibling.linkToParentType, "firstBlockMargin");
+    }
+    return this.size.height + this.margin.y + this.attributeCount * this.font.size + extraHeight;
   }
 
   handleMouseOverBlock(mousePosition) {
@@ -363,7 +391,7 @@ class Block {
       return;
     } else {
       if (this.isPositionOver(mousePosition)) {
-        if(!this.isRoot) {
+        if (!this.isRoot) {
           this.mouseOver = true;
           mouseIsOverBlock = true;
         }
@@ -377,9 +405,14 @@ class Block {
   }
 
   setChildrenPositionRelative() {
+    let totalRecursiveHeightCount = 0;
     this.children.map((child, i) => {
+      if (i > 0) {
+        totalRecursiveHeightCount += this.children[i - 1].getMaxRecursiveHeight();
+      }
+
       child.position.x = this.margin.x + this.position.x;
-      child.position.y = this.margin.y * i + this.position.y;
+      child.position.y = totalRecursiveHeightCount + this.position.y;
       child.setChildrenPositionRelative();
     });
   }
@@ -390,7 +423,9 @@ class Block {
     if (!anyBlockBeingDragged || this.dragged) {
       if (this.dragged && !leftClickState) {
         // Stop block dragging
-        actionHandler.trigger("blocks: sort children using position", {parentBlock: this.parent});
+        actionHandler.trigger("blocks: sort children using position", {
+          parentBlock: this.parent
+        });
         // this.parent.sortChildrenByYPosition();
         this.dragged = false;
         anyBlockBeingDragged = false;
@@ -407,8 +442,7 @@ class Block {
           x: this.position.x - mousePosition.x,
           y: this.position.y - mousePosition.y
         };
-      }
-      else if(this.dragged && leftClickState) {
+      } else if (this.dragged && leftClickState) {
         this.setChildrenPositionRelative();
         // TODO: Make it so blocks are automatically moved up / down
         /*if(config.forceAutoLayout) {
@@ -511,8 +545,19 @@ class Block {
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
 
-      ctx.fillText(this.name + " - " + this.getMaxRecursiveHeight(), this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
+      ctx.fillText(this.name /* + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
 
+      ctx.textAlign = "left";
+      ctx.fillStyle = "white";
+      ctx.textBaseline = "top";
+
+      let lineCounter = 0;
+      for (let type in this.attributes) {
+        for (let i = 0; i < this.attributes[type].length; ++i) {
+          ctx.fillText(this.attributes[type][i].name, this.position.x, this.size.height + this.position.y + this.font.size * lineCounter);
+          lineCounter++;
+        }
+      }
     }
 
 
