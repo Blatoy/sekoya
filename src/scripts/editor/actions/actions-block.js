@@ -44,6 +44,32 @@ module.exports.registerActions = () => {
     rootBlock.autoLayout();
   });
 
+  actionHandler.addAction("blocks: add block", (data) => {
+    if(data.block.isDeleted) {
+      if(data.parent) {
+        data.block.parent.addChild(data.block, data.linkType);
+      }
+      else {
+        data.block.parent.addChild(data.block);
+      }
+    }
+    else {
+      if(data.parent) {
+        data.block.changeParent(data.parent, data.linkType);
+      }
+      else {
+        data.block.changeParent(rootBlock);
+      }
+    }
+  }, (data) => {
+    return {block: data.block, parent: data.parent, linkType: data.linkType};
+  }, (data) => {
+    data.block.delete();
+  /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
+    data.block.setSelected();
+    rootBlock.autoLayout();*/
+  });
+
   actionHandler.addAction("blocks: exchange block order", (data) => {
 
   }, () => {
