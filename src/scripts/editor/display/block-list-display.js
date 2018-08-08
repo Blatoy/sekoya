@@ -17,7 +17,15 @@ module.exports.addBlocksToLeftMenu = () => {
       else {
         spanBlock.textContent = blockDefinitions[blockCategory][blockName].name;
       }
-      spanBlock.onmousedown = () => { actionHandler.trigger("block: add to canvas", blockName); };
+
+      spanBlock.onmousedown = () => {
+        let newBlock = new Block(blockLoader.getDefinitionByName(blockName), false, false, []);
+        newBlock.position.x = global.mouse.cameraX -newBlock.size.width / 2;
+        newBlock.position.y = global.mouse.cameraY -newBlock.size.height / 2;
+        newBlock.isNewDraggedBlock = true;
+
+        actionHandler.trigger("blocks: add block", {block: newBlock});
+      };
       divBlockList.appendChild(spanBlock);
     }
   }
