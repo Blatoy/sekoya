@@ -20,6 +20,9 @@ function getSourceArray() {
 function displayLinked(index) {
   lastLinkedIndex = index;
   linkType = config.connectionsTypes[index].name;
+  if(!Block.getSelectedBlock().linkableTo(linkType)) {
+    return false;
+  }
   quickAccess.attachType("Add \"" + linkType + "\" block", getSourceArray(), onResultSelected);
   return quickAccess.display();
 }
@@ -36,8 +39,11 @@ function onResultSelected(blockName) {
     y: global.mouse.cameraY
   });
 
-  if(lastLinkedIndex !== -1) {
-    newBlock.changeParent(Block.getSelectedBlock(), linkType);
+  if(lastLinkedIndex === -1) {
+    actionHandler.trigger("blocks: add block", {block: newBlock});
+  }
+  else {
+    actionHandler.trigger("blocks: add block", {block: newBlock, parent: Block.getSelectedBlock(), linkType: linkType});
   }
 
 }
