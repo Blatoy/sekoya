@@ -111,14 +111,14 @@ module.exports = [{
   },
   {
     key: 'Enter',
-    ctrl: false,
+    ctrl: true,
     alt: false,
     shift: false,
     action: "quick access bar: add block dialog"
   },
   {
     key: 'Enter',
-    ctrl: true,
+    ctrl: false,
     alt: false,
     shift: false,
     action: "quick access bar: add linked normal block dialog"
