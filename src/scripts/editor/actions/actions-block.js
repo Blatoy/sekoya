@@ -45,6 +45,7 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction("blocks: add block", (data) => {
+    // Deleted block are kept until they are deleted from the history
     if(data.block.isDeleted) {
       if(data.parent) {
         data.block.parent.addChild(data.block, data.linkType);
@@ -61,10 +62,21 @@ module.exports.registerActions = () => {
         data.block.changeParent(rootBlock);
       }
     }
+
+    if(!data.block.isNewDraggedBlock) {
+      rootBlock.autoLayout();
+    }
+
+
+    if(!data.block.isTerminalNode()) {
+      data.block.setSelected(true);
+    }
+
   }, (data) => {
     return {block: data.block, parent: data.parent, linkType: data.linkType};
   }, (data) => {
     data.block.delete();
+    rootBlock.autoLayout();
   /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
     data.block.setSelected();
     rootBlock.autoLayout();*/
@@ -76,6 +88,11 @@ module.exports.registerActions = () => {
 
   }, (data) => {
 
+  });
+
+  actionHandler.addAction("blocks: sort children using position - no undo", (data) => {
+    data.parentBlock.sortChildrenByYPosition();
+    data.parentBlock.autoLayout();
   });
 
   actionHandler.addAction("blocks: sort children using position", (data) => {
