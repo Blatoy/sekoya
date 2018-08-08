@@ -115,6 +115,9 @@ function trigger(name, args, ignoreCommandHistory = false) {
     }
 
     let parameters = action.setData(args);
+    if(parameters === undefined) {
+      parameters = args;
+    }
 
     if (action.undoAction && !ignoreCommandHistory) {
       undoStack.push({
