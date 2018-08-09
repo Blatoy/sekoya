@@ -114,12 +114,17 @@ function trigger(name, args, ignoreCommandHistory = false) {
       action.setData = () => {};
     }
 
-    let parameters = action.setData(args);
+    let actionHandlerParameters = {cancelUndo: false};
+
+    let parameters = action.setData(args, actionHandlerParameters);
     if(parameters === undefined) {
       parameters = args;
     }
 
-    if (action.undoAction && !ignoreCommandHistory) {
+    let actionReturnedValue = actions[name].doAction(parameters, actionHandlerParameters);
+
+if(action.undoAction)
+    if(!actionHandlerParameters.cancelUndo && action.undoAction && !ignoreCommandHistory) {
       undoStack.push({
         actionName: name,
         parameters: parameters
@@ -127,8 +132,8 @@ function trigger(name, args, ignoreCommandHistory = false) {
       redoStack = [];
     }
 
+    return actionReturnedValue;
 
-    return actions[name].doAction(parameters);
   } else {
     console.warn("Unknown action: '" + name + "'");
   }
@@ -159,13 +164,13 @@ function addAction(name, doAction, setData = () => {}, undoAction = false, prior
   };
 }
 
-function setHistory(undo, redo) {
+function setHistory(newHistory) {
   let currentHistory = {
     undo: undoStack,
     redo: redoStack
   };
-  undoStack = undo;
-  redoStack = redo;
+  undoStack = newHistory.undo;
+  redoStack = newHistory.redo;
 
   return currentHistory;
 }
