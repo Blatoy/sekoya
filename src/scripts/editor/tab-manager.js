@@ -80,12 +80,32 @@ function selectTab(index) {
     index = tabs.length - 1;
   }
 
-  let previousTab = tabs[selectedTabIndex];
+  let previousSelectedTab = tabs[selectedTabIndex];
+  let newSelectedTab = tabs[index];
+
+  if(previousSelectedTab) {
+    previousSelectedTab.setSelected(false);
+    previousSelectedTab.cameraState = {x: camera.getPosition().x, y: camera.getPosition().y, scaling: camera.getScaling()};
+    previousSelectedTab.history = actionHandler.setHistory(newSelectedTab.history);
+
+    let selectedBlock = Block.getSelectedBlock();
+    if(selectedBlock && selectedBlock.parent) {
+      previousSelectedTab.selectedBlock = selectedBlock;
+    }
+  }
+
+
   selectedTabIndex = index;
 
-  tabs.map((element, i) => {
-    element.selected = (i == index);
-  });
+  camera.setPosition(newSelectedTab.cameraState.x, newSelectedTab.cameraState.y);
+  camera.setScaling(newSelectedTab.cameraState.scaling);
+
+  newSelectedTab.setSelected(true);
+  rootBlock.children = newSelectedTab.blocks;
+
+  if(newSelectedTab.selectedBlock) {
+    newSelectedTab.selectedBlock.setSelected();
+  }
 
   // blockManager.setCurrentTab();
 
