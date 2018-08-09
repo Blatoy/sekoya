@@ -16,6 +16,10 @@ const SPEED = 10;
 const SCROLL_SPEED = 50;
 const ZOOM_VELOCITY = 0.1;
 
+module.exports.getPosition = () => {
+  return position;
+}
+
 function setPosition(x, y) {
   position.x = x;
   position.y = y;
@@ -42,6 +46,16 @@ module.exports.setMoveLeft = (state) => {
 module.exports.resetPosition = () => {
   setPosition(0, 0);
 };
+
+module.exports.setScaling = (scaling_) => {
+  scaling = scaling_;
+};
+
+module.exports.getScaling = () => {
+  return scaling;
+};
+
+module.exports.setPosition = setPosition;
 
 module.exports.resetZoom = () => {
   scaling = 1;
