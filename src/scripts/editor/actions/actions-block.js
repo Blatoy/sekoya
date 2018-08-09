@@ -13,17 +13,24 @@ module.exports.registerActions = () => {
     let blockIndex = selectedBlock.parent.children.indexOf(selectedBlock);
 
     // We must track a reference to all the children since they are manually deleted from the block
-    for(let i = 0; i < selectedBlock.children.length; ++i) {
-      children.push({child: selectedBlock.children[i], linkToParentType: selectedBlock.children[i].linkToParentType});
+    for (let i = 0; i < selectedBlock.children.length; ++i) {
+      children.push({
+        child: selectedBlock.children[i],
+        linkToParentType: selectedBlock.children[i].linkToParentType
+      });
     }
 
-    return {block: selectedBlock, children: children, index: blockIndex};
+    return {
+      block: selectedBlock,
+      children: children,
+      index: blockIndex
+    };
   }, (data) => {
 
     // Using addChild is fine here since the block is deleted
     data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
 
-    for(let i = 0; i < data.children.length; ++i) {
+    for (let i = 0; i < data.children.length; ++i) {
       data.children[i].child.changeParent(data.block, data.children[i].linkToParentType);
     }
 
@@ -37,7 +44,10 @@ module.exports.registerActions = () => {
   }, () => {
     let selectedBlock = Block.getSelectedBlock();
 
-    return {block: selectedBlock, index: selectedBlock.parent.children.indexOf(selectedBlock)};
+    return {
+      block: selectedBlock,
+      index: selectedBlock.parent.children.indexOf(selectedBlock)
+    };
   }, (data) => {
     data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
     data.block.setSelected();
@@ -46,40 +56,42 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction("blocks: add block", (data) => {
     // Deleted block are kept until they are deleted from the history
-    if(data.block.isDeleted) {
-      if(data.parent) {
+    if (data.block.isDeleted) {
+      if (data.parent) {
         data.block.parent.addChild(data.block, data.linkType);
-      }
-      else {
+      } else {
         data.block.parent.addChild(data.block);
       }
-    }
-    else {
-      if(data.parent) {
+    } else {
+      if (data.parent) {
         data.block.changeParent(data.parent, data.linkType);
-      }
-      else {
+      } else {
         data.block.changeParent(rootBlock);
       }
     }
 
-    if(!data.block.isNewDraggedBlock) {
+    if (!data.block.isNewDraggedBlock) {
       rootBlock.autoLayout();
     }
 
 
-    if(!data.block.isTerminalNode()) {
-      data.block.setSelected(true);
+    if (!data.block.isTerminalNode()) {
+      // New dragged block are set to selected with the mouse down event
+      data.block.setSelected(!data.block.isNewDraggedBlock);
     }
 
   }, (data) => {
-    return {block: data.block, parent: data.parent, linkType: data.linkType};
+    return {
+      block: data.block,
+      parent: data.parent,
+      linkType: data.linkType
+    };
   }, (data) => {
     data.block.delete();
     rootBlock.autoLayout();
-  /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
-    data.block.setSelected();
-    rootBlock.autoLayout();*/
+    /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
+      data.block.setSelected();
+      rootBlock.autoLayout();*/
   });
 
   actionHandler.addAction("blocks: exchange block order", (data) => {
@@ -98,21 +110,32 @@ module.exports.registerActions = () => {
   actionHandler.addAction("blocks: sort children using position", (data) => {
     data.parentBlock.children = data.newChildOrder;
     data.parentBlock.autoLayout();
-  }, (data) => {
+  }, (data, actionHandlerParameters) => {
     let originalChildOrder = [];
     let newChildOrder = [];
 
-    for(let i = 0; i < data.parentBlock.children.length; ++i) {
+    for (let i = 0; i < data.parentBlock.children.length; ++i) {
       originalChildOrder.push(data.parentBlock.children[i]);
     }
 
     data.parentBlock.sortChildrenByYPosition();
 
-    for(let i = 0; i < data.parentBlock.children.length; ++i) {
+    actionHandlerParameters.cancelUndo = true;
+
+    for (let i = 0; i < data.parentBlock.children.length; ++i) {
       newChildOrder.push(data.parentBlock.children[i]);
+      // Add action to undo stack only if any changes occured
+      if (actionHandlerParameters.cancelUndo && newChildOrder[i] !== originalChildOrder[i]) {
+        actionHandlerParameters.cancelUndo = false;
+      }
     }
 
-    return {parentBlock: data.parentBlock, newChildOrder: newChildOrder, originalChildOrder: originalChildOrder};
+
+    return {
+      parentBlock: data.parentBlock,
+      newChildOrder: newChildOrder,
+      originalChildOrder: originalChildOrder
+    };
   }, (data) => {
     data.parentBlock.children = data.originalChildOrder;
     data.parentBlock.autoLayout();
