@@ -11,6 +11,7 @@ function mainLoop() {
 
   camera.applyTransforms(ctx);
   rootBlock.render(ctx);
+  rootBlock.renderConnections(ctx);
   camera.resetTransforms(ctx);
   requestAnimationFrame(mainLoop);
 }
