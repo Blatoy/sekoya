@@ -3,6 +3,26 @@ module.exports.registerActions = () => {
     rootBlock.autoLayout();
   });
 
+  actionHandler.addAction("blocks: change current linking type", () => {
+    Block.getSelectedBlock().switchLinkingLinkType();
+  });
+
+  actionHandler.addAction("blocks: attach selected to block", (data) => {
+    /*data.block.deleteRecursive();
+    rootBlock.autoLayout();*/
+  }, () => {
+  /*  let selectedBlock = Block.getSelectedBlock();
+
+    return {
+      block: selectedBlock,
+      index: selectedBlock.parent.children.indexOf(selectedBlock)
+    };*/
+  }, (data) => {
+  /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
+    data.block.setSelected();
+    rootBlock.autoLayout();*/
+  });
+
   actionHandler.addAction("blocks: delete selected", (data) => {
     data.block.delete();
     rootBlock.autoLayout();

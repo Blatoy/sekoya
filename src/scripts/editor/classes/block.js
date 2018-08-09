@@ -70,6 +70,8 @@ class Block {
     this.mouseOver = false;
     this.selected = false;
     this.dragged = false;
+    this.linkingInProgress = false;
+    this.linkingLinkTypeIndex = 0;
     this.position = position;
 
     this.size = getBlockStyleProperty(this.type, "size");
@@ -323,6 +325,7 @@ class Block {
     if (this.isRoot) {
       if (this.children[1]) {
         if (selectedBlock) {
+          selectedBlock.linkingInProgress = false;
           selectedBlock.selected = false;
         }
         this.children[1].setSelected();
@@ -332,6 +335,7 @@ class Block {
       }
     } else {
       if (selectedBlock) {
+        selectedBlock.linkingInProgress = false;
         selectedBlock.selected = false;
       }
 
@@ -364,6 +368,20 @@ class Block {
   {"name": "else", "linkableTo": ["condition", "other"]},
   {"name": "or", "linkableTo":  ["logic"], "allowedChildTypes": ["condition"], "childrenAreTerminalNodes": 1}
   */
+
+  switchLinkingLinkType() {
+    if (!this.linkingInProgress || config.connectionsTypes.length <= 0) {
+      return false;
+    }
+
+    do {
+      this.linkingLinkTypeIndex++;
+      if (this.linkingLinkTypeIndex >= config.connectionsTypes.length) {
+        this.linkingLinkTypeIndex = 0;
+      }
+      console.log(this.linkingLinkTypeIndex);
+    } while (!config.connectionsTypes[this.linkingLinkTypeIndex].linkableTo.includes(this.type));
+  }
 
   // Move to previous / next sibling
   moveSelectedUpDown(direction) {
@@ -439,7 +457,7 @@ class Block {
   }
 
   // Handle block clicking and block double-clicking
-  handleBlockSelection(mousePosition, leftClickState) {
+  handleBlockSelection(mousePosition, leftClickState, rightClickState) {
     // No need to look into details if a block is already selected
     if (!anyBlockBeingDragged || this.dragged) {
       if (this.dragged && !leftClickState) {
@@ -470,6 +488,20 @@ class Block {
           x: this.position.x - mousePosition.x,
           y: this.position.y - mousePosition.y
         };
+      } else if (!this.dragged && rightClickState && this.mouseOver && !selectedBlock.linkingInProgress) {
+        // Start block dragging
+        this.setSelected();
+        this.linkingInProgress = true;
+        /*  this.dragged = true;
+          anyBlockBeingDragged = true;
+          mouseClickPosition = {
+            x: this.position.x,
+            y: this.position.y
+          };
+          mouseClickPositionRelativeToBlock = {
+            x: this.position.x - mousePosition.x,
+            y: this.position.y - mousePosition.y
+          };*/
       } else if (this.dragged && leftClickState) {
         this.setChildrenPositionRelative();
         // TODO: Make it so blocks are automatically moved up / down
@@ -484,8 +516,9 @@ class Block {
       }
     }
 
+
     this.children.map((child) => {
-      child.handleBlockSelection(mousePosition, leftClickState);
+      child.handleBlockSelection(mousePosition, leftClickState, rightClickState);
     });
   }
 
@@ -513,7 +546,7 @@ class Block {
       this.handleBlockSelection({
         x: global.mouse.cameraX,
         y: global.mouse.cameraY
-      }, global.mouse.buttons[1]);
+      }, global.mouse.buttons[1], global.mouse.buttons[3]);
 
       this.handleBlockDragging({
         x: global.mouse.cameraX,
@@ -530,8 +563,73 @@ class Block {
     }
   }
 
-  render(ctx) {
+  renderConnections(ctx) {
+    if (this.linkingInProgress) {
+      const linkingType = config.connectionsTypes[this.linkingLinkTypeIndex] ? config.connectionsTypes[this.linkingLinkTypeIndex].name : "all";
+      const dashInterval = getLinkStyleProperty(linkingType, "dashInterval");
+      const baseLinkLength = getLinkStyleProperty(linkingType, "baseLength");
 
+      ctx.strokeStyle = getLinkStyleProperty(linkingType, "color");
+      ctx.lineWidth = getLinkStyleProperty(linkingType, "lineWidth");
+
+      if (dashInterval == 0) {
+        ctx.setLineDash([]);
+      } else {
+        ctx.setLineDash([dashInterval]);
+      }
+
+      ctx.beginPath();
+
+      ctx.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
+
+      // why didn't I use vectore in the first place, I'm so dumb
+      let x = (this.position.x + this.size.width) - global.mouse.cameraX;
+      let y = (this.position.y + this.size.height * 0.5) - global.mouse.cameraY;
+      let angle = Math.atan2(y, x);
+
+      // TODO: Allows styling arrow in config
+      ctx.lineTo(global.mouse.cameraX, global.mouse.cameraY);
+      ctx.lineTo(global.mouse.cameraX + 20 * Math.cos(angle - Math.PI / 5), global.mouse.cameraY + 20 * Math.sin(angle - Math.PI / 5));
+      ctx.moveTo(global.mouse.cameraX, global.mouse.cameraY);
+      ctx.lineTo(global.mouse.cameraX + 20 * Math.cos(angle + Math.PI / 5), global.mouse.cameraY + 20 * Math.sin(angle + Math.PI / 5));
+
+      ctx.stroke();
+    }
+
+    this.children.map((child, i) => {
+      // Render links
+      // TODO: Allows "unconnected" effect selection in config since it's not always great
+      if (!this.isRoot || i == 0) {
+        const childSize = getBlockStyleProperty(child.type, "size");
+        const dashInterval = getLinkStyleProperty(child.linkToParentType, "dashInterval");
+        const baseLinkLength = getLinkStyleProperty(child.linkToParentType, "baseLength");
+
+        ctx.strokeStyle = getLinkStyleProperty(child.linkToParentType, "color");
+        ctx.lineWidth = getLinkStyleProperty(child.linkToParentType, "lineWidth");
+
+
+        if (dashInterval == 0) {
+          ctx.setLineDash([]);
+        } else {
+          ctx.setLineDash([dashInterval]);
+        }
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
+        ctx.lineTo(this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
+        ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
+        ctx.lineTo(child.position.x, child.position.y + childSize.height * 0.5);
+
+        ctx.stroke();
+      }
+
+      child.renderConnections(ctx);
+    });
+  }
+
+  render(ctx) {
     if (!this.isRoot) {
       // Render block
       ctx.fillStyle = this.color;
@@ -590,35 +688,7 @@ class Block {
       }
     }
 
-    this.children.map((child, i) => {
-      // Render links
-      // TODO: Allows "unconnected" effect selection in config since it's not always great
-      if (!this.isRoot || i == 0) {
-        const childSize = getBlockStyleProperty(child.type, "size");
-
-        ctx.strokeStyle = getLinkStyleProperty(child.linkToParentType, "color");
-        ctx.lineWidth = getLinkStyleProperty(child.linkToParentType, "lineWidth");
-
-        const dashInterval = getLinkStyleProperty(child.linkToParentType, "dashInterval");
-
-        if (dashInterval == 0) {
-          ctx.setLineDash([]);
-        } else {
-          ctx.setLineDash([dashInterval]);
-        }
-
-        const baseLinkLength = getLinkStyleProperty(child.linkToParentType, "baseLength");
-
-        ctx.beginPath();
-
-        ctx.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
-        ctx.lineTo(this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
-        ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
-        ctx.lineTo(child.position.x, child.position.y + childSize.height * 0.5);
-
-        ctx.stroke();
-      }
-
+    this.children.map((child) => {
       child.render(ctx);
     });
   }

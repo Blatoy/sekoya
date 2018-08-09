@@ -103,6 +103,13 @@ module.exports = [{
     action: "cancel block linking"
   },
   {
+    key: 'Space',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "blocks: change current linking type"
+  },
+  {
     key: 'p',
     ctrl: true,
     alt: false,
