@@ -70,8 +70,11 @@ class Block {
     this.mouseOver = false;
     this.selected = false;
     this.dragged = false;
+
     this.linkingInProgress = false;
     this.linkingLinkTypeIndex = 0;
+    this.startLinkingLinkAllowed = true;
+
     this.position = position;
 
     this.size = getBlockStyleProperty(this.type, "size");
@@ -286,7 +289,7 @@ class Block {
 
   sortChildrenByYPosition() {
     this.children.sort(blockPositionYComparison);
-    this.children.sort(blockLinkToParentComparison);
+  //  this.children.sort(blockLinkToParentComparison);
   }
 
   autoLayout() {
@@ -355,6 +358,21 @@ class Block {
     if (config.connectionsTypes.length <= 0) {
       return false;
     } else {
+      /*
+      "connectionsTypes": [
+        {"name": "normal", "linkableTo": ["condition", "root", "other", "logic"]},
+        {"name": "else", "linkableTo": ["condition", "logic"]},
+        {"name": "or", "linkableTo":  ["logic"], "allowedChildTypes": ["condition"], "childrenAreTerminalNodes": 1}
+      ],
+      */
+      // Is terminal node because of childrenAreTerminalNodes ?
+      for (let i = 0; i < config.connectionsTypes.length; ++i) {
+        if(this.linkToParentType === config.connectionsTypes[i].name && config.connectionsTypes[i].childrenAreTerminalNodes) {
+          return true;
+        }
+      }
+
+      // Can this be linked to anything?
       for (let i = 0; i < config.connectionsTypes.length; ++i) {
         if (config.connectionsTypes[i].linkableTo.includes(this.type)) {
           return false;
@@ -379,7 +397,7 @@ class Block {
       if (this.linkingLinkTypeIndex >= config.connectionsTypes.length) {
         this.linkingLinkTypeIndex = 0;
       }
-      console.log(this.linkingLinkTypeIndex);
+
     } while (!config.connectionsTypes[this.linkingLinkTypeIndex].linkableTo.includes(this.type));
   }
 
@@ -456,12 +474,57 @@ class Block {
     });
   }
 
+  cancelBlockLinking() {
+    this.linkingInProgress = false;
+    this.linkingLinkTypeIndex = 0;
+  }
+
+  isRecursiveChild(block) {
+    if (this === block || this.parent === block) {
+      return true;
+    } else if (this.isRoot) {
+      return false;
+    } else {
+      return this.parent.isRecursiveChild(block);
+    }
+
+    //    return false;
+    /*
+
+        if(this.isRoot) {
+          return false;
+        }
+
+        if(this === block) {
+          return true;
+        }
+
+
+        return this.parent.isRecursiveChild(block);*/
+    /*if(this === block || (this === block.parent && !block.parent.isRoot)) {
+      return true;
+    }
+    else {
+      if(block.parent) {
+        if(block.parent.isRoot) {
+          return false;
+        }
+        else {
+          return block.parent.isRecursiveChild(this);
+        }
+      }
+      else {
+        return false;
+      }
+    }*/
+  }
+
   // Handle block clicking and block double-clicking
   handleBlockSelection(mousePosition, leftClickState, rightClickState) {
-    // No need to look into details if a block is already selected
     if (!anyBlockBeingDragged || this.dragged) {
       if (this.dragged && !leftClickState) {
         // Stop block dragging
+
         if (this.isNewDraggedBlock) {
           this.isNewDraggedBlock = false;
           actionHandler.trigger("blocks: sort children using position - no undo", {
@@ -472,48 +535,58 @@ class Block {
             parentBlock: this.parent
           });
         }
-        // this.parent.sortChildrenByYPosition();
+
         this.dragged = false;
         anyBlockBeingDragged = false;
-      } else if (!this.dragged && leftClickState && this.mouseOver) {
+      } else if (!this.dragged && leftClickState && this.mouseOver && !selectedBlock.linkingInProgress) {
         // Start block dragging
+
         this.dragged = true;
         this.setSelected();
+
         anyBlockBeingDragged = true;
+
         mouseClickPosition = {
           x: this.position.x,
           y: this.position.y
         };
+
         mouseClickPositionRelativeToBlock = {
           x: this.position.x - mousePosition.x,
           y: this.position.y - mousePosition.y
         };
-      } else if (!this.dragged && rightClickState && this.mouseOver && !selectedBlock.linkingInProgress) {
-        // Start block dragging
-        this.setSelected();
-        this.linkingInProgress = true;
-        /*  this.dragged = true;
-          anyBlockBeingDragged = true;
-          mouseClickPosition = {
-            x: this.position.x,
-            y: this.position.y
-          };
-          mouseClickPositionRelativeToBlock = {
-            x: this.position.x - mousePosition.x,
-            y: this.position.y - mousePosition.y
-          };*/
+      } else if (!this.dragged && (rightClickState || leftClickState) && this.mouseOver && this.startLinkingLinkAllowed) {
+        if (!selectedBlock.linkingInProgress && !this.isTerminalNode()) {
+          // Start block linking
+          this.setSelected();
+          this.linkingInProgress = true;
+        } else if (!selectedBlock.isRecursiveChild(this) && selectedBlock.linkingInProgress) {
+          // Link blocks
+
+          this.startLinkingLinkAllowed = false;
+
+          actionHandler.trigger("blocks: link block", {
+            targetBlock: this,
+            parentBlock: selectedBlock,
+            linkType: config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : "all"
+          });
+
+          //this.changeParent(selectedBlock, config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : "all")
+        //  this.parent.autoLayout();
+
+          if (!global.metaKeys.ctrl) {
+            selectedBlock.cancelBlockLinking();
+          }
+        }
       } else if (this.dragged && leftClickState) {
         this.setChildrenPositionRelative();
-        // TODO: Make it so blocks are automatically moved up / down
-        /*if(config.forceAutoLayout) {
-          let currentOrder = [];
-          this.parent.children.map((child) => {
-            currentOrder.push(child);
-          });
-          this.parent.children;
-          this.parent.autoLayout();
-        }*/
       }
+
+
+    }
+
+    if (!rightClickState) {
+      this.startLinkingLinkAllowed = true;
     }
 
 
@@ -607,6 +680,10 @@ class Block {
         ctx.strokeStyle = getLinkStyleProperty(child.linkToParentType, "color");
         ctx.lineWidth = getLinkStyleProperty(child.linkToParentType, "lineWidth");
 
+        // This could be an interesting feature to add, currently disabled becuase it doesn't look super good
+        /*if(selectedBlock.isRecursiveChild(child)) {
+          ctx.lineWidth = getLinkStyleProperty(child.linkToParentType, "lineWidth") * 3;
+        }*/
 
         if (dashInterval == 0) {
           ctx.setLineDash([]);
@@ -619,8 +696,27 @@ class Block {
 
         ctx.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
         ctx.lineTo(this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
-        ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
-        ctx.lineTo(child.position.x, child.position.y + childSize.height * 0.5);
+
+        if(this.position.x + this.size.width + baseLinkLength > child.position.x) {
+          if(this.position.x + this.size.width + baseLinkLength > child.position.x + childSize.width) {
+            ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
+            ctx.lineTo(child.position.x + childSize.width, child.position.y + childSize.height * 0.5);
+          }
+          else {
+            if(child.position.y > this.position.y) {
+              ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y);
+            }
+            else {
+              ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height);
+            }
+            // ctx.lineTo(child.position.x + childSize.width / 2, child.position.y);
+          }
+        }
+        else {
+          // If the test make everything too laggy, just keep these 2 lines
+          ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
+          ctx.lineTo(child.position.x, child.position.y + childSize.height * 0.5);
+        }
 
         ctx.stroke();
       }
@@ -671,7 +767,8 @@ class Block {
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
 
-      ctx.fillText(this.name /* + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
+
+      ctx.fillText(this.name /* + " - " + selectedBlock.isRecursiveChild(this) /* + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
 
       ctx.textAlign = "left";
       ctx.fillStyle = "white";
@@ -733,19 +830,7 @@ class Block {
   }
 
   // name copyright goes to marukyu
-  isRecursiveChild(block) {
-    if(this == block.parent) {
-      return true;
-    }
-    else {
-      if(block.parent) {
-        return block.parent.isRecursiveChild(this);
-      }
-      else {
-        return false;
-      }
-    }
-  }
+
 
   linkTo(block) {
     // Make sure target isn't already connected

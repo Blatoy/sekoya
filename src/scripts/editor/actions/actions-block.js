@@ -1,5 +1,6 @@
 module.exports.registerActions = () => {
   actionHandler.addAction("blocks: auto layout", () => {
+    rootBlock.sortChildrenByYPosition();
     rootBlock.autoLayout();
   });
 
@@ -7,25 +8,36 @@ module.exports.registerActions = () => {
     Block.getSelectedBlock().switchLinkingLinkType();
   });
 
-  actionHandler.addAction("blocks: attach selected to block", (data) => {
+  actionHandler.addAction("blocks: cancel block linking", () => {
+    Block.getSelectedBlock().cancelBlockLinking();
+  });
+
+  actionHandler.addAction("blocks: link block", (data) => {
+    data.targetBlock.changeParent(data.parentBlock, data.linkType);
+
     /*data.block.deleteRecursive();
     rootBlock.autoLayout();*/
-  }, () => {
-  /*  let selectedBlock = Block.getSelectedBlock();
-
-    return {
-      block: selectedBlock,
-      index: selectedBlock.parent.children.indexOf(selectedBlock)
-    };*/
   }, (data) => {
-  /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
-    data.block.setSelected();
-    rootBlock.autoLayout();*/
+    let oldParent = data.targetBlock.parent;
+    let oldLinkingType = data.targetBlock.linkToParentType;
+    return {
+      oldParent: data.targetBlock.parent,
+      oldLinkingType: oldLinkingType,
+      targetBlock: data.targetBlock,
+      parentBlock: data.parentBlock,
+      linkType: data.linkType
+    };
+  }, (data) => {
+    data.targetBlock.changeParent(data.oldParent, data.oldLinkingType);
+
+    /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
+      data.block.setSelected();
+      rootBlock.autoLayout();*/
   });
 
   actionHandler.addAction("blocks: delete selected", (data) => {
     data.block.delete();
-    rootBlock.autoLayout();
+    // rootBlock.autoLayout();
   }, () => {
     let children = [];
     let selectedBlock = Block.getSelectedBlock();
@@ -55,12 +67,12 @@ module.exports.registerActions = () => {
     }
 
     data.block.setSelected();
-    rootBlock.autoLayout();
+    // rootBlock.autoLayout();
   });
 
   actionHandler.addAction("blocks: delete selected and children", (data) => {
     data.block.deleteRecursive();
-    rootBlock.autoLayout();
+    // rootBlock.autoLayout();
   }, () => {
     let selectedBlock = Block.getSelectedBlock();
 
@@ -71,7 +83,7 @@ module.exports.registerActions = () => {
   }, (data) => {
     data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
     data.block.setSelected();
-    rootBlock.autoLayout();
+    // rootBlock.autoLayout();
   });
 
   actionHandler.addAction("blocks: add block", (data) => {
@@ -108,7 +120,7 @@ module.exports.registerActions = () => {
     };
   }, (data) => {
     data.block.delete();
-    rootBlock.autoLayout();
+    // rootBlock.autoLayout();
     /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
       data.block.setSelected();
       rootBlock.autoLayout();*/
@@ -124,7 +136,6 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction("blocks: sort children using position - no undo", (data) => {
     data.parentBlock.sortChildrenByYPosition();
-    data.parentBlock.autoLayout();
   });
 
   actionHandler.addAction("blocks: sort children using position", (data) => {
@@ -149,7 +160,6 @@ module.exports.registerActions = () => {
         actionHandlerParameters.cancelUndo = false;
       }
     }
-
 
     return {
       parentBlock: data.parentBlock,
