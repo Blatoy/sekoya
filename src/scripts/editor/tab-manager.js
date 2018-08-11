@@ -48,21 +48,22 @@ function renameTab(index, name) {
 
 function closeTab(index = 0) {
   if(tabs.length > 1) {
-    tabs.splice(index, 1);
     if(selectedTabIndex === index) {
-      if(index >= tabs.length) {
-        selectTab(tabs.length - 1);
+      if(index >= tabs.length - 1) {
+        selectTab(tabs.length - 2);
       }
       else {
-        selectTab(index);
+        selectTab(index + 1);
+        selectedTabIndex--;
       }
     }
     else {
       if(index < selectedTabIndex) {
         selectedTabIndex--;
       }
-      notifyTabDisplayer();
     }
+    tabs.splice(index, 1);
+    notifyTabDisplayer();
   }
 
 }
