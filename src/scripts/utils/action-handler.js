@@ -1,4 +1,6 @@
 const keybinds = require(basePath + "/config/keybinds.js");
+const accelerators = require(basePath + "/config/menu.json").topMenu;
+
 let actions = {};
 let undoStack = [];
 let redoStack = [];
@@ -26,7 +28,7 @@ function handleKeyDown(e) {
       keybind.alt === e.altKey) {
       // Prevent the user to use inexisting shorcuts
       if (actions[keybind.action]) {
-        if (actions[keybind.action].preventTriggerWhenInputFocused && document.activeElement.tagName === "INPUT") {
+        if ((actions[keybind.action].preventTriggerWhenInputFocused && document.activeElement.tagName === "INPUT") || hasAccelerator(keybind.action)) {
           continue;
         } else {
           suitableActions.push(actions[keybind.action]);
@@ -114,23 +116,25 @@ function trigger(name, args, ignoreCommandHistory = false) {
       action.setData = () => {};
     }
 
-    let actionHandlerParameters = {cancelUndo: false};
+    let actionHandlerParameters = {
+      cancelUndo: false
+    };
 
     let parameters = action.setData(args, actionHandlerParameters);
-    if(parameters === undefined) {
+    if (parameters === undefined) {
       parameters = args;
     }
 
     let actionReturnedValue = actions[name].doAction(parameters, actionHandlerParameters);
 
-if(action.undoAction)
-    if(!actionHandlerParameters.cancelUndo && action.undoAction && !ignoreCommandHistory) {
-      undoStack.push({
-        actionName: name,
-        parameters: parameters
-      });
-      redoStack = [];
-    }
+    if (action.undoAction)
+      if (!actionHandlerParameters.cancelUndo && action.undoAction && !ignoreCommandHistory) {
+        undoStack.push({
+          actionName: name,
+          parameters: parameters
+        });
+        redoStack = [];
+      }
 
     return actionReturnedValue;
 
@@ -179,6 +183,37 @@ module.exports.getActions = () => {
   return actions;
 };
 
+// Returns the first shortcut available
+function getActionAccelerator(actionIdentifier) {
+  for (let i = 0; i < keybinds.length; ++i) {
+    if (actionIdentifier === keybinds[i].action) {
+      let accelerator = "";
+      if (keybinds[i].ctrl) accelerator += "CmdOrCtrl+";
+      if (keybinds[i].alt) accelerator += "Alt+";
+      if (keybinds[i].shift) accelerator += "Shift+";
+
+      accelerator += keybinds[i].key.replace(/key/i, "");
+
+      return accelerator;
+    }
+  }
+  return "";
+}
+
+function hasAccelerator(action) {
+  for (let i = 0; i < accelerators.length; ++i) {
+    for (let j = 0; j < accelerators[i].items.length; ++j) {
+      if (accelerators[i].items[j].action === action && !accelerators[i].items[j].doNotUseAccelerator) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+
+module.exports.getActionAccelerator = getActionAccelerator;
 module.exports.handleKeyUp = handleKeyUp;
 module.exports.handleKeyDown = handleKeyDown;
 module.exports.setHistory = setHistory;

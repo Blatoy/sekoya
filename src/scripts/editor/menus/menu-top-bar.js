@@ -1,32 +1,34 @@
 const {remote} = require('electron');
-const {Menu, MenuItem} = remote;
+const {Menu, MenuItem, globalShortcut} = remote;
+const topMenuItems = require(basePath + "/config/menu.json").topMenu;
 
 const menu = new Menu();
 
 module.exports.setMenu = function() {
-  menu.append(new MenuItem({label: 'File', submenu: [
-    new MenuItem({label: 'MenuItem 1', click() { console.log('item 1 clicked') }}),
-    new MenuItem({label: 'MenuItem 2', click() { console.log('item 1 clicked') }}),
-    new MenuItem({label: 'MenuItem 3', click() { console.log('item 1 clicked') }})
-  ]}));
+  for(let i = 0 ; i < topMenuItems.length; ++i) {
 
-  menu.append(new MenuItem({label: 'Edit', submenu: [
-    new MenuItem({label: 'MenuItem 1', click() { console.log('item 1 clicked') }}),
-    new MenuItem({label: 'MenuItem 2', click() { console.log('item 1 clicked') }}),
-    new MenuItem({label: 'MenuItem 3', click() { console.log('item 1 clicked') }})
-  ]}));
+    let menuItems = [];
+    for(let j = 0; j < topMenuItems[i].items.length; ++j) {
+      let menuItem = topMenuItems[i].items[j];
+      if(menuItem.type === "separator") {
+          menuItems.push(new MenuItem({type: "separator"}));
+      }
+      else {
+        menuItems.push(
+          new MenuItem(
+            {
+              label: menuItem.label,
+              accelerator: menuItem.doNotUseAccelerator ? "" : actionHandler.getActionAccelerator(menuItem.action),
+              click(e) {
+                actionHandler.trigger(menuItem.action);
+              }
+            }
+          )
+        );
+      }
+    }
+    menu.append(new MenuItem({label: topMenuItems[i].label, submenu: menuItems}));
+  }
 
-  menu.append(new MenuItem({label: 'Settings', submenu: [
-    new MenuItem({label: 'MenuItem 1', click() { console.log('item 1 clicked') }}),
-    new MenuItem({label: 'MenuItem 2', click() { console.log('item 1 clicked') }}),
-    new MenuItem({label: 'MenuItem 3', click() { console.log('item 1 clicked') }})
-  ]}));
-
-  menu.append(new MenuItem({label: 'About', submenu: [
-    new MenuItem({label: 'MenuItem 1', click() { console.log('item 1 clicked') }}),
-    new MenuItem({label: 'MenuItem 2', click() { console.log('item 1 clicked') }}),
-    new MenuItem({label: 'MenuItem 3', click() { console.log('item 1 clicked') }})
-  ]}));
-
-  Menu.setApplicationMenu(menu);
+  remote.Menu.setApplicationMenu(menu);
 };

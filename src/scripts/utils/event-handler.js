@@ -6,6 +6,12 @@ global.mouse = {
   buttons: {}
 };
 
+global.metaKeys = {
+  ctrl: false,
+  alt: false,
+  shift: false
+}
+
 function setMousePosition(e) {
   var rect = canvas.getBoundingClientRect();
   global.mouse.x = e.clientX;
@@ -30,10 +36,21 @@ module.exports.addEditorEvents = () => {
 
   window.addEventListener("keydown", (e) => {
     actionHandler.handleKeyDown(e);
+
+    metaKeys = {
+      ctrl: e.ctrlKey,
+      shift: e.shiftKey,
+      alt: e.altKey
+    };
   });
 
   window.addEventListener("keyup", (e) => {
     actionHandler.handleKeyUp(e);
+    metaKeys = {
+      ctrl: e.ctrlKey,
+      shift: e.shiftKey,
+      alt: e.altKey
+    };
   });
 
   canvas.addEventListener("wheel", (e) => {

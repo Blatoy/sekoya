@@ -1,0 +1,96 @@
+{
+  "topMenu": [{
+      "label": "File",
+      "items": [{
+          "label": "New file",
+          "action": "tabs: create new tab"
+        },
+        {
+          "label": "Open file",
+          "action": "core: open file"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "label": "Save",
+          "action": "tabs: save current"
+        },
+        {
+          "label": "Save as",
+          "action": "tabs: save current as"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "label": "About",
+          "action": "core: about dialog"
+        }
+      ]
+    },
+    {
+      "label": "Edit",
+      "items": [{
+          "label": "Undo",
+          "action": "core: undo",
+          "doNotUseAccelerator": true
+        },
+        {
+          "label": "Redo",
+          "action": "core: redo",
+          "doNotUseAccelerator": true
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "label": "Copy",
+          "action": "blocks: copy selected blocks"
+        },
+        {
+          "label": "Cut",
+          "action": "blocks: cut selected blocks"
+        },
+        {
+          "label": "Paste",
+          "action": "blocks: paste copied blocks"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "label": "Find by comments",
+          "action": "blocks: find block - comment"
+        },
+        {
+          "label": "Find by attributes",
+          "action": "blocks: find block - attributes"
+        },
+        {
+          "label": "Find by block name",
+          "action": "blocks: find block - name"
+        }
+      ]
+    },
+    {
+      "label": "View",
+      "items": [{
+          "label": "Auto layout",
+          "action": "blocks: auto layout"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "label": "Reset camera position",
+          "action": "camera: reset position"
+        },
+        {
+          "label": "Reset camera scaling",
+          "action": "camera: reset zoom"
+        }
+      ]
+    }
+  ]
+}
