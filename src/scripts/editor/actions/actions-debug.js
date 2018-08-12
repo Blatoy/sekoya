@@ -19,9 +19,9 @@ module.exports.registerActions = () => {
   }, 0, DISPLAY_DEBUG_COMMANDS);*/
 
   actionHandler.addAction("debug: log undo stack", () => {
-    let currentHistory = actionHandler.setHistory({}, {});
+    let currentHistory = actionHandler.setHistory({undo: [], redo: []});
     console.log(currentHistory);
-    actionHandler.setHistory(currentHistory.undo, currentHistory.redo);
+    actionHandler.setHistory(currentHistory);
 
   }, false, false, 0, DISPLAY_DEBUG_COMMANDS, false);
 };
