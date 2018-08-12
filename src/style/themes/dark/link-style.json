@@ -16,7 +16,7 @@
   },
   "or": {
     "lineWidth": 2,
-    "color": "yellow",
-    "dashInterval": 0
+    "color": "#D6C040",
+    "dashInterval": 8
   }
 }

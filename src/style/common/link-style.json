@@ -4,7 +4,8 @@
     "color": "black",
     "dashInterval": 0,
     "baseLength": 40,
-    "firstBlockMargin" : 0
+    "firstBlockMargin" : 0,
+    "displayBelowParent": false
   },
   "normal": {
     "lineWidth": 2,
@@ -20,8 +21,9 @@
   },
   "or": {
     "lineWidth": 2,
-    "color": "#D3D3D3",
+    "color": "#D6C040",
     "dashInterval": 4,
-    "baseLength": 5
+    "baseLength": 10,
+    "displayBelowParent": true
   }
 }

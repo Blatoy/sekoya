@@ -186,17 +186,45 @@ class Block {
     return false;
   }
 
-  // Almost like the one above, but returns block height instead
+  // TODO: Make it take into account comment and properties
+  getFullHeight() {
+    let extraHeight = 0;
+
+    // Attributes
+    extraHeight += this.attributeCount * this.font.size;
+
+    // Everything displayed below the parents count as the block's height
+    this.children.map((child) => {
+      if (getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
+        extraHeight += child.getFullHeight();
+      }
+    });
+
+    /*  if (this.parent) {
+        let nextSibling = this.parent.children[this.parent.children.indexOf(this) + 1];
+        if (nextSibling && nextSibling.linkToParentType != this.linkToParentType) {
+          extraHeight += getLinkStyleProperty(nextSibling.linkToParentType, "firstBlockMargin");
+        }
+      }
+
+      const displayBelowParent = getLinkStyleProperty(this.linkToParentType, "displayBelowParent");
+      if (displayBelowParent) {
+        if (this.parent.children.indexOf(this) === 0) {
+          extraHeight += getBlockStyleProperty(this.type, "belowParentBlockMargin");
+        }
+      }*/
+    return this.size.height + this.margin.y + extraHeight;
+  }
+
   getMaxRecursiveHeight(previousHeight = 0) {
-    if (this.children.length <= 0) {
-      return this.getFullHeight();
-    } else {
-      let childrenTotalHeight = 0;
-      this.children.map((child) => {
+    let childrenTotalHeight = 0;
+    this.children.map((child) => {
+      // This is already taken into account in the getFullHeight()
+      if (!getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
         childrenTotalHeight += child.getMaxRecursiveHeight();
-      });
-      return childrenTotalHeight;
-    }
+      }
+    });
+    return Math.max(childrenTotalHeight, this.getFullHeight());
   }
   // getFullHeight
   // Changes the link linking this block to its parent
@@ -289,30 +317,49 @@ class Block {
 
   sortChildrenByYPosition() {
     this.children.sort(blockPositionYComparison);
-  //  this.children.sort(blockLinkToParentComparison);
+    // this.children.sort(blockLinkToParentComparison);
+  }
+
+  getConnectionType() {
+    for (let i = 0; i < config.connectionsTypes.length; ++i) {
+      if (config.connectionsTypes[i].name === this.linkToParentType) {
+        return config.connectionsTypes[i].name;
+      }
+    }
+    return "all";
   }
 
   autoLayout() {
-    // Make sure everything is in the intended order
-    // NOTE: This has been commented out as it SHOULD be callsed using a trigger action because it is undoable
-    // this should not change anything or it means there's a bug
-    // this.sortChildrenByYPosition();
-
     if (this.isRoot) {
       const rootPosition = getBlockStyleProperty("all", "rootPosition");
       this.position.x = rootPosition.x - this.margin.x;
       this.position.y = rootPosition.y;
     }
 
+    const belowParentBlockMargin = getBlockStyleProperty(this.linkToParentType, "belowParentBlockMargin");
+
     let totalRecursiveHeightCount = 0;
+    let belowParentHeight = belowParentBlockMargin.y;
+    let previousBlock = false;
+    let previousIsBelowParent = false;
+
     for (let i = 0; i < this.children.length; ++i) {
-      if (i > 0) {
-        totalRecursiveHeightCount += this.children[i - 1].getMaxRecursiveHeight();
+      const displayBelowParent = getLinkStyleProperty(this.children[i].linkToParentType, "displayBelowParent");
+
+      if (displayBelowParent === true) {
+        this.children[i].position.x = this.position.x + belowParentBlockMargin.x;
+        this.children[i].position.y = belowParentHeight + this.position.y;
+        belowParentHeight += this.children[i].getFullHeight();
+      } else {
+        if (previousBlock) {
+          totalRecursiveHeightCount += previousBlock.getMaxRecursiveHeight();
+        }
+
+        this.children[i].position.x = this.margin.x + this.position.x;
+        this.children[i].position.y = totalRecursiveHeightCount + this.position.y;
+
+        previousBlock = this.children[i];
       }
-
-
-      this.children[i].position.x = this.margin.x + this.position.x;
-      this.children[i].position.y = totalRecursiveHeightCount + this.position.y;
 
       this.children[i].autoLayout();
     }
@@ -358,16 +405,9 @@ class Block {
     if (config.connectionsTypes.length <= 0) {
       return false;
     } else {
-      /*
-      "connectionsTypes": [
-        {"name": "normal", "linkableTo": ["condition", "root", "other", "logic"]},
-        {"name": "else", "linkableTo": ["condition", "logic"]},
-        {"name": "or", "linkableTo":  ["logic"], "allowedChildTypes": ["condition"], "childrenAreTerminalNodes": 1}
-      ],
-      */
       // Is terminal node because of childrenAreTerminalNodes ?
       for (let i = 0; i < config.connectionsTypes.length; ++i) {
-        if(this.linkToParentType === config.connectionsTypes[i].name && config.connectionsTypes[i].childrenAreTerminalNodes) {
+        if (this.linkToParentType === config.connectionsTypes[i].name && config.connectionsTypes[i].childrenAreTerminalNodes) {
           return true;
         }
       }
@@ -381,11 +421,6 @@ class Block {
       return true;
     }
   }
-  /*
-  {"name": "normal", "linkableTo": ["condition", "root", "other"]},
-  {"name": "else", "linkableTo": ["condition", "other"]},
-  {"name": "or", "linkableTo":  ["logic"], "allowedChildTypes": ["condition"], "childrenAreTerminalNodes": 1}
-  */
 
   switchLinkingLinkType() {
     if (!this.linkingInProgress || config.connectionsTypes.length <= 0) {
@@ -401,8 +436,50 @@ class Block {
     } while (!config.connectionsTypes[this.linkingLinkTypeIndex].linkableTo.includes(this.type));
   }
 
+  // ooof it's way too late i'm probaly doing zork
+  getNearestBlock(direction, axis, targetBlock = false, initialBlock = false, results = {
+    bestDistance: Infinity,
+    bestBlock: false
+  }) {
+    if (!initialBlock) {
+      initialBlock = rootBlock;
+    }
+
+    if (!targetBlock) {
+      targetBlock = this;
+    }
+
+    let bestBlock = this;
+
+    initialBlock.children.map((child) => {
+      let vx = child.position.x - targetBlock.position.x;
+      let vy = child.position.y - targetBlock.position.y;
+      let dist = Math.sqrt(vx ** 2 + vy ** 2);
+      // crappy workaround for or blocks
+      if(vy === 0) {
+        dist /= 100;
+      }
+      if (axis === "y" && (direction * child.position.y > direction * targetBlock.position.y) ||
+        axis === "x" && (direction * child.position.x > direction * targetBlock.position.x)) {
+        if (dist < results.bestDistance && child !== targetBlock) {
+          results.bestDistance = dist;
+          results.bestBlock = child;
+        }
+      }
+      child.getNearestBlock(direction, axis, targetBlock, child, results);
+    });
+
+    return results;
+  }
+
   // Move to previous / next sibling
   moveSelectedUpDown(direction) {
+    let closestBlock = this.getNearestBlock(direction, "y").bestBlock;
+    if (closestBlock) {
+      closestBlock.setSelected(true);
+    }
+
+    /*
     let indexInParentArray = this.parent.children.indexOf(this);
 
     if (direction < 0 && indexInParentArray > 0) {
@@ -411,14 +488,42 @@ class Block {
     if (direction > 0 && indexInParentArray < this.parent.children.length - 1) {
       this.parent.children[indexInParentArray + 1].setSelected(true);
     }
+    */
   }
 
   // Move to parent / first child
   moveSelectedLeftRight(direction) {
-    if (direction < 0 && !this.parent.isRoot) {
-      this.parent.setSelected(true);
-    } else if (direction > 0 && this.children.length > 0) {
+    let closestBlock = this.getNearestBlock(direction, "x").bestBlock;
+    if (closestBlock) {
+      closestBlock.setSelected(true);
+    }
+  }
+
+  setSelectedChild() {
+    if (this.children.length > 0) {
       this.children[0].setSelected(true);
+    }
+  }
+
+  setSelectedParent() {
+    if (!this.parent.isRoot) {
+      this.parent.setSelected(true);
+    }
+  }
+
+  setSelectedNextSibling() {
+    let indexInParentArray = this.parent.children.indexOf(this);
+
+    if (indexInParentArray < this.parent.children.length - 1) {
+      this.parent.children[indexInParentArray + 1].setSelected(true);
+    }
+  }
+
+  setSelectedPreviousSibling() {
+    let indexInParentArray = this.parent.children.indexOf(this);
+
+    if (indexInParentArray > 0) {
+      this.parent.children[indexInParentArray - 1].setSelected(true);
     }
   }
 
@@ -428,16 +533,6 @@ class Block {
 
   setSelectedFirstSibling() {
     this.parent.children[0].setSelected(true);
-  }
-
-  // TODO: Make it take into account comment and properties
-  getFullHeight() {
-    let extraHeight = 0;
-    let nextSibling = this.parent.children[this.parent.children.indexOf(this) + 1];
-    if (nextSibling && nextSibling.linkToParentType != this.linkToParentType) {
-      extraHeight += getLinkStyleProperty(nextSibling.linkToParentType, "firstBlockMargin");
-    }
-    return this.size.height + this.margin.y + this.attributeCount * this.font.size + extraHeight;
   }
 
   handleMouseOverBlock(mousePosition) {
@@ -572,7 +667,7 @@ class Block {
           });
 
           //this.changeParent(selectedBlock, config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : "all")
-        //  this.parent.autoLayout();
+          //  this.parent.autoLayout();
 
           if (!global.metaKeys.ctrl) {
             selectedBlock.cancelBlockLinking();
@@ -694,27 +789,32 @@ class Block {
 
         ctx.beginPath();
 
-        ctx.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
-        ctx.lineTo(this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
+        const displayBelowParent = getLinkStyleProperty(child.linkToParentType, "displayBelowParent");
 
-        if(this.position.x + this.size.width + baseLinkLength > child.position.x) {
-          if(this.position.x + this.size.width + baseLinkLength > child.position.x + childSize.width) {
+        if (!displayBelowParent) {
+          ctx.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
+          ctx.lineTo(this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
+
+          if (this.position.x + this.size.width + baseLinkLength > child.position.x) {
+            if (this.position.x + this.size.width + baseLinkLength > child.position.x + childSize.width) {
+              ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
+              ctx.lineTo(child.position.x + childSize.width, child.position.y + childSize.height * 0.5);
+            } else {
+              if (child.position.y > this.position.y) {
+                ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y);
+              } else {
+                ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height);
+              }
+              // ctx.lineTo(child.position.x + childSize.width / 2, child.position.y);
+            }
+          } else {
+            // If the test make everything too laggy, just keep these 2 lines
             ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
-            ctx.lineTo(child.position.x + childSize.width, child.position.y + childSize.height * 0.5);
+            ctx.lineTo(child.position.x, child.position.y + childSize.height * 0.5);
           }
-          else {
-            if(child.position.y > this.position.y) {
-              ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y);
-            }
-            else {
-              ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height);
-            }
-            // ctx.lineTo(child.position.x + childSize.width / 2, child.position.y);
-          }
-        }
-        else {
-          // If the test make everything too laggy, just keep these 2 lines
-          ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
+        } else {
+          ctx.moveTo(this.position.x, this.position.y + this.size.height);
+          ctx.lineTo(this.position.x, child.position.y + childSize.height * 0.5);
           ctx.lineTo(child.position.x, child.position.y + childSize.height * 0.5);
         }
 
@@ -767,8 +867,15 @@ class Block {
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
 
-
-      ctx.fillText(this.name /* + " - " + selectedBlock.isRecursiveChild(this) /* + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
+      // DEBUG: Display blocks real height
+      /*ctx.setLineDash([]);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "red";
+      ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getFullHeight());
+      ctx.strokeStyle = "blue";
+      ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getMaxRecursiveHeight());
+      */
+      ctx.fillText(this.name /* + " - " + selectedBlock.isRecursiveChild(this) */ + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")", this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
 
       ctx.textAlign = "left";
       ctx.fillStyle = "white";

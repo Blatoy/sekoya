@@ -100,7 +100,7 @@ module.exports = [{
     ctrl: false,
     alt: false,
     shift: false,
-    action: "cancel block linking"
+    action: "blocks: cancel block linking"
   },
   {
     key: 'Space',
@@ -172,6 +172,8 @@ module.exports = [{
     shift: false,
     action: "quick access bar: next result"
   },
+
+
   {
     key: 'ArrowDown',
     ctrl: true,
@@ -187,33 +189,65 @@ module.exports = [{
     action: "blocks: select first sibling"
   },
   {
-    key: 'ArrowDown',
-    ctrl: false,
-    alt: false,
-    shift: false,
-    action: "blocks: select next sibling"
-  },
-  {
-    key: 'ArrowUp',
-    ctrl: false,
-    alt: false,
-    shift: false,
-    action: "blocks: select previous sibling"
-  },
-  {
     key: 'ArrowLeft',
-    ctrl: false,
+    ctrl: true,
     alt: false,
     shift: false,
     action: "blocks: select parent"
   },
   {
     key: 'ArrowRight',
-    ctrl: false,
+    ctrl: true,
     alt: false,
     shift: false,
     action: "blocks: select child"
   },
+
+  {
+    key: 'ArrowDown',
+    ctrl: false,
+    alt: true,
+    shift: false,
+    action: "blocks: select next sibling"
+  },
+  {
+    key: 'ArrowUp',
+    ctrl: false,
+    alt: true,
+    shift: false,
+    action: "blocks: select previous sibling"
+  },
+
+  {
+    key: 'ArrowDown',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "blocks: select block below"
+  },
+  {
+    key: 'ArrowUp',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "blocks: select block above"
+  },
+  {
+    key: 'ArrowLeft',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "blocks: select left block"
+  },
+  {
+    key: 'ArrowRight',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "blocks: select right block"
+  },
+
+
   {
     key: 'KeyW',
     ctrl: false,

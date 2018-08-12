@@ -171,25 +171,25 @@ module.exports.registerActions = () => {
     data.parentBlock.autoLayout();
   });
 
-  // TODO: To tomorrow self, u fucking idiot, quick-access-block should trigger an action with an args
-  // otherwise it CANNOT be undoable
-
-  actionHandler.addAction("blocks: select parent", () => {
-    Block.getSelectedBlock().moveSelectedLeftRight(-1);
-  });
-
-  actionHandler.addAction("blocks: select child", () => {
-    Block.getSelectedBlock().moveSelectedLeftRight(1);
-  });
-
-  actionHandler.addAction("blocks: select next sibling", () => {
+  // Block moving: closest one
+  actionHandler.addAction("blocks: select block below", () => {
     Block.getSelectedBlock().moveSelectedUpDown(1);
   });
 
-  actionHandler.addAction("blocks: select previous sibling", () => {
+  actionHandler.addAction("blocks: select block above", () => {
     Block.getSelectedBlock().moveSelectedUpDown(-1);
   });
 
+
+  actionHandler.addAction("blocks: select left block", () => {
+    Block.getSelectedBlock().moveSelectedLeftRight(-1);
+  });
+
+  actionHandler.addAction("blocks: select right block", () => {
+    Block.getSelectedBlock().moveSelectedLeftRight(1);
+  });
+
+  // Block moving: using tree
   actionHandler.addAction("blocks: select first sibling", () => {
     Block.getSelectedBlock().setSelectedFirstSibling();
   });
@@ -198,6 +198,23 @@ module.exports.registerActions = () => {
     Block.getSelectedBlock().setSelectedLastSibling();
   });
 
+
+  actionHandler.addAction("blocks: select parent", () => {
+    Block.getSelectedBlock().setSelectedParent();
+  });
+
+  actionHandler.addAction("blocks: select child", () => {
+    Block.getSelectedBlock().setSelectedChild();
+  });
+
+  // Quick sibling move
+  actionHandler.addAction("blocks: select previous sibling", () => {
+    Block.getSelectedBlock().setSelectedPreviousSibling();
+  });
+
+  actionHandler.addAction("blocks: select next sibling", () => {
+    Block.getSelectedBlock().setSelectedNextSibling();
+  });
 };
 
 
