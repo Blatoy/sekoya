@@ -9,9 +9,10 @@ module.exports.getPredefinedValues = () => {
 };
 
 module.exports.getDefinitionByName = (name) => {
+  name = name.toLowerCase();
   for(let type in blockDefinitions) {
     for(let blockName in blockDefinitions[type]) {
-      if(blockName === name) {
+      if(blockName.toLowerCase() === name || (blockDefinitions[type][blockName].useNameAttributeAsTagName && blockDefinitions[type][blockName].type.toLowerCase() === name)) {
         return blockDefinitions[type][blockName];
       }
     }
@@ -30,20 +31,23 @@ module.exports.loadBlockDefinitions = (onLoaded) => {
 
       // TODO: Handle properly if invalid format
       if (result.blockdefinitions) {
-        for (let blockType in result.blockdefinitions) {
-          if (blockType == "predefined_values") {
-            for(let i = 0; i < result.blockdefinitions[blockType].length; ++i) {
-              predefinedValues[result.blockdefinitions[blockType][i].$.id] = result.blockdefinitions[blockType][i].value;
+        for (let blockCategory in result.blockdefinitions) {
+          if (blockCategory == "predefined_values") {
+            for(let i = 0; i < result.blockdefinitions[blockCategory].length; ++i) {
+              predefinedValues[result.blockdefinitions[blockCategory][i].$.id] = result.blockdefinitions[blockCategory][i].value;
             }
           } else {
-            blockDefinitions[blockType] = {};
+            blockDefinitions[blockCategory] = {};
             // [0] is there because there can only be one blockType
-            for(let k in result.blockdefinitions[blockType][0]) {
-              for(let j = 0; j < result.blockdefinitions[blockType][0][k].length; ++j) {
-                let xmlBlock = result.blockdefinitions[blockType][0][k][j];
+            for(let blockType in result.blockdefinitions[blockCategory][0]) {
+              for(let j = 0; j < result.blockdefinitions[blockCategory][0][blockType].length; ++j) {
+                let xmlBlock = result.blockdefinitions[blockCategory][0][blockType][j];
+
                 let blockName = xmlBlock["$"].name;
                 let displayName = xmlBlock["$"].displayName;
                 let useNameAttributeAsTagName = xmlBlock["$"].useNameAttributeAsTagName === undefined ? false : true;
+                let preventInteraction = xmlBlock["$"].preventInteraction === undefined ? false : true;
+                let hidden = xmlBlock["$"].hidden === undefined ? false : true;
                 let blockPropertiesGroupedByType = {};
 
                 for(let propertyType in xmlBlock) {
@@ -59,12 +63,14 @@ module.exports.loadBlockDefinitions = (onLoaded) => {
                   }
                 }
 
-                blockDefinitions[blockType][blockName] = {
+                blockDefinitions[blockCategory][blockName] = {
                   name: blockName,
                   displayName: displayName,
+                  hidden: hidden,
                   useNameAttributeAsTagName: useNameAttributeAsTagName,
                   blockPropertiesGroupedByType: blockPropertiesGroupedByType,
-                  type: blockType
+                  type: blockType,
+                  preventInteraction: preventInteraction
                 };
               }
             }
