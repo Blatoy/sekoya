@@ -1,15 +1,17 @@
 {
   "//": "Name of the theme located in themes, uses default values if not found",
-    "theme": "dark",
+    "theme": "default",
     "forceAutoLayout": true,
   "//": "Filename of the file to use in block-definitions",
     "blockDefinitionFile": "awesomenauts.xml",
   "//" : "name of the block to create followed by the block type it can be attached to. Use an empty array for no blocks. First one is the default one for some actions and must be connectable to root",
     "connectionsTypes": [
-      {"name": "normal", "linkableTo": ["condition", "root", "other", "logic"]},
-      {"name": "else", "linkableTo": ["condition", "logic"]},
-      {"name": "or", "linkableTo":  ["logic"], "allowedChildTypes": ["condition"], "childrenAreTerminalNodes": 1}
+      {"name": "normal", "linkableTo": ["condition", "root", "other", "logic"], "sortOrder": 1},
+      {"name": "else", "linkableTo": ["condition", "logic"], "sortOrder": 2},
+      {"name": "or", "linkableTo":  ["logic"], "sortOrder": 0, "allowedChildTypes": ["condition"], "childrenAreTerminalNodes": 1}
     ],
+  "//" : "The name of the block that will be added by default when creating a new file",
+    "defaultBlock": "root",
   "//" : "Used when loading a block to set a default value when it's not specified in the definition. You can add custom ones. If missing, empty string is set a default",
     "defaultEmptyValues": {
       "float": 0,
