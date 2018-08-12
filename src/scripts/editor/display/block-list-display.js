@@ -9,6 +9,10 @@ module.exports.addBlocksToLeftMenu = () => {
     divBlockList.appendChild(spanBlockCategory);
 
     for (let blockName in blockDefinitions[blockCategory]) {
+      if(blockDefinitions[blockCategory][blockName].hidden) {
+        continue;
+      }
+
       let spanBlock = document.createElement("span");
       spanBlock.classList.add("block");
       if(blockDefinitions[blockCategory][blockName].displayName) {

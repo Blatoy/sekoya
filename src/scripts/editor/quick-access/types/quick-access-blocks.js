@@ -8,9 +8,12 @@ function getSourceArray() {
 
   for (let actionType in blockDefinitions) {
     for (let blockName in blockDefinitions[actionType]) {
-      sourceArray.push({
-        actionName: blockName
-      });
+      if(!blockDefinitions[actionType][blockName].hidden) {
+        sourceArray.push({
+          displayName: blockDefinitions[actionType][blockName].displayName || blockDefinitions[actionType][blockName].name,
+          actionName: blockDefinitions[actionType][blockName].name
+        });
+      }
     }
   }
 

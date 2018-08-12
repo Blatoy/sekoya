@@ -6,7 +6,7 @@ function display() {
 
   for(let actionName in actionList) {
     if(actionList[actionName].displayable) {
-      sourceArray.push({actionName: actionName});
+      sourceArray.push({actionName: actionName, displayName: actionName});
     }
   }
 

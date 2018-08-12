@@ -120,8 +120,8 @@ function displaySearchResults(results) {
 
     divResult.setAttribute("action", result.actionName);
 
-    for (let j = 0; j < result.actionName.length; ++j) {
-      let letter = result.actionName[j];
+    for (let j = 0; j < result.displayName.length; ++j) {
+      let letter = result.displayName[j];
 
       if (result.characterMatchIndexes.includes(j)) {
         let spanCharacterMatch = document.createElement("span");

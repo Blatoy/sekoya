@@ -13,7 +13,7 @@ function compareByScore(a, b) {
   if (a.score > b.score) {
     return -1;
   } else if(a.score === b.score) {
-    if(a.actionName.length > b.actionName.length) {
+    if(a.displayName.length > b.displayName.length) {
       return 1;
     }
     else {
@@ -25,12 +25,13 @@ function compareByScore(a, b) {
   }
 }
 
-// results: [{actionName: ..., score: 3, characterMatchIndexes: []}]
+// results: [{displayName: ..., score: 3, characterMatchIndexes: []}]
 function getResultArray(search) {
   let results = [];
   for (let i = 0; i < sourceArray.length; ++i) {
-    let result = getSearchScoreAndCharactersMatchIndexes(search, sourceArray[i].actionName);
+    let result = getSearchScoreAndCharactersMatchIndexes(search, sourceArray[i].displayName);
     results.push({
+      displayName: sourceArray[i].displayName,
       actionName: sourceArray[i].actionName,
       score: result.score,
       characterMatchIndexes: result.characterMatchIndexes
@@ -44,8 +45,8 @@ function switchSelectedResult(direction) {
   return quickAccessDisplay.switchSelectedResult(direction);
 }
 
-function executeSelectedAction(actionName = false) {
-  let selectedAction = actionName || quickAccessDisplay.getSelectedResultAction();
+function executeSelectedAction(displayName = false) {
+  let selectedAction = displayName || quickAccessDisplay.getSelectedResultAction();
   if(!selectedAction) {
     return false;
   }
