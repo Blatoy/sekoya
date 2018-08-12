@@ -1018,25 +1018,6 @@
     </condition>
   </condition>
 
-  <test>
-    <test name="1">
-      <string name="Is blocking" values="yesno" defaultvalue="no"/>
-    </test>
-    <test name="2">
-      <string name="Is blocking" values="yesno" defaultvalue="no"/>
-    </test>
-    <test name="3">
-      <string name="Is blocking" values="yesno" defaultvalue="no"/>
-    </test>
-    <test name="4">
-      <string name="Is blocking" values="yesno" defaultvalue="no"/>
-    </test>
-    <test name="5">
-      <string name="Is blocking" values="yesno" defaultvalue="no"/>
-    </test>
-
-  </test>
-
   <logic>
     <logic name="orblock" useNameAttributeAsTagName="1" displayName="Or">
     </logic>
@@ -1045,9 +1026,11 @@
   </logic>
 
   <other>
-    <other name="Sequence">
+    <other name="Sequence" useNameAttributeAsTagName="1" >
       <string name="Is blocking" values="yesno" defaultvalue="no"/>
     </other>
+    <root name="Root" hidden="1" preventInteraction="1">
+    </root>
   </other>
 
 </blockdefinitions>
