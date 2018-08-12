@@ -40,6 +40,13 @@ module.exports = [{
     action: "core: save"
   },
   {
+    key: 'o',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "file: open"
+  },
+  {
     key: 'r',
     ctrl: false,
     alt: false,
@@ -87,6 +94,13 @@ module.exports = [{
     alt: false,
     shift: false,
     action: "blocks: delete selected and children"
+  },
+  {
+    key: 'Delete',
+    ctrl: false,
+    alt: true,
+    shift: false,
+    action: "blocks: unlink selected block"
   },
   {
     key: 'Delete',
