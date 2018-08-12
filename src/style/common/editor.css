@@ -150,11 +150,11 @@ main {
   padding-bottom: 10px;
   border: 1px solid #aaa;
   border-top: none;
-  background-color: #eee;
+  background-color: white;
   cursor: pointer;
 }
 
-.quick-access-bar-result:hover, .quick-access-bar-result .selected {
+.quick-access-bar-result:hover, .quick-access-bar-result.selected {
   background-color: lightgray;
 }
 

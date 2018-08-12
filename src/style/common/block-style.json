@@ -1,5 +1,6 @@
 {
   "all": {
+    "attributeColor": "black",
     "rootPosition": {
       "x": 15,
       "y": 15
@@ -24,7 +25,7 @@
       "padding": 1,
       "speedDivider": 5
     },
-    "belowParentBlockMargin": {
+    "blockBelowParentMargin": {
       "x": 20,
       "y": 50
     }
