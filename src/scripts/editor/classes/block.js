@@ -18,21 +18,13 @@ let mouseClickPosition = {
   y: 0
 };
 
-function blockLinkToParentComparison(a, b) {
-  // TODO: Allows to set a custom order for block type as it's super sad, or just use the order in the def file
-  // TODO: Fix that block margin may be by "all" instead of allowing or block to works as expected
-  if (a.linkToParentType < b.linkToParentType) {
+function compare(a, b) {
+  if (a < b) {
+    return -1;
+  } else if (a > b) {
     return 1;
   } else {
-    return -1;
-  }
-}
-
-function blockPositionYComparison(a, b) {
-  if (a.position.y > b.position.y) {
-    return 1;
-  } else {
-    return -1;
+    return 0;
   }
 }
 
@@ -57,14 +49,15 @@ class Block {
     x: 0,
     y: 0
   }) {
+
     this.name = blockDefinition.name;
     this.type = blockDefinition.type;
+    this.attributes = {};
+    this.attributeCount = 0;
+
     this.children = children;
     this.parent = parent;
     this.isRoot = blockDefinition.isRoot || false;
-    this.attributes = {};
-
-    this.attributeCount = 0;
 
     this.isNewDraggedBlock = false;
     this.mouseOver = false;
@@ -73,15 +66,21 @@ class Block {
 
     this.linkingInProgress = false;
     this.linkingLinkTypeIndex = 0;
+    this.linkToParentType = "";
+    this.linkToParentProperties = {};
     this.startLinkingLinkAllowed = true;
 
     this.position = position;
-
     this.size = getBlockStyleProperty(this.type, "size");
-    this.color = getBlockStyleProperty(this.type, "color");
-    this.font = getBlockStyleProperty(this.type, "font");
-    this.margin = getBlockStyleProperty(this.type, "margin");
-    this.selectedStyle = getBlockStyleProperty(this.type, "selectedBorder");
+
+    this.style = {
+      attributeColor: getBlockStyleProperty(this.type, "attributeColor"),
+      color: getBlockStyleProperty(this.type, "color"),
+      margin: getBlockStyleProperty(this.type, "margin"),
+      font: getBlockStyleProperty(this.type, "font"),
+      selected: getBlockStyleProperty(this.type, "selectedBorder"),
+      blockBelowParentMargin: getBlockStyleProperty(this.type, "blockBelowParentMargin"),
+    };
 
     // Blocks cannot be orphan
     if (!parent && !blockDefinition.isRoot) {
@@ -92,6 +91,7 @@ class Block {
       this.parent.addChild(this, linkToParentType);
     }
 
+    // CLEANING: Check if it's truly necessary
     this.setLinkToParentType(linkToParentType);
 
     // Set everything to their default value and create the attribute object by copying everything
@@ -121,7 +121,7 @@ class Block {
         };
 
         this.attributeCount++;
-        this.attributes[type].push(attribute);
+        this.attributes[type][templateAttribute.name] = (attribute);
       }
     }
 
@@ -130,49 +130,16 @@ class Block {
       if (this.attributes["string"] === undefined) {
         this.attributes["string"] = [];
       }
+
       this.attributeCount++;
-      this.attributes["string"].push({
+      this.attributes["string"][config.commentAttributeName] = ({
         value: "",
         name: config.commentAttributeName
       });
     }
   }
 
-
-  getRoot() {
-    if (this.parent === false) {
-      return this;
-    } else {
-      return this.parent.getRoot();
-    }
-  }
-
-  getBlockAttributes() {
-    return this.attributes;
-  }
-
-  setBlockAttributes(attributes) {
-    for (let i = 0; i < attributes.length; ++i) {
-
-    }
-  }
-
-  // Used to auto layout the blocks
-  getMaxRecursiveDepth(previousDepth = 0) {
-    if (this.children.length <= 0) {
-      return 0;
-    } else {
-      let maxChildCount = this.children.length - 1;
-      for (let i = 0; i < this.children.length; ++i) {
-        let maxRecursiveDepth = this.children[i].getMaxRecursiveDepth(maxChildCount);
-        if (maxRecursiveDepth > maxChildCount) {
-          maxChildCount = maxRecursiveDepth;
-        }
-      }
-      return maxChildCount + previousDepth;
-    }
-  }
-
+  // Returns true if linkType can be a child link of this block
   linkableTo(linkType) {
     if (config.connectionsTypes.length === 0) {
       return true;
@@ -191,7 +158,7 @@ class Block {
     let extraHeight = 0;
 
     // Attributes
-    extraHeight += this.attributeCount * this.font.size;
+    extraHeight += this.attributeCount * this.style.font.size;
 
     // Everything displayed below the parents count as the block's height
     this.children.map((child) => {
@@ -200,20 +167,7 @@ class Block {
       }
     });
 
-    /*  if (this.parent) {
-        let nextSibling = this.parent.children[this.parent.children.indexOf(this) + 1];
-        if (nextSibling && nextSibling.linkToParentType != this.linkToParentType) {
-          extraHeight += getLinkStyleProperty(nextSibling.linkToParentType, "firstBlockMargin");
-        }
-      }
-
-      const displayBelowParent = getLinkStyleProperty(this.linkToParentType, "displayBelowParent");
-      if (displayBelowParent) {
-        if (this.parent.children.indexOf(this) === 0) {
-          extraHeight += getBlockStyleProperty(this.type, "belowParentBlockMargin");
-        }
-      }*/
-    return this.size.height + this.margin.y + extraHeight;
+    return this.size.height + this.style.margin.y + extraHeight;
   }
 
   getMaxRecursiveHeight(previousHeight = 0) {
@@ -226,7 +180,7 @@ class Block {
     });
     return Math.max(childrenTotalHeight, this.getFullHeight());
   }
-  // getFullHeight
+
   // Changes the link linking this block to its parent
   // Note that a "false" link doesn't means there's no link
   setLinkToParentType(linkToParentType = false) {
@@ -234,16 +188,30 @@ class Block {
       // If not link specified, use the default one or false
       if (config.connectionsTypes[0]) {
         this.linkToParentType = config.connectionsTypes[0].name;
+        this.linkToParentProperties = config.connectionsTypes[0];
       } else {
         this.linkToParentType = false;
       }
     } else {
+      for (let i = 0; i < config.connectionsTypes.length; ++i) {
+        if (config.connectionsTypes[i].name === linkToParentType) {
+          this.linkToParentProperties = config.connectionsTypes[i];
+          break;
+        }
+      }
       this.linkToParentType = linkToParentType;
     }
   }
 
   changeParent(newParent, linkToParentType = false) {
-    if (newParent === this || newParent === this.parent || !newParent) return false;
+    if (newParent === this || (newParent === this.parent && this.linkToParentType === linkToParentType) || !newParent) {
+      return false;
+    }
+
+    if (this.parent === newParent) {
+      this.setLinkToParentType(linkToParentType);
+      return true;
+    }
 
     // Removes from current parent
     this.parent.children.splice(this.parent.children.indexOf(this), 1);
@@ -251,6 +219,7 @@ class Block {
     this.parent = newParent;
     newParent.children.push(this);
     this.setLinkToParentType(linkToParentType);
+    return true;
   }
 
   // Should not really be used except in the constructor
@@ -305,10 +274,8 @@ class Block {
   delete() {
     if (this.isRoot) return false; // no
 
-    let root = this.getRoot();
-
     while (this.children.length > 0) {
-      this.children[0].changeParent(root);
+      this.children[0].changeParent(rootBlock);
     }
 
     // Note: delete recusive only delete this block since we removed all children
@@ -316,38 +283,35 @@ class Block {
   }
 
   sortChildrenByYPosition() {
-    this.children.sort(blockPositionYComparison);
-    // this.children.sort(blockLinkToParentComparison);
-  }
+    this.children.sort((a, b) => {
+      let sortOrderA = parseInt(a.linkToParentProperties.sortOrder);
+      let sortOrderB = parseInt(b.linkToParentProperties.sortOrder);
 
-  getConnectionType() {
-    for (let i = 0; i < config.connectionsTypes.length; ++i) {
-      if (config.connectionsTypes[i].name === this.linkToParentType) {
-        return config.connectionsTypes[i].name;
+      if (sortOrderA === sortOrderB) {
+        return compare(a.position.y, b.position.y);
+      } else {
+        return compare(sortOrderA, sortOrderB);
       }
-    }
-    return "all";
+    });
+    /*  this.children.sort(positionYComparator);
+      this.children = stable(this.children, linkToParentComparator);*/
   }
 
   autoLayout() {
     if (this.isRoot) {
       const rootPosition = getBlockStyleProperty("all", "rootPosition");
-      this.position.x = rootPosition.x - this.margin.x;
+      this.position.x = rootPosition.x - this.style.margin.x;
       this.position.y = rootPosition.y;
     }
 
-    const belowParentBlockMargin = getBlockStyleProperty(this.linkToParentType, "belowParentBlockMargin");
-
     let totalRecursiveHeightCount = 0;
-    let belowParentHeight = belowParentBlockMargin.y;
+    let belowParentHeight = this.style.blockBelowParentMargin.y;
     let previousBlock = false;
     let previousIsBelowParent = false;
 
     for (let i = 0; i < this.children.length; ++i) {
-      const displayBelowParent = getLinkStyleProperty(this.children[i].linkToParentType, "displayBelowParent");
-
-      if (displayBelowParent === true) {
-        this.children[i].position.x = this.position.x + belowParentBlockMargin.x;
+      if (getLinkStyleProperty(this.children[i].linkToParentType, "displayBelowParent") === true) {
+        this.children[i].position.x = this.position.x + this.style.blockBelowParentMargin.x;
         this.children[i].position.y = belowParentHeight + this.position.y;
         belowParentHeight += this.children[i].getFullHeight();
       } else {
@@ -355,7 +319,7 @@ class Block {
           totalRecursiveHeightCount += previousBlock.getMaxRecursiveHeight();
         }
 
-        this.children[i].position.x = this.margin.x + this.position.x;
+        this.children[i].position.x = this.style.margin.x + this.position.x;
         this.children[i].position.y = totalRecursiveHeightCount + this.position.y;
 
         previousBlock = this.children[i];
@@ -364,7 +328,6 @@ class Block {
       this.children[i].autoLayout();
     }
   }
-
 
   isPositionOver(position) {
     return position.x > this.position.x && position.y > this.position.y &&
@@ -456,7 +419,7 @@ class Block {
       let vy = child.position.y - targetBlock.position.y;
       let dist = Math.sqrt(vx ** 2 + vy ** 2);
       // crappy workaround for or blocks
-      if(vy === 0) {
+      if (vy === 0) {
         dist /= 100;
       }
       if (axis === "y" && (direction * child.position.y > direction * targetBlock.position.y) ||
@@ -478,17 +441,6 @@ class Block {
     if (closestBlock) {
       closestBlock.setSelected(true);
     }
-
-    /*
-    let indexInParentArray = this.parent.children.indexOf(this);
-
-    if (direction < 0 && indexInParentArray > 0) {
-      this.parent.children[indexInParentArray - 1].setSelected(true);
-    }
-    if (direction > 0 && indexInParentArray < this.parent.children.length - 1) {
-      this.parent.children[indexInParentArray + 1].setSelected(true);
-    }
-    */
   }
 
   // Move to parent / first child
@@ -563,7 +515,7 @@ class Block {
         totalRecursiveHeightCount += this.children[i - 1].getMaxRecursiveHeight();
       }
 
-      child.position.x = this.margin.x + this.position.x;
+      child.position.x = this.style.margin.x + this.position.x;
       child.position.y = totalRecursiveHeightCount + this.position.y;
       child.setChildrenPositionRelative();
     });
@@ -582,36 +534,6 @@ class Block {
     } else {
       return this.parent.isRecursiveChild(block);
     }
-
-    //    return false;
-    /*
-
-        if(this.isRoot) {
-          return false;
-        }
-
-        if(this === block) {
-          return true;
-        }
-
-
-        return this.parent.isRecursiveChild(block);*/
-    /*if(this === block || (this === block.parent && !block.parent.isRoot)) {
-      return true;
-    }
-    else {
-      if(block.parent) {
-        if(block.parent.isRoot) {
-          return false;
-        }
-        else {
-          return block.parent.isRecursiveChild(this);
-        }
-      }
-      else {
-        return false;
-      }
-    }*/
   }
 
   // Handle block clicking and block double-clicking
@@ -660,7 +582,7 @@ class Block {
 
           this.startLinkingLinkAllowed = false;
 
-          actionHandler.trigger("blocks: link block", {
+          let linkChanged = actionHandler.trigger("blocks: link block", {
             targetBlock: this,
             parentBlock: selectedBlock,
             linkType: config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : "all"
@@ -668,22 +590,18 @@ class Block {
 
           //this.changeParent(selectedBlock, config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : "all")
           //  this.parent.autoLayout();
-
-          if (!global.metaKeys.ctrl) {
+          if (!global.metaKeys.ctrl && linkChanged) {
             selectedBlock.cancelBlockLinking();
           }
         }
       } else if (this.dragged && leftClickState) {
         this.setChildrenPositionRelative();
       }
-
-
     }
 
     if (!rightClickState) {
       this.startLinkingLinkAllowed = true;
     }
-
 
     this.children.map((child) => {
       child.handleBlockSelection(mousePosition, leftClickState, rightClickState);
@@ -720,9 +638,7 @@ class Block {
         x: global.mouse.cameraX,
         y: global.mouse.cameraY
       });
-
     });
-
 
     if (mouseIsOverBlock) {
       document.getElementById("main-canvas").style.cursor = "pointer";
@@ -748,14 +664,14 @@ class Block {
 
       ctx.beginPath();
 
+      // Move to block
       ctx.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
 
-      // why didn't I use vectore in the first place, I'm so dumb
+      // Draw an arrow at the end of the line
       let x = (this.position.x + this.size.width) - global.mouse.cameraX;
       let y = (this.position.y + this.size.height * 0.5) - global.mouse.cameraY;
       let angle = Math.atan2(y, x);
 
-      // TODO: Allows styling arrow in config
       ctx.lineTo(global.mouse.cameraX, global.mouse.cameraY);
       ctx.lineTo(global.mouse.cameraX + 20 * Math.cos(angle - Math.PI / 5), global.mouse.cameraY + 20 * Math.sin(angle - Math.PI / 5));
       ctx.moveTo(global.mouse.cameraX, global.mouse.cameraY);
@@ -763,22 +679,15 @@ class Block {
 
       ctx.stroke();
     }
-
+    // Render links
     this.children.map((child, i) => {
-      // Render links
-      // TODO: Allows "unconnected" effect selection in config since it's not always great
+      // We don't want to draw the connection from the hidden root to its children, except for the first element
       if (!this.isRoot || i == 0) {
-        const childSize = getBlockStyleProperty(child.type, "size");
         const dashInterval = getLinkStyleProperty(child.linkToParentType, "dashInterval");
         const baseLinkLength = getLinkStyleProperty(child.linkToParentType, "baseLength");
 
         ctx.strokeStyle = getLinkStyleProperty(child.linkToParentType, "color");
         ctx.lineWidth = getLinkStyleProperty(child.linkToParentType, "lineWidth");
-
-        // This could be an interesting feature to add, currently disabled becuase it doesn't look super good
-        /*if(selectedBlock.isRecursiveChild(child)) {
-          ctx.lineWidth = getLinkStyleProperty(child.linkToParentType, "lineWidth") * 3;
-        }*/
 
         if (dashInterval == 0) {
           ctx.setLineDash([]);
@@ -786,74 +695,122 @@ class Block {
           ctx.setLineDash([dashInterval]);
         }
 
-
         ctx.beginPath();
-
-        const displayBelowParent = getLinkStyleProperty(child.linkToParentType, "displayBelowParent");
-
-        if (!displayBelowParent) {
-          ctx.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
-          ctx.lineTo(this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
-
-          if (this.position.x + this.size.width + baseLinkLength > child.position.x) {
-            if (this.position.x + this.size.width + baseLinkLength > child.position.x + childSize.width) {
-              ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
-              ctx.lineTo(child.position.x + childSize.width, child.position.y + childSize.height * 0.5);
-            } else {
-              if (child.position.y > this.position.y) {
-                ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y);
-              } else {
-                ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height);
-              }
-              // ctx.lineTo(child.position.x + childSize.width / 2, child.position.y);
-            }
-          } else {
-            // If the test make everything too laggy, just keep these 2 lines
-            ctx.lineTo(this.position.x + this.size.width + baseLinkLength, child.position.y + childSize.height * 0.5);
-            ctx.lineTo(child.position.x, child.position.y + childSize.height * 0.5);
-          }
+        // Blocks displayed below their parent are styled in another manner
+        if (!getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
+          // No need to redraw the first segment multiple time
+        //   camera.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
+          camera.drawSegment(ctx, this.position.x + this.size.width, this.position.y + this.size.height * 0.5,
+           this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
+         //  camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
+         camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5,
+        this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
+          //camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
+      //    camera.lineTo(ctx, child.position.x, child.position.y + child.size.height * 0.5);
+        camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5,
+         child.position.x, child.position.y + child.size.height * 0.5);
         } else {
           ctx.moveTo(this.position.x, this.position.y + this.size.height);
-          ctx.lineTo(this.position.x, child.position.y + childSize.height * 0.5);
-          ctx.lineTo(child.position.x, child.position.y + childSize.height * 0.5);
+          ctx.lineTo(this.position.x, child.position.y + child.size.height * 0.5);
+          ctx.lineTo(child.position.x, child.position.y + child.size.height * 0.5);
         }
 
         ctx.stroke();
       }
+      /*  if (this.position.x + this.size.width + baseLinkLength > child.position.x) {
+          if (this.position.x + this.size.width + baseLinkLength > child.position.x + child.size.width) {
+            if(i === this.children.length - 1 || child.selected) {
+              camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
+            }
+            else {
+              ctx.moveTo(this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
+            }
+            camera.lineTo(ctx, child.position.x + child.size.width, child.position.y + child.size.height * 0.5);
+          } else {
+            if (child.position.y > this.position.y) {
+              camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y);
+            } else {
+              camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height);
+            }
+            // camera.lineTo(ctx, child.position.x + child.size.width / 2, child.position.y);
+          }
+        } else {
+          // If the test make everything too laggy, just keep these 2 lines
+          if(i === this.children.length - 1 || child.selected) {
+            camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
+          }
+          else {
+            ctx.moveTo(this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
+          }
+          camera.lineTo(ctx, child.position.x, child.position.y + child.size.height * 0.5);
+        }
+      } else {
+        ctx.moveTo(this.position.x, this.position.y + this.size.height);
+        camera.lineTo(ctx, this.position.x, child.position.y + child.size.height * 0.5);
+        camera.lineTo(ctx, child.position.x, child.position.y + child.size.height * 0.5);
+      }*/
 
       child.renderConnections(ctx);
     });
   }
 
+  getCommentLines() {
+    let lines = [];
+    if (!this.attributes["string"] || !this.attributes["string"][config.commentAttributeName]) {
+      return lines;
+    } else {
+      let words = this.attributes["string"][config.commentAttributeName].split(" ");
+    }
+  }
+
+  isInView() {
+    let bounds = camera.getBounds();
+    if (this.position.x > bounds.x + bounds.width || this.position.y > bounds.y + bounds.height) {
+      return false;
+    }
+
+    if (this.position.x + this.size.width < bounds.x || this.position.y + this.getFullHeight() < bounds.y) {
+      return false;
+    }
+
+    return true;
+  }
+
   render(ctx) {
-    if (!this.isRoot) {
+    if (!this.isRoot && this.isInView(camera)) {
+      /*  let commentHeight = 0;
+        if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName]) {
+          commentHeight = 150;
+          ctx.fillStyle = "green";
+          ctx.fillText(this.attributes["string"][config.commentAttributeName].value, this.position.x, this.position.y);
+        }*/
+
       // Render block
-      ctx.fillStyle = this.color;
+      ctx.fillStyle = this.style.color;
       ctx.fillRect(this.position.x, this.position.y, this.size.width, this.size.height);
 
       // Selection border
       if (this.selected) {
-        ctx.strokeStyle = this.color;
-        ctx.setLineDash([this.selectedStyle.dashInterval]);
-        ctx.lineDashOffset = tick / this.selectedStyle.speedDivider;
-        ctx.lineWidth = this.selectedStyle.width;
+        ctx.strokeStyle = this.style.color;
+        ctx.setLineDash([this.style.selected.dashInterval]);
+        ctx.lineDashOffset = tick / this.style.selected.speedDivider;
+        ctx.lineWidth = this.style.selected.width;
 
-        ctx.strokeRect(this.position.x - this.selectedStyle.padding,
-          this.position.y - this.selectedStyle.padding,
-          this.size.width + this.selectedStyle.padding * 2,
-          this.size.height + this.selectedStyle.padding * 2);
+        ctx.strokeRect(this.position.x - this.style.selected.padding,
+          this.position.y - this.style.selected.padding,
+          this.size.width + this.style.selected.padding * 2,
+          this.size.height + this.style.selected.padding * 2);
 
         ctx.lineDashOffset = 0;
       }
 
-      // Mouse over colour
+      // Mouse over color
       if (this.mouseOver) {
         ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
         ctx.fillRect(this.position.x, this.position.y, this.size.width, this.size.height);
       }
 
-      // Text
-      // White or black depending on the colour of the block
+      // Text is white or black depending on the colour of the block
       const textColour = ((
           parseInt(ctx.fillStyle.slice(1, 3), 16) +
           parseInt(ctx.fillStyle.slice(3, 5), 16) +
@@ -863,29 +820,36 @@ class Block {
       ctx.fillStyle = textColour;
 
       // Text
-      ctx.font = this.font.size + "px " + this.font.family;
+      ctx.font = this.style.font.size + "px " + this.style.font.family;
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
 
       // DEBUG: Display blocks real height
-      /*ctx.setLineDash([]);
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "red";
-      ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getFullHeight());
-      ctx.strokeStyle = "blue";
-      ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getMaxRecursiveHeight());
+      /*      ctx.setLineDash([]);
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "red";
+            ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getFullHeight());
+            ctx.strokeStyle = "blue";
+            ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getMaxRecursiveHeight());
       */
-      ctx.fillText(this.name /* + " - " + selectedBlock.isRecursiveChild(this) */ + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")", this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
+      ctx.fillText(this.name + " - " + this.parent.children.indexOf(this) /* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
 
       ctx.textAlign = "left";
-      ctx.fillStyle = "white";
+      ctx.fillStyle = this.style.attributeColor;
       ctx.textBaseline = "top";
 
       let lineCounter = 0;
+      // Render attributes
       for (let type in this.attributes) {
-        for (let i = 0; i < this.attributes[type].length; ++i) {
+        for (let i in this.attributes[type]) {
+          // Skip comment (TODO: Skip IsMinimized)
           if (this.attributes[type][i].name !== config.commentAttributeName) {
-            ctx.fillText(this.attributes[type][i].shortName || this.attributes[type][i].name, this.position.x, this.size.height + this.position.y + this.font.size * lineCounter);
+            // Draw rect instead of text when zoomed out too much to increase performances
+            if (camera.getScaling() < 0.4) {
+              ctx.fillRect(this.position.x, this.size.height + this.position.y + this.style.font.size * lineCounter, this.attributes[type][i].name.length * 5, 2);
+            } else {
+              ctx.fillText((this.attributes[type][i].shortName || this.attributes[type][i].name) + ": " + this.attributes[type][i].value, this.position.x, this.size.height + this.position.y + this.style.font.size * lineCounter);
+            }
             lineCounter++;
           }
         }
@@ -912,193 +876,3 @@ selectedBlock = root;
 
 module.exports.rootBlock = root;
 module.exports.Block = Block;
-/*
-
-const canvasStyle = require(basePath + '/src/scripts/utils/theme-loader.js').canvasStyle;
-
-
-
-class Block {
-  constructor(name, type, position = {
-    x: 0,
-    y: 0
-  }, link = "", properties = {}, children = [], parent = false, selected = false) {
-    this.link = link;
-    this.name = name;
-    this.type = type;
-    this.position = position;
-    this.properties = properties;
-    this.children = children;
-    this.parent = parent;
-    this.lastSelected = false;
-    this.selected = selected;
-    this._isMouseOver = false;
-    this.linkingType = 0;
-  }
-
-  // name copyright goes to marukyu
-
-
-  linkTo(block) {
-    // Make sure target isn't already connected
-    if(block != this && block.parent === false && block.type != "root" && !block.isRecursiveChild(this)) {
-      block.parent = this;
-      this.children.push(block);
-      return true;
-    }
-  }
-
-  getName() {
-    return this.name;
-  }
-
-  getBlockAtMousePos(mousePos) {
-    this._isMouseOver = false;
-    // Give priority to the deepest child
-    for (let i = 0; i < this.children.length; ++i) {
-      this.children[i]._isMouseOver = false;
-      if (this.children[i].getBlockAtMousePos(mousePos) !== false) {
-        return this.children[i].getBlockAtMousePos(mousePos);
-      } else {
-        if (this.children[i].isMouseOver(mousePos)) {
-          this.children[i]._isMouseOver = true;
-          return this.children[i];
-        }
-      }
-    }
-
-    // Reached a terminal node
-    if(this.isMouseOver(mousePos)) {
-      this._isMouseOver = true;
-      return this;
-    }
-    else {
-      return false;
-    }
-  }
-
-  getSize() {
-    return {
-      w: canvasStyle.blocks.size.width,
-      h: canvasStyle.blocks.size.height
-    };
-  }
-
-  getPosition() {
-    let position = {
-      x: this.position.x,
-      y: this.position.y
-    };
-
-    if (!this.selected && this.parent) {
-      let parentPosition = this.parent.getPosition();
-      position.x += parentPosition.x;
-      position.y += parentPosition.y;
-    }
-
-    return position;
-  }
-
-  renderConnections(ctx, camera, mousePos) {
-
-    let position = this.getPosition();
-    let size = this.getSize();
-
-    ctx.strokeStyle = canvasStyle.connections.colour;
-    ctx.lineWidth = canvasStyle.connections.lineWidth;
-
-    ctx.setLineDash([]);
-
-    if (this.type == "root") {
-      ctx.beginPath();
-      ctx.moveTo(0, position.y + size.h * 0.5);
-      ctx.lineTo(position.x, position.y + size.h * 0.5);
-      ctx.stroke();
-    }
-    // TODO: Handle linking type
-    if(this.linkingType != 0) {
-      ctx.beginPath();
-      // Block end
-      ctx.moveTo(position.x + size.w, position.y + size.h * 0.5);
-      // Move away from the block
-      ctx.lineTo(position.x + size.w + canvasStyle.connections.baseLength, position.y + size.h * 0.5);
-      ctx.lineTo(position.x + size.w + canvasStyle.connections.baseLength, mousePos.y);
-      // Connect to the other block
-      ctx.lineTo(mousePos.x, mousePos.y);
-      ctx.stroke();
-      ctx.strokeRect(mousePos.x - 3, mousePos.y - 3, 6, 6);
-    }
-
-    // Draw connections to childs
-    for (let i = 0; i < this.children.length; ++i) {
-      let child = this.children[i];
-
-      ctx.beginPath();
-      // Block end
-      ctx.moveTo(position.x + size.w, position.y + size.h * 0.5);
-      // Move away from the block
-      ctx.lineTo(position.x + size.w + canvasStyle.connections.baseLength, position.y + size.h * 0.5);
-      ctx.lineTo(position.x + size.w + canvasStyle.connections.baseLength, child.getPosition(position).y + size.h * 0.5);
-      // Connect to the other block
-      ctx.lineTo(child.getPosition(position).x, child.getPosition(position).y + size.h * 0.5);
-      ctx.stroke();
-
-      child.renderConnections(ctx, position, mousePos);
-    }
-  }
-
-  render(ctx, camera) {
-
-    let position = this.getPosition();
-    let size = {
-      w: canvasStyle.blocks.size.width,
-      h: canvasStyle.blocks.size.height
-    };
-
-    // Draw block base
-    ctx.fillStyle = canvasStyle.blocks.colours[this.type];
-    ctx.fillRect(position.x,
-      position.y,
-      size.w,
-      size.h
-    );
-
-    if(this.lastSelected) {
-      ctx.strokeStyle = canvasStyle.blocks.colours[this.type];
-      ctx.setLineDash([10]);
-      ctx.lineDashOffset = tick / 5;
-      ctx.lineWidth = 3;
-      ctx.strokeRect(position.x - 1, position.y -1, size.w + 2, size.h + 2);
-    }
-    else if(this._isMouseOver) {
-      ctx.fillRect(position.x - 2, position.y - 2, size.w + 4, size.h + 4);
-    }
-
-
-    // Calculate average colour and use white or black depending on the colour
-
-    let textColour = ((parseInt(ctx.fillStyle.slice(1, 3), 16) +
-      parseInt(ctx.fillStyle.slice(3, 5), 16) +
-      parseInt(ctx.fillStyle.slice(5, 7), 16)) / 3) < 127 ? "white" : "black";
-
-    ctx.fillStyle = textColour;
-
-    // Text
-    ctx.font = canvasStyle.blocks.font.size + "px " + canvasStyle.blocks.font.family;
-    ctx.textBaseline = "middle";
-    ctx.textAlign = "center";
-
-    ctx.fillText(this.name/* + "(" + (this.getMaxRecursiveDepth() + 1) + ")"*/
-/*,
-      position.x + size.w * 0.5,
-      position.y + size.h * 0.5, size.w);
-
-    // Render children
-    for (let i = 0; i < this.children.length; ++i) {
-      this.children[i].render(ctx, {}, position);
-    }
-
-  }
-}
-
-module.exports = Block;*/

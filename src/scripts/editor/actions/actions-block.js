@@ -12,11 +12,17 @@ module.exports.registerActions = () => {
     Block.getSelectedBlock().cancelBlockLinking();
   });
 
-  actionHandler.addAction("blocks: link block", (data) => {
-    data.targetBlock.changeParent(data.parentBlock, data.linkType);
+  actionHandler.addAction("blocks: unlink selected block", () => {
+    actionHandler.trigger("blocks: link block", {parentBlock: rootBlock, targetBlock: Block.getSelectedBlock()});
+  });
 
-    /*data.block.deleteRecursive();
-    rootBlock.autoLayout();*/
+  actionHandler.addAction("blocks: link block", (data, actionHandlerParameters) => {
+    if(!data.targetBlock.changeParent(data.parentBlock, data.linkType)) {
+      actionHandlerParameters.cancelUndo = true;
+      return false;
+    }
+
+    return true;
   }, (data) => {
     let oldParent = data.targetBlock.parent;
     let oldLinkingType = data.targetBlock.linkToParentType;
@@ -29,10 +35,6 @@ module.exports.registerActions = () => {
     };
   }, (data) => {
     data.targetBlock.changeParent(data.oldParent, data.oldLinkingType);
-
-    /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
-      data.block.setSelected();
-      rootBlock.autoLayout();*/
   });
 
   actionHandler.addAction("blocks: delete selected", (data) => {
