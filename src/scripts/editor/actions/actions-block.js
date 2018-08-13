@@ -39,7 +39,7 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction("blocks: delete selected", (data) => {
     data.block.delete();
-    // rootBlock.autoLayout();
+    rootBlock.autoLayout();
   }, () => {
     let children = [];
     let selectedBlock = Block.getSelectedBlock();
@@ -68,13 +68,13 @@ module.exports.registerActions = () => {
       data.children[i].child.changeParent(data.block, data.children[i].linkToParentType);
     }
 
-    data.block.setSelected();
-    // rootBlock.autoLayout();
+    rootBlock.autoLayout();
+    data.block.setSelected(true);
   });
 
   actionHandler.addAction("blocks: delete selected and children", (data) => {
     data.block.deleteRecursive();
-    // rootBlock.autoLayout();
+    rootBlock.autoLayout();
   }, () => {
     let selectedBlock = Block.getSelectedBlock();
 
@@ -84,8 +84,8 @@ module.exports.registerActions = () => {
     };
   }, (data) => {
     data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
-    data.block.setSelected();
-    // rootBlock.autoLayout();
+    rootBlock.autoLayout();
+    data.block.setSelected(true);
   });
 
   actionHandler.addAction("blocks: add block", (data) => {
@@ -122,7 +122,7 @@ module.exports.registerActions = () => {
     };
   }, (data) => {
     data.block.delete();
-    // rootBlock.autoLayout();
+    rootBlock.autoLayout();
     /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
       data.block.setSelected();
       rootBlock.autoLayout();*/
@@ -218,79 +218,3 @@ module.exports.registerActions = () => {
     Block.getSelectedBlock().setSelectedNextSibling();
   });
 };
-
-
-/*
-actionHandler.addAction("auto block layout", () => {
-  let blocks = dataManager.getBlocks();
-  for (let i = 0; i < blocks.length; ++i) {
-    blocks[i].selected = false;
-    blocks[i].position.x = canvasStyle.blocks.rootPosition.x;
-    blocks[i].position.y = canvasStyle.blocks.rootPosition.y + i * canvasStyle.blocks.margin.y;
-    blocks[i].autoLayout();
-  }
-});
-
-actionHandler.addAction("block select up", () => {
-  if(lastSelectedBlock && lastSelectedBlock.parent && lastSelectedBlock.parent.children.indexOf(lastSelectedBlock) > 0) {
-    lastSelectedBlock.lastSelected = false;
-    lastSelectedBlock = lastSelectedBlock.parent.children[lastSelectedBlock.parent.children.indexOf(lastSelectedBlock) -1 ];
-    lastSelectedBlock.lastSelected = true;
-  }
-});
-
-actionHandler.addAction("block select down", () => {
-  if(lastSelectedBlock && lastSelectedBlock.parent && lastSelectedBlock.parent.children.indexOf(lastSelectedBlock) < lastSelectedBlock.parent.children.length - 1) {
-    lastSelectedBlock.lastSelected = false;
-    lastSelectedBlock = lastSelectedBlock.parent.children[lastSelectedBlock.parent.children.indexOf(lastSelectedBlock) + 1];
-    lastSelectedBlock.lastSelected = true;
-  }
-});
-
-actionHandler.addAction("block select parent", () => {
-  if(lastSelectedBlock && lastSelectedBlock.parent) {
-    lastSelectedBlock.lastSelected = false;
-    lastSelectedBlock = lastSelectedBlock.parent;
-    lastSelectedBlock.lastSelected = true;
-  }
-});
-
-actionHandler.addAction("block select child", () => {
-  if(lastSelectedBlock && lastSelectedBlock.children[0]) {
-    lastSelectedBlock.lastSelected = false;
-    lastSelectedBlock = lastSelectedBlock.children[0];
-    lastSelectedBlock.lastSelected = true;
-  }
-});
-
-actionHandler.addAction("cancel block linking", () => {
-  let blocks = dataManager.getBlocks();
-  if (linkingBlock) {
-    linkingBlock.linkingType = 0;
-    linkingBlock = false;
-  }
-});
-
-actionHandler.addAction("delete selected block and children", () => {
-  let blocks = dataManager.getBlocks();
-  if (hoveredBlock && hoveredBlock.type !== "root") {
-    if (hoveredBlock.parent) {
-      hoveredBlock.destroy();
-    } else {
-      // We have to remove it manually if it's not connected to root
-      blocks.splice(blocks.indexOf(hoveredBlock), 1);
-    }
-    hoveredBlock = false;
-  }
-});
-
-actionHandler.addAction("delete selected block", () => {
-  let blocks = dataManager.getBlocks();
-  if (hoveredBlock && hoveredBlock.type !== "root") {
-    // If the items has no parent, delete cannot delete it
-    if (!hoveredBlock.delete(blocks)) {
-      blocks.splice(blocks.indexOf(hoveredBlock), 1);
-      hoveredBlock = false;
-    }
-  }
-});*/
