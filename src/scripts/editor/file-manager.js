@@ -1,6 +1,7 @@
 const {dialog} = require('electron').remote;
 const fs = require("fs");
 const xml2js = require("xml2js");
+const path = require("path");
 
 module.exports.openWithDialog = () => {
   dialog.showOpenDialog({
@@ -14,7 +15,7 @@ module.exports.openWithDialog = () => {
   });
 };
 
-let validLinkTypes = {"normal": 1, "else": 1, "or": 1};
+let validLinkTypes = {"normal": 1, "else": 1, "orblock": 1, "or": 1};
 
 function addBlockRecursively(xml, parentBlock) {
 //  console.log(xml);
@@ -30,9 +31,19 @@ function addBlockRecursively(xml, parentBlock) {
           for(let k = 0; k < xml[attributeOrLinkToParentType][i][j].length; ++k) {
             if(xml[attributeOrLinkToParentType][i][j][k].$) {
               let blockName =  xml[attributeOrLinkToParentType][i][j][k].$.id;
-              let parent = new Block(blockLoader.getDefinitionByName(blockName || blockType), parentBlock);
+              let parent = new Block(blockLoader.getDefinitionByName(blockName), parentBlock, attributeOrLinkToParentType);
+
+              xml[attributeOrLinkToParentType][i][j][k]
               addBlockRecursively(xml[attributeOrLinkToParentType][i][j][k], parent)
-              // console.log("NORMAL STUFF", blockName);
+            }
+            else {
+              // orblock / andblock / ??? handling
+              let blockName = j;
+    
+              let parent = new Block(blockLoader.getDefinitionByName(blockName), parentBlock, attributeOrLinkToParentType);
+
+              xml[attributeOrLinkToParentType][i][j][k]
+              addBlockRecursively(xml[attributeOrLinkToParentType][i][j][k], parent)
             }
 
           }
@@ -42,6 +53,7 @@ function addBlockRecursively(xml, parentBlock) {
         if(!parentBlock.attributes[attributeOrLinkToParentType]) {
           parentBlock.attributes[attributeOrLinkToParentType] = {};
         }
+        console.log(xml[attributeOrLinkToParentType][i]);
         if(!parentBlock.attributes[attributeOrLinkToParentType][xml[attributeOrLinkToParentType][i].$.id]) {
           parentBlock.attributes[attributeOrLinkToParentType][xml[attributeOrLinkToParentType][i].$.id] = {
             name: xml[attributeOrLinkToParentType][i].$.id,
@@ -63,10 +75,10 @@ function addBlockRecursively(xml, parentBlock) {
 }
 
 function open(file) {
+  tabManager.newTab(path.basename(file), [], file);
   fs.readFile(file, 'utf-8', function(err, xml) {
     xml2js.parseString(xml, function(err, result) {
       let hiddenRoot = result.enemy;
-  //    console.log(hiddenRoot.behaviour);
       for(let i = 0; i < hiddenRoot.behaviour.length; ++i) {
         for(let blockType in hiddenRoot.behaviour[i]) {
           for(let j = 0; j < hiddenRoot.behaviour[i][blockType].length; ++j) {
@@ -75,12 +87,7 @@ function open(file) {
 
             addBlockRecursively(hiddenRoot.behaviour[i][blockType][j], parent);
           }
-        /*  console.log(hiddenRoot.behaviour[i][k]);
-          new Block(blockLoader.getDefinitionByName(blockType));*/
         }
-      //  console.log(hiddenRoot.behaviour[i]);
-    //    console.log(blockLoader.getDefinitionByName(hiddenRoot.behaviour[i]));
-        // List of things to attach to rootBlock
       }
     })
   });

@@ -35,6 +35,15 @@ function newTab(name = "", blocks = [], fileLocation = "", selected = true) {
     // Display is handled in selectTab otherwise
     notifyTabDisplayer();
   }
+
+  // TEMP: Add root block if file location not set for cool "demo" purpose
+  if(!fileLocation) {
+    new Block({
+      type: "root",
+      name: "root"
+    });
+    rootBlock.autoLayout();
+  }
 }
 
 function closeCurrentTab() {
