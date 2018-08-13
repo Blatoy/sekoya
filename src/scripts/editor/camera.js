@@ -35,7 +35,8 @@ module.exports.drawSegment = (ctx, x1, y1, x2, y2) => {
   if (x1 > x2) x1, x2 = x2, x1;
   if (y1 > y2) y1, y2 = y2, y1;
 
-  if (x1 > bounds.x && x2 > bounds.x && x1 < bounds.x + bounds.width && x2 < bounds.x + bounds.width) {
+  //if (x1 > bounds.x && x2 > bounds.x && x1 < bounds.x + bounds.width && x2 < bounds.x + bounds.width) {
+  if (x1 < bounds.x + bounds.width && x2 > bounds.x) {
     if (y1 < bounds.y + bounds.height && y2 > bounds.y) {
       x1 = Math.max(bounds.x, x1);
       x2 = Math.max(bounds.x, x2);

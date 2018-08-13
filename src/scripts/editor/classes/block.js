@@ -5,8 +5,8 @@
 let root;
 let selectedBlock;
 
-let mouseIsOverBlock = false;
-let anyBlockBeingDragged = false;
+let mouseOverAnyBlock = false;
+let blockLinkingInProgress = false;
 
 let mouseClickPositionRelativeToBlock = {
   x: 0,
@@ -329,16 +329,16 @@ class Block {
     }
   }
 
-  isPositionOver(position) {
-    return position.x > this.position.x && position.y > this.position.y &&
-      position.x < this.position.x + this.size.width && position.y < this.position.y + this.size.height;
+  isPositionOver(x, y) {
+    return y > this.position.y && y < this.position.y + this.size.height && x > this.position.x &&
+      x < this.position.x + this.size.width;
   }
 
   setSelected(moveCamera = false) {
     if (this.isRoot) {
       if (this.children[1]) {
         if (selectedBlock) {
-          selectedBlock.linkingInProgress = false;
+          selectedBlock.cancelBlockLinking();
           selectedBlock.selected = false;
         }
         this.children[1].setSelected();
@@ -348,7 +348,7 @@ class Block {
       }
     } else {
       if (selectedBlock) {
-        selectedBlock.linkingInProgress = false;
+        selectedBlock.cancelBlockLinking();
         selectedBlock.selected = false;
       }
 
@@ -487,27 +487,6 @@ class Block {
     this.parent.children[0].setSelected(true);
   }
 
-  handleMouseOverBlock(mousePosition) {
-    this.mouseOver = false;
-
-    // Found a block that is hovered, no need to proceed further
-    if (mouseIsOverBlock) {
-      return;
-    } else {
-      if (this.isPositionOver(mousePosition)) {
-        if (!this.isRoot) {
-          this.mouseOver = true;
-          mouseIsOverBlock = true;
-        }
-        return;
-      }
-    }
-
-    this.children.map((child) => {
-      child.handleMouseOverBlock(mousePosition);
-    });
-  }
-
   setChildrenPositionRelative() {
     let totalRecursiveHeightCount = 0;
     this.children.map((child, i) => {
@@ -522,6 +501,7 @@ class Block {
   }
 
   cancelBlockLinking() {
+    blockLinkingInProgress = false;
     this.linkingInProgress = false;
     this.linkingLinkTypeIndex = 0;
   }
@@ -536,111 +516,194 @@ class Block {
     }
   }
 
-  // Handle block clicking and block double-clicking
-  handleBlockSelection(mousePosition, leftClickState, rightClickState) {
-    if (!anyBlockBeingDragged || this.dragged) {
-      if (this.dragged && !leftClickState) {
-        // Stop block dragging
+  /*
+    handleMouseOverBlock(mousePosition) {
+      this.mouseOver = false;
 
-        if (this.isNewDraggedBlock) {
-          this.isNewDraggedBlock = false;
-          actionHandler.trigger("blocks: sort children using position - no undo", {
-            parentBlock: this.parent
-          });
-        } else {
-          actionHandler.trigger("blocks: sort children using position", {
-            parentBlock: this.parent
-          });
+      // Found a block that is hovered, no need to proceed further
+      if (mouseIsOverBlock) {
+        return;
+      } else {
+        if (this.isPositionOver(mousePosition)) {
+          if (!this.isRoot) {
+            this.mouseOver = true;
+            mouseIsOverBlock = true;
+          }
+          return;
         }
+      }
 
-        this.dragged = false;
-        anyBlockBeingDragged = false;
-      } else if (!this.dragged && leftClickState && this.mouseOver && !selectedBlock.linkingInProgress) {
-        // Start block dragging
+      this.children.map((child) => {
+        child.handleMouseOverBlock(mousePosition);
+      });
+    }
+  */
 
-        this.dragged = true;
-        this.setSelected();
+  // Handle block clicking and block double-clicking
+  /*  handleBlockSelection(mousePosition, leftClickState, rightClickState) {
+      if (!anyBlockBeingDragged || this.dragged) {
+        if (this.dragged && !leftClickState) {
+          // Stop block dragging
 
-        anyBlockBeingDragged = true;
+          if (this.isNewDraggedBlock) {
+            this.isNewDraggedBlock = false;
+            actionHandler.trigger("blocks: sort children using position - no undo", {
+              parentBlock: this.parent
+            });
+          } else {
+            actionHandler.trigger("blocks: sort children using position", {
+              parentBlock: this.parent
+            });
+          }
 
-        mouseClickPosition = {
-          x: this.position.x,
-          y: this.position.y
-        };
+          this.dragged = false;
+          anyBlockBeingDragged = false;
+        } else if (!this.dragged && leftClickState && this.mouseOver && !selectedBlock.linkingInProgress) {
+          // Start block dragging
 
-        mouseClickPositionRelativeToBlock = {
-          x: this.position.x - mousePosition.x,
-          y: this.position.y - mousePosition.y
-        };
-      } else if (!this.dragged && (rightClickState || leftClickState) && this.mouseOver && this.startLinkingLinkAllowed) {
-        if (!selectedBlock.linkingInProgress && !this.isTerminalNode()) {
-          // Start block linking
+          this.dragged = true;
           this.setSelected();
-          this.linkingInProgress = true;
-        } else if (!selectedBlock.isRecursiveChild(this) && selectedBlock.linkingInProgress) {
-          // Link blocks
 
-          this.startLinkingLinkAllowed = false;
+          anyBlockBeingDragged = true;
 
-          let linkChanged = actionHandler.trigger("blocks: link block", {
-            targetBlock: this,
-            parentBlock: selectedBlock,
-            linkType: config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : "all"
-          });
+          mouseClickPosition = {
+            x: this.position.x,
+            y: this.position.y
+          };
 
-          //this.changeParent(selectedBlock, config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : "all")
-          //  this.parent.autoLayout();
-          if (!global.metaKeys.ctrl && linkChanged) {
-            selectedBlock.cancelBlockLinking();
+          mouseClickPositionRelativeToBlock = {
+            x: this.position.x - mousePosition.x,
+            y: this.position.y - mousePosition.y
+          };
+        } else if (!this.dragged && (rightClickState || leftClickState) && this.mouseOver && this.startLinkingLinkAllowed) {
+          if (!selectedBlock.linkingInProgress && !this.isTerminalNode()) {
+            // Start block linking
+            this.setSelected();
+            this.linkingInProgress = true;
+          } else if (!selectedBlock.isRecursiveChild(this) && selectedBlock.linkingInProgress) {
+            // Link blocks
+
+            this.startLinkingLinkAllowed = false;
+
+            let linkChanged = actionHandler.trigger("blocks: link block", {
+              targetBlock: this,
+              parentBlock: selectedBlock,
+              linkType: config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : "all"
+            });
+
+            //this.changeParent(selectedBlock, config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : "all")
+            //  this.parent.autoLayout();
+            if (!global.metaKeys.ctrl && linkChanged) {
+              selectedBlock.cancelBlockLinking();
+            }
+          }
+        } else if (this.dragged && leftClickState) {
+          this.setChildrenPositionRelative();
+        }
+      }
+
+      if (!rightClickState) {
+        this.startLinkingLinkAllowed = true;
+      }
+
+      this.children.map((child) => {
+        child.handleBlockSelection(mousePosition, leftClickState, rightClickState);
+      });
+    }
+
+    handleBlockDragging(mousePosition) {
+      if (this.dragged) {
+        this.position.x = mouseClickPositionRelativeToBlock.x + mousePosition.x;
+        this.position.y = mouseClickPositionRelativeToBlock.y + mousePosition.y;
+      }
+
+      this.children.map((child) => {
+        child.handleBlockDragging(mousePosition);
+      });
+    }
+  */
+
+  handleMouseInteraction() {
+    this.mouseOver = false;
+
+    // Skip blocks if something was found
+    if (!mouseOverAnyBlock && (!selectedBlock.dragged || this.dragged)) {
+      // Handle mouse over display
+      if (this.isPositionOver(global.mouse.cameraX, global.mouse.cameraY)) {
+        if (!this.isRoot) {
+          this.mouseOver = true;
+          mouseOverAnyBlock = true;
+
+          if (!this.dragged) {
+            this.dragged = true;
+            mouseClickPositionRelativeToBlock = {
+              x: this.position.x - global.mouse.cameraX,
+              y: this.position.y - global.mouse.cameraY
+            };
+          }
+
+          if (selectedBlock.linkingInProgress && (global.mouse.buttons[1] || global.mouse.buttons[3]) && !this.linkingInProgress && !selectedBlock.isRecursiveChild(this)) {
+            this.startLinkingLinkAllowed = false;
+            let linkChanged = actionHandler.trigger("blocks: link block", {
+              targetBlock: this,
+              parentBlock: selectedBlock,
+              linkType: config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : false
+            });
+
+            if (!global.metaKeys.ctrl && linkChanged) {
+              selectedBlock.cancelBlockLinking();
+            }
+          }
+
+          if (global.mouse.buttons[1] && !this.selected) {
+            this.setSelected();
+          }
+
+          if (global.mouse.buttons[3] && !blockLinkingInProgress && this.startLinkingLinkAllowed) {
+            this.setSelected();
+            if (!this.isTerminalNode()) {
+              blockLinkingInProgress = true;
+              this.linkingInProgress = true;
+            }
           }
         }
-      } else if (this.dragged && leftClickState) {
-        this.setChildrenPositionRelative();
       }
     }
 
-    if (!rightClickState) {
+    if (this.dragged && !global.mouse.buttons[1]) {
+      this.dragged = false;
+
+      if (this.isNewDraggedBlock) {
+        this.isNewDraggedBlock = false;
+        actionHandler.trigger("blocks: sort children using position - no undo", {
+          parentBlock: this.parent
+        });
+      } else {
+        actionHandler.trigger("blocks: sort children using position", {
+          parentBlock: this.parent
+        });
+      }
+    }
+
+    if (!global.mouse.buttons[3]) {
       this.startLinkingLinkAllowed = true;
     }
 
     this.children.map((child) => {
-      child.handleBlockSelection(mousePosition, leftClickState, rightClickState);
-    });
-  }
-
-  handleBlockDragging(mousePosition) {
-    if (this.dragged) {
-      this.position.x = mouseClickPositionRelativeToBlock.x + mousePosition.x;
-      this.position.y = mouseClickPositionRelativeToBlock.y + mousePosition.y;
-    }
-
-    this.children.map((child) => {
-      child.handleBlockDragging(mousePosition);
+      child.handleMouseInteraction();
     });
   }
 
   update() {
-    mouseIsOverBlock = false;
+    mouseOverAnyBlock = false;
+    this.handleMouseInteraction();
 
-    this.children.map((child) => {
+    if (selectedBlock.dragged) {
+      selectedBlock.position.x = mouseClickPositionRelativeToBlock.x + global.mouse.cameraX;
+      selectedBlock.position.y = mouseClickPositionRelativeToBlock.y + global.mouse.cameraY;
+    }
 
-      this.handleMouseOverBlock({
-        x: global.mouse.cameraX,
-        y: global.mouse.cameraY
-      });
-
-      this.handleBlockSelection({
-        x: global.mouse.cameraX,
-        y: global.mouse.cameraY
-      }, global.mouse.buttons[1], global.mouse.buttons[3]);
-
-      this.handleBlockDragging({
-        x: global.mouse.cameraX,
-        y: global.mouse.cameraY
-      });
-    });
-
-    if (mouseIsOverBlock) {
+    if (mouseOverAnyBlock) {
       document.getElementById("main-canvas").style.cursor = "pointer";
     } else {
       document.getElementById("main-canvas").style.cursor = "default";
@@ -698,17 +761,12 @@ class Block {
         ctx.beginPath();
         // Blocks displayed below their parent are styled in another manner
         if (!getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
-          // No need to redraw the first segment multiple time
-        //   camera.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
           camera.drawSegment(ctx, this.position.x + this.size.width, this.position.y + this.size.height * 0.5,
-           this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
-         //  camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
-         camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5,
-        this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
-          //camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
-      //    camera.lineTo(ctx, child.position.x, child.position.y + child.size.height * 0.5);
-        camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5,
-         child.position.x, child.position.y + child.size.height * 0.5);
+            this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
+          camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5,
+            this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
+          camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5,
+            child.position.x, child.position.y + child.size.height * 0.5);
         } else {
           ctx.moveTo(this.position.x, this.position.y + this.size.height);
           ctx.lineTo(this.position.x, child.position.y + child.size.height * 0.5);
@@ -717,38 +775,6 @@ class Block {
 
         ctx.stroke();
       }
-      /*  if (this.position.x + this.size.width + baseLinkLength > child.position.x) {
-          if (this.position.x + this.size.width + baseLinkLength > child.position.x + child.size.width) {
-            if(i === this.children.length - 1 || child.selected) {
-              camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
-            }
-            else {
-              ctx.moveTo(this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
-            }
-            camera.lineTo(ctx, child.position.x + child.size.width, child.position.y + child.size.height * 0.5);
-          } else {
-            if (child.position.y > this.position.y) {
-              camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y);
-            } else {
-              camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height);
-            }
-            // camera.lineTo(ctx, child.position.x + child.size.width / 2, child.position.y);
-          }
-        } else {
-          // If the test make everything too laggy, just keep these 2 lines
-          if(i === this.children.length - 1 || child.selected) {
-            camera.lineTo(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
-          }
-          else {
-            ctx.moveTo(this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
-          }
-          camera.lineTo(ctx, child.position.x, child.position.y + child.size.height * 0.5);
-        }
-      } else {
-        ctx.moveTo(this.position.x, this.position.y + this.size.height);
-        camera.lineTo(ctx, this.position.x, child.position.y + child.size.height * 0.5);
-        camera.lineTo(ctx, child.position.x, child.position.y + child.size.height * 0.5);
-      }*/
 
       child.renderConnections(ctx);
     });
@@ -778,12 +804,15 @@ class Block {
 
   render(ctx) {
     if (!this.isRoot && this.isInView(camera)) {
-      /*  let commentHeight = 0;
-        if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName]) {
-          commentHeight = 150;
-          ctx.fillStyle = "green";
-          ctx.fillText(this.attributes["string"][config.commentAttributeName].value, this.position.x, this.position.y);
-        }*/
+        let commentHeight = 0;
+        if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName] && this.attributes["string"][config.commentAttributeName].value) {
+          // commentHeight = 150;
+          ctx.fillStyle = "lime";
+          ctx.font = "15px"
+          ctx.fillRect(this.position.x + 5, this.position.y - 25, this.size.width - 5, 50);
+          ctx.fillStyle = "black";
+          ctx.fillText(this.attributes["string"][config.commentAttributeName].value, this.position.x + 10, this.position.y - 20);
+        }
 
       // Render block
       ctx.fillStyle = this.style.color;
@@ -832,7 +861,7 @@ class Block {
             ctx.strokeStyle = "blue";
             ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getMaxRecursiveHeight());
       */
-      ctx.fillText(this.name + " - " + this.parent.children.indexOf(this) /* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
+      ctx.fillText(this.name/* + " - " + this.parent.children.indexOf(this) *//* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
 
       ctx.textAlign = "left";
       ctx.fillStyle = this.style.attributeColor;
@@ -871,6 +900,8 @@ root = new Block({
   type: "root",
   isRoot: true
 }, false);
+
+root.autoLayout();
 
 selectedBlock = root;
 
