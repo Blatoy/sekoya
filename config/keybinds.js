@@ -54,6 +54,13 @@ module.exports = [{
     action: "blocks: auto layout"
   },
   {
+    key: 'n',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "tabs: create new tab"
+  },
+  {
     key: 't',
     ctrl: true,
     alt: false,

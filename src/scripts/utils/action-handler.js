@@ -15,7 +15,7 @@ function handleKeyDown(e) {
   for (let i = 0; i < keybinds.length; ++i) {
     let keybind = keybinds[i];
 
-    // e.code = KeyZ, e.key = Y, thus why we try to avoid e.code except if we don't have a choice
+    // e.code = KeyZ, e.key = Y, we try to use the most appropriate choice
     if (keybind.key.length !== 1 || e.key === "" || e.key === undefined) {
       keyPressed = e.code;
     } else {
@@ -28,7 +28,7 @@ function handleKeyDown(e) {
       keybind.alt === e.altKey) {
       // Prevent the user to use inexisting shorcuts
       if (actions[keybind.action]) {
-        if ((actions[keybind.action].preventTriggerWhenInputFocused && document.activeElement.tagName === "INPUT") || hasAccelerator(keybind.action)) {
+        if ((actions[keybind.action].preventTriggerWhenInputFocused && document.activeElement.tagName === "INPUT") || hasAccelerator(keybind.action, getAccelerator(keybind))) {
           continue;
         } else {
           suitableActions.push(actions[keybind.action]);
@@ -183,27 +183,34 @@ module.exports.getActions = () => {
   return actions;
 };
 
+function getAccelerator(keybind) {
+  let accelerator = "";
+  if (keybind.ctrl) accelerator += "CmdOrCtrl+";
+  if (keybind.alt) accelerator += "Alt+";
+  if (keybind.shift) accelerator += "Shift+";
+
+  accelerator += keybind.key.replace(/key/i, "");
+  return accelerator;
+}
+
 // Returns the first shortcut available
 function getActionAccelerator(actionIdentifier) {
   for (let i = 0; i < keybinds.length; ++i) {
     if (actionIdentifier === keybinds[i].action) {
-      let accelerator = "";
-      if (keybinds[i].ctrl) accelerator += "CmdOrCtrl+";
-      if (keybinds[i].alt) accelerator += "Alt+";
-      if (keybinds[i].shift) accelerator += "Shift+";
-
-      accelerator += keybinds[i].key.replace(/key/i, "");
-
-      return accelerator;
+      return getAccelerator(keybinds[i]);
     }
   }
   return "";
 }
 
-function hasAccelerator(action) {
+// Returns true if the action is associated to an accelerator
+// If accelerator is specified, it checks that the action has an accelerator and that the accelerator is the same as the one specified
+// This is to prevent triggering a shortcut twice if it has an accelerator
+// The seconds arg allows to assign multiples shortcuts with only one accelerator
+function hasAccelerator(action, accelerator = "") {
   for (let i = 0; i < accelerators.length; ++i) {
     for (let j = 0; j < accelerators[i].items.length; ++j) {
-      if (accelerators[i].items[j].action === action && !accelerators[i].items[j].doNotUseAccelerator) {
+      if (accelerators[i].items[j].action === action && !accelerators[i].items[j].doNotUseAccelerator && (accelerator === "" || accelerators[i].items[j].registeredAccelerator === accelerator)) {
         return true;
       }
     }
