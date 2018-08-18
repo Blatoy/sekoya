@@ -13,6 +13,10 @@ function refreshView(tabs, selectTab, closeTab, renameTab) {
       document.title = "Sekoya - " + tabs[i].getFileLocation();
     }
 
+    if (!tabs[i].isSaved()) {
+      spanTabElement.classList.add("tab-unsaved");
+    }
+
     spanTabElement.textContent = tabs[i].getName();
 
     spanTabElement.onmouseup = (e) => {

@@ -14,11 +14,13 @@ module.exports.setMenu = function() {
           menuItems.push(new MenuItem({type: "separator"}));
       }
       else {
+        let accelerator = menuItem.doNotUseAccelerator ? "" : actionHandler.getActionAccelerator(menuItem.action);
+        menuItem.registeredAccelerator = accelerator;
         menuItems.push(
           new MenuItem(
             {
               label: menuItem.label,
-              accelerator: menuItem.doNotUseAccelerator ? "" : actionHandler.getActionAccelerator(menuItem.action),
+              accelerator: accelerator,
               click(e) {
                 actionHandler.trigger(menuItem.action);
               }

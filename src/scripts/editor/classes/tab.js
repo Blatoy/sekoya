@@ -11,8 +11,8 @@ class Tab {
     this.saved = true;
   }
 
-  setSaved(saved) {
-    this.saved = saved;
+  save() {
+    this.saved = true;
   }
 
   isSaved() {

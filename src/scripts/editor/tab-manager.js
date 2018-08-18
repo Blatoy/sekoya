@@ -77,6 +77,27 @@ function closeTab(index = 0) {
 
 }
 
+module.exports.handleNewTab = (fileName, fileLocation) => {
+  let tabIndex = getTabIndexFromFileLocation(fileLocation + fileName);
+  if(tabIndex === -1) {
+    tabManager.newTab(fileName, [], fileLocation);
+    return true;
+  }
+  else {
+    selectTab(tabIndex);
+    return false;
+  }
+};
+
+function getTabIndexFromFileLocation(fileLocation) {
+  for(let i = 0; i < tabs.length; ++i) {
+    if(tabs[i].getFileLocation() === fileLocation) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 function openTab() {
   // Open file dialog, pr
 }

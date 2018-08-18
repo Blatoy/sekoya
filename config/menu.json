@@ -7,18 +7,18 @@
         },
         {
           "label": "Open file",
-          "action": "core: open file"
+          "action": "file: open"
         },
         {
           "type": "separator"
         },
         {
           "label": "Save",
-          "action": "tabs: save current"
+          "action": "file: save current"
         },
         {
           "label": "Save as",
-          "action": "tabs: save current as"
+          "action": "file: save current as"
         },
         {
           "type": "separator"
