@@ -70,5 +70,7 @@ module.exports.addEditorEvents = () => {
     setMousePosition(e);
   });
 
-  setCanvasSize();
+  document.onreadystatechange = () => {
+    setCanvasSize();
+  };
 };
