@@ -27,11 +27,16 @@ function setCanvasSize() {
 
 module.exports.addEditorEvents = () => {
   window.addEventListener("mousedown", (e) => {
+    camera.onMouseDown(e.which);
     global.mouse.buttons[e.which] = true;
   });
 
   window.addEventListener("mouseup", (e) => {
     global.mouse.buttons[e.which] = false;
+  });
+
+  window.addEventListener("dblclick", (e) => {
+
   });
 
   window.addEventListener("keydown", (e) => {

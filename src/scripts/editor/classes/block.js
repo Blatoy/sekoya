@@ -703,10 +703,13 @@ class Block {
       selectedBlock.position.y = mouseClickPositionRelativeToBlock.y + global.mouse.cameraY;
     }
 
-    if (mouseOverAnyBlock) {
-      document.getElementById("main-canvas").style.cursor = "pointer";
-    } else {
-      document.getElementById("main-canvas").style.cursor = "default";
+    // Prevent changing the moving canvas cursor
+    if(!global.mouse.buttons["2"]) {
+      if (mouseOverAnyBlock) {
+        document.getElementById("main-canvas").style.cursor = "pointer";
+      } else {
+        document.getElementById("main-canvas").style.cursor = "default";
+      }
     }
   }
 
@@ -742,6 +745,7 @@ class Block {
 
       ctx.stroke();
     }
+
     // Render links
     this.children.map((child, i) => {
       // We don't want to draw the connection from the hidden root to its children, except for the first element
@@ -768,9 +772,10 @@ class Block {
           camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5,
             child.position.x, child.position.y + child.size.height * 0.5);
         } else {
-          ctx.moveTo(this.position.x, this.position.y + this.size.height);
-          ctx.lineTo(this.position.x, child.position.y + child.size.height * 0.5);
-          ctx.lineTo(child.position.x, child.position.y + child.size.height * 0.5);
+          camera.drawSegment(ctx, this.position.x, this.position.y + this.size.height,
+            this.position.x, child.position.y + child.size.height * 0.5);
+          camera.drawSegment(ctx, this.position.x, child.position.y + child.size.height * 0.5,
+            child.position.x, child.position.y + child.size.height * 0.5);
         }
 
         ctx.stroke();
@@ -804,15 +809,15 @@ class Block {
 
   render(ctx) {
     if (!this.isRoot && this.isInView(camera)) {
-        let commentHeight = 0;
-        if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName] && this.attributes["string"][config.commentAttributeName].value) {
-          // commentHeight = 150;
-          ctx.fillStyle = "lime";
-          ctx.font = "15px"
-          ctx.fillRect(this.position.x + 5, this.position.y - 25, this.size.width - 5, 50);
-          ctx.fillStyle = "black";
-          ctx.fillText(this.attributes["string"][config.commentAttributeName].value, this.position.x + 10, this.position.y - 20);
-        }
+      let commentHeight = 0;
+      if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName] && this.attributes["string"][config.commentAttributeName].value) {
+        // commentHeight = 150;
+        ctx.fillStyle = "lime";
+        ctx.font = "15px"
+        ctx.fillRect(this.position.x + 5, this.position.y - 25, this.size.width - 5, 50);
+        ctx.fillStyle = "black";
+        ctx.fillText(this.attributes["string"][config.commentAttributeName].value, this.position.x + 10, this.position.y - 20);
+      }
 
       // Render block
       ctx.fillStyle = this.style.color;
@@ -849,19 +854,23 @@ class Block {
       ctx.fillStyle = textColour;
 
       // Text
-      ctx.font = this.style.font.size + "px " + this.style.font.family;
-      ctx.textBaseline = "middle";
-      ctx.textAlign = "center";
+      if (camera.getScaling() > 0.3) {
+        ctx.font = this.style.font.size + "px " + this.style.font.family;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+
+        ctx.fillText(this.name /* + " - " + this.parent.children.indexOf(this) */ /* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
+      }
+
 
       // DEBUG: Display blocks real height
-      /*      ctx.setLineDash([]);
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = "red";
-            ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getFullHeight());
-            ctx.strokeStyle = "blue";
-            ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getMaxRecursiveHeight());
-      */
-      ctx.fillText(this.name/* + " - " + this.parent.children.indexOf(this) *//* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
+      /*ctx.setLineDash([]);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "red";
+      ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getFullHeight());
+      ctx.strokeStyle = "blue";
+      ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getMaxRecursiveHeight());*/
+
 
       ctx.textAlign = "left";
       ctx.fillStyle = this.style.attributeColor;
