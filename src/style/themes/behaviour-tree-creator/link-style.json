@@ -1,0 +1,29 @@
+{
+  "all": {
+    "lineWidth": 1,
+    "color": "black",
+    "dashInterval": 0,
+    "baseLength": 75,
+    "firstBlockMargin" : 0,
+    "displayBelowParent": false
+  },
+  "normal": {
+    "lineWidth": 1,
+    "color": "black",
+    "dashInterval": 0
+  },
+  "else": {
+    "firstBlockMargin" : 30,
+    "lineWidth": 1,
+    "color": "#D3D3D3",
+    "dashInterval": 0,
+    "baseLength": 30
+  },
+  "or": {
+    "lineWidth": 1,
+    "color": "#D6C040",
+    "dashInterval": 4,
+    "baseLength": 10,
+    "displayBelowParent": true
+  }
+}

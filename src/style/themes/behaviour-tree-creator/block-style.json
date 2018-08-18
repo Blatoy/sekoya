@@ -1,0 +1,51 @@
+{
+  "all": {
+    "attributeColor": "black",
+    "rootPosition": {
+      "x": 15,
+      "y": 15
+    },
+    "color": "#666",
+    "size": {
+      "width": 130,
+      "height": 18
+    },
+    "margin": {
+      "x": 250,
+      "y": 0
+    },
+    "font": {
+      "size": 12,
+      "family": "'Microsoft Sans Serif', Helvetica, sans-serif"
+    },
+    "border": {
+      "color": "black",
+      "thickness": 1
+    },
+    "selectedBorder": {
+      "dashInterval": 10,
+      "width": 1,
+      "padding": 1,
+      "speedDivider": 5
+    },
+    "blockBelowParentMargin": {
+      "x": 20,
+      "y": 50
+    }
+  },
+  "root": {
+    "color": "#0092CC"
+  },
+  "condition": {
+    "color": "#323232"
+  },
+  "action": {
+    "color": "#779933"
+  },
+  "other": {
+    "color": "#FF3333"
+  },
+  "logic": {
+    "color": "#DCD427"
+  }
+}

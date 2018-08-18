@@ -1,0 +1,44 @@
+.block {
+  margin-bottom: 1px;
+  font-size: 12px;
+  padding-left: 5px;
+  margin-left: 20px;
+  border-left: 1px dotted gray;
+}
+
+.block:hover {
+  background-color: #0078D7;
+  color: white;
+}
+
+.block-header::before, .block-title::before {
+  content: "[-] ";
+}
+
+.block-category-list {
+  border-left: 1px dotted gray;
+  margin-left: 33px;
+}
+
+.block-header {
+  font-weight: normal;
+  margin-left: 28px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.block-title {
+  margin-left: 10px;
+  font-weight: normal;
+  font-size: 12px;
+}
+
+#block-list {
+   width: 200px;
+   overflow: auto;
+}
+
+main, #tab-list-container {
+  width: calc(100% - 201px);
+}
