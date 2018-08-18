@@ -1,5 +1,18 @@
 {
   "all": {
-    "attributeColor": "white"
+    "attributeColor": "white",
+    "comment": {
+      "backgroundColor": "#64DC64",
+      "textColor": "black",
+      "border": {
+        "color": "",
+        "thickness": 0
+      },
+      "width": 0.95,
+      "padding": {
+        "top": 2,
+        "left": 5
+      }
+    }
   }
 }
