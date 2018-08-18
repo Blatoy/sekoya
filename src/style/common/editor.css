@@ -90,6 +90,10 @@ body {
   width: 30px;
 }
 
+.tab-unsaved {
+  font-style: italic;
+}
+
 .tab-selected {
   background-color: lightgray;
   color: black;
