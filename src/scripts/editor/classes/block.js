@@ -29,7 +29,7 @@ function compare(a, b) {
 }
 
 function getLinkStyleProperty(type, property) {
-  if (STYLE.LINKS[type] && STYLE.LINKS[type][property]) {
+  if (STYLE.LINKS[type] && STYLE.LINKS[type][property] !== undefined) {
     return STYLE.LINKS[type][property];
   } else {
     return STYLE.LINKS["all"][property];
@@ -37,7 +37,7 @@ function getLinkStyleProperty(type, property) {
 }
 
 function getBlockStyleProperty(type, property) {
-  if (STYLE.BLOCKS[type] && STYLE.BLOCKS[type][property]) {
+  if (STYLE.BLOCKS[type] && STYLE.BLOCKS[type][property] !== undefined) {
     return STYLE.BLOCKS[type][property];
   } else {
     return STYLE.BLOCKS["all"][property];
@@ -72,6 +72,7 @@ class Block {
 
     this.position = position;
     this.size = getBlockStyleProperty(this.type, "size");
+    this.commentHeight = 0;
 
     this.style = {
       attributeColor: getBlockStyleProperty(this.type, "attributeColor"),
@@ -80,6 +81,8 @@ class Block {
       font: getBlockStyleProperty(this.type, "font"),
       selected: getBlockStyleProperty(this.type, "selectedBorder"),
       blockBelowParentMargin: getBlockStyleProperty(this.type, "blockBelowParentMargin"),
+      border: getBlockStyleProperty(this.type, "border"),
+      comment: getBlockStyleProperty(this.type, "comment"),
     };
 
     // Blocks cannot be orphan
@@ -153,12 +156,19 @@ class Block {
     return false;
   }
 
+  // Returns the Y position at which the block can be clicked, displayed and stuff, comments are
+  // displayed ABOVE this value
+  getYPosition()  {
+    return this.position.y + this.commentHeight;
+  }
+
   // TODO: Make it take into account comment and properties
   getFullHeight() {
     let extraHeight = 0;
 
     // Attributes
     extraHeight += this.attributeCount * this.style.font.size;
+    extraHeight += this.commentHeight;
 
     // Everything displayed below the parents count as the block's height
     this.children.map((child) => {
@@ -330,7 +340,7 @@ class Block {
   }
 
   isPositionOver(x, y) {
-    return y > this.position.y && y < this.position.y + this.size.height && x > this.position.x &&
+    return y > this.position.y && y < this.position.y + this.size.height + this.commentHeight && x > this.position.x &&
       x < this.position.x + this.size.width;
   }
 
@@ -516,113 +526,6 @@ class Block {
     }
   }
 
-  /*
-    handleMouseOverBlock(mousePosition) {
-      this.mouseOver = false;
-
-      // Found a block that is hovered, no need to proceed further
-      if (mouseIsOverBlock) {
-        return;
-      } else {
-        if (this.isPositionOver(mousePosition)) {
-          if (!this.isRoot) {
-            this.mouseOver = true;
-            mouseIsOverBlock = true;
-          }
-          return;
-        }
-      }
-
-      this.children.map((child) => {
-        child.handleMouseOverBlock(mousePosition);
-      });
-    }
-  */
-
-  // Handle block clicking and block double-clicking
-  /*  handleBlockSelection(mousePosition, leftClickState, rightClickState) {
-      if (!anyBlockBeingDragged || this.dragged) {
-        if (this.dragged && !leftClickState) {
-          // Stop block dragging
-
-          if (this.isNewDraggedBlock) {
-            this.isNewDraggedBlock = false;
-            actionHandler.trigger("blocks: sort children using position - no undo", {
-              parentBlock: this.parent
-            });
-          } else {
-            actionHandler.trigger("blocks: sort children using position", {
-              parentBlock: this.parent
-            });
-          }
-
-          this.dragged = false;
-          anyBlockBeingDragged = false;
-        } else if (!this.dragged && leftClickState && this.mouseOver && !selectedBlock.linkingInProgress) {
-          // Start block dragging
-
-          this.dragged = true;
-          this.setSelected();
-
-          anyBlockBeingDragged = true;
-
-          mouseClickPosition = {
-            x: this.position.x,
-            y: this.position.y
-          };
-
-          mouseClickPositionRelativeToBlock = {
-            x: this.position.x - mousePosition.x,
-            y: this.position.y - mousePosition.y
-          };
-        } else if (!this.dragged && (rightClickState || leftClickState) && this.mouseOver && this.startLinkingLinkAllowed) {
-          if (!selectedBlock.linkingInProgress && !this.isTerminalNode()) {
-            // Start block linking
-            this.setSelected();
-            this.linkingInProgress = true;
-          } else if (!selectedBlock.isRecursiveChild(this) && selectedBlock.linkingInProgress) {
-            // Link blocks
-
-            this.startLinkingLinkAllowed = false;
-
-            let linkChanged = actionHandler.trigger("blocks: link block", {
-              targetBlock: this,
-              parentBlock: selectedBlock,
-              linkType: config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : "all"
-            });
-
-            //this.changeParent(selectedBlock, config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : "all")
-            //  this.parent.autoLayout();
-            if (!global.metaKeys.ctrl && linkChanged) {
-              selectedBlock.cancelBlockLinking();
-            }
-          }
-        } else if (this.dragged && leftClickState) {
-          this.setChildrenPositionRelative();
-        }
-      }
-
-      if (!rightClickState) {
-        this.startLinkingLinkAllowed = true;
-      }
-
-      this.children.map((child) => {
-        child.handleBlockSelection(mousePosition, leftClickState, rightClickState);
-      });
-    }
-
-    handleBlockDragging(mousePosition) {
-      if (this.dragged) {
-        this.position.x = mouseClickPositionRelativeToBlock.x + mousePosition.x;
-        this.position.y = mouseClickPositionRelativeToBlock.y + mousePosition.y;
-      }
-
-      this.children.map((child) => {
-        child.handleBlockDragging(mousePosition);
-      });
-    }
-  */
-
   handleMouseInteraction() {
     this.mouseOver = false;
 
@@ -731,11 +634,11 @@ class Block {
       ctx.beginPath();
 
       // Move to block
-      ctx.moveTo(this.position.x + this.size.width, this.position.y + this.size.height * 0.5);
+      ctx.moveTo(this.position.x + this.size.width, this.getYPosition() + this.size.height * 0.5);
 
       // Draw an arrow at the end of the line
       let x = (this.position.x + this.size.width) - global.mouse.cameraX;
-      let y = (this.position.y + this.size.height * 0.5) - global.mouse.cameraY;
+      let y = (this.getYPosition() + this.size.height * 0.5) - global.mouse.cameraY;
       let angle = Math.atan2(y, x);
 
       ctx.lineTo(global.mouse.cameraX, global.mouse.cameraY);
@@ -765,17 +668,17 @@ class Block {
         ctx.beginPath();
         // Blocks displayed below their parent are styled in another manner
         if (!getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
-          camera.drawSegment(ctx, this.position.x + this.size.width, this.position.y + this.size.height * 0.5,
-            this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5);
-          camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, this.position.y + this.size.height * 0.5,
-            this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5);
-          camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, child.position.y + child.size.height * 0.5,
-            child.position.x, child.position.y + child.size.height * 0.5);
+          camera.drawSegment(ctx, this.position.x + this.size.width, this.getYPosition() + this.size.height * 0.5,
+            this.position.x + this.size.width + baseLinkLength, this.getYPosition() + this.size.height * 0.5);
+          camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, this.getYPosition() + this.size.height * 0.5,
+            this.position.x + this.size.width + baseLinkLength, child.getYPosition() + child.size.height * 0.5);
+          camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, child.getYPosition() + child.size.height * 0.5,
+            child.position.x, child.getYPosition() + child.size.height * 0.5);
         } else {
-          camera.drawSegment(ctx, this.position.x, this.position.y + this.size.height,
-            this.position.x, child.position.y + child.size.height * 0.5);
-          camera.drawSegment(ctx, this.position.x, child.position.y + child.size.height * 0.5,
-            child.position.x, child.position.y + child.size.height * 0.5);
+          camera.drawSegment(ctx, this.position.x, this.getYPosition() + this.size.height,
+            this.position.x, child.getYPosition() + child.size.height * 0.5);
+          camera.drawSegment(ctx, this.position.x, child.getYPosition() + child.size.height * 0.5,
+            child.position.x, child.getYPosition() + child.size.height * 0.5);
         }
 
         ctx.stroke();
@@ -785,12 +688,31 @@ class Block {
     });
   }
 
-  getCommentLines() {
+  getCommentLines(ctx) {
     let lines = [];
+
     if (!this.attributes["string"] || !this.attributes["string"][config.commentAttributeName]) {
       return lines;
     } else {
-      let words = this.attributes["string"][config.commentAttributeName].split(" ");
+      let words = this.attributes["string"][config.commentAttributeName].value.split(" ");
+
+      let currentLine = "";
+      for(let i = 0; i < words.length; ++i) {
+        if(ctx.measureText(currentLine + words[i]).width >= this.size.width * this.style.comment.width - this.style.comment.padding.left * 2) {
+          lines.push(currentLine);
+          currentLine = words[i] + " ";
+        }
+        else {
+          currentLine += words[i] + " ";
+        }
+      }
+
+      lines.push(currentLine);
+
+      // probably not the best place to put this...
+      this.commentHeight = (lines.length + 1) * this.style.font.size;
+
+      return lines;
     }
   }
 
@@ -809,19 +731,32 @@ class Block {
 
   render(ctx) {
     if (!this.isRoot && this.isInView(camera)) {
-      let commentHeight = 0;
       if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName] && this.attributes["string"][config.commentAttributeName].value) {
-        // commentHeight = 150;
-        ctx.fillStyle = "lime";
-        ctx.font = "15px"
-        ctx.fillRect(this.position.x + 5, this.position.y - 25, this.size.width - 5, 50);
-        ctx.fillStyle = "black";
-        ctx.fillText(this.attributes["string"][config.commentAttributeName].value, this.position.x + 10, this.position.y - 20);
+
+        if(this.style.comment.border.thickness > 0) {
+          ctx.fillStyle = this.style.comment.border.color;
+          ctx.fillRect(this.position.x - this.style.comment.border.thickness, this.position.y - this.style.comment.border.thickness,
+            this.size.width * this.style.comment.width + this.style.comment.border.thickness * 2, this.commentHeight + this.style.comment.border.thickness * 2);
+        }
+        ctx.fillStyle = this.style.comment.backgroundColor;
+        ctx.fillRect(this.position.x, this.position.y, this.size.width * this.style.comment.width, this.commentHeight);
+        ctx.fillStyle = this.style.comment.textColor;
+
+        let lines = this.getCommentLines(ctx);
+        for(let i = 0; i < lines.length; ++i) {
+          ctx.fillText(lines[i], this.position.x + this.style.comment.padding.left, this.position.y + i * this.style.font.size + this.style.comment.padding.top)
+        }
       }
 
       // Render block
+      if(this.style.border) {
+        ctx.fillStyle = this.style.border.color;
+        ctx.fillRect(this.position.x - this.style.border.thickness, this.getYPosition() - this.style.border.thickness,
+          this.size.width + this.style.border.thickness * 2, this.size.height + this.style.border.thickness * 2);
+      }
+
       ctx.fillStyle = this.style.color;
-      ctx.fillRect(this.position.x, this.position.y, this.size.width, this.size.height);
+      ctx.fillRect(this.position.x, this.getYPosition() /** this.style.font.size*/, this.size.width, this.size.height);
 
       // Selection border
       if (this.selected) {
@@ -831,17 +766,11 @@ class Block {
         ctx.lineWidth = this.style.selected.width;
 
         ctx.strokeRect(this.position.x - this.style.selected.padding,
-          this.position.y - this.style.selected.padding,
+          this.getYPosition() - this.style.selected.padding,
           this.size.width + this.style.selected.padding * 2,
           this.size.height + this.style.selected.padding * 2);
 
         ctx.lineDashOffset = 0;
-      }
-
-      // Mouse over color
-      if (this.mouseOver) {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
-        ctx.fillRect(this.position.x, this.position.y, this.size.width, this.size.height);
       }
 
       // Text is white or black depending on the colour of the block
@@ -849,7 +778,14 @@ class Block {
           parseInt(ctx.fillStyle.slice(1, 3), 16) +
           parseInt(ctx.fillStyle.slice(3, 5), 16) +
           parseInt(ctx.fillStyle.slice(5, 7), 16)) /
-        3) < 127 ? "white" : "black";
+        3) <= 128 ? "white" : "black";
+
+      // Mouse over color
+      if (this.mouseOver) {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+        ctx.fillRect(this.position.x, this.getYPosition(), this.size.width, this.size.height);
+      }
+
 
       ctx.fillStyle = textColour;
 
@@ -859,7 +795,7 @@ class Block {
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
 
-        ctx.fillText(this.name /* + " - " + this.parent.children.indexOf(this) */ /* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.position.y + this.size.height * 0.5);
+        ctx.fillText(this.name /* + " - " + this.parent.children.indexOf(this) */ /* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
       }
 
 
@@ -884,9 +820,10 @@ class Block {
           if (this.attributes[type][i].name !== config.commentAttributeName) {
             // Draw rect instead of text when zoomed out too much to increase performances
             if (camera.getScaling() < 0.4) {
-              ctx.fillRect(this.position.x, this.size.height + this.position.y + this.style.font.size * lineCounter, this.attributes[type][i].name.length * 5, 2);
+              ctx.fillRect(this.position.x, this.size.height + this.getYPosition() + this.style.font.size * lineCounter, this.attributes[type][i].name.length * 5, 2);
             } else {
-              ctx.fillText((this.attributes[type][i].shortName || this.attributes[type][i].name) + ": " + this.attributes[type][i].value, this.position.x, this.size.height + this.position.y + this.style.font.size * lineCounter);
+              let value = this.attributes[type][i].value || "";
+              ctx.fillText((this.attributes[type][i].shortName || this.attributes[type][i].name) + ": " + value.slice(0, 15), this.position.x, this.size.height + this.getYPosition() + this.style.font.size * lineCounter);
             }
             lineCounter++;
           }

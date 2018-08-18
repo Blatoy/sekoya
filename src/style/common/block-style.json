@@ -1,11 +1,24 @@
 {
   "all": {
+    "comment": {
+      "backgroundColor": "#64DC64",
+      "textColor": "black",
+      "border": {
+        "thickness": 1,
+        "color": "black"
+      },
+      "width": 0.95,
+      "padding": {
+        "top": 2,
+        "left": 5
+      }
+    },
     "attributeColor": "black",
     "rootPosition": {
       "x": 15,
       "y": 15
     },
-    "color": "#666",
+    "color": "#333",
     "size": {
       "width": 225,
       "height": 30
@@ -18,7 +31,7 @@
       "size": 14,
       "family": "Trebuchet MS, Helvetica, sans-serif"
     },
-    "border": {},
+    "border": false,
     "selectedBorder": {
       "dashInterval": 10,
       "width": 3,
@@ -31,18 +44,18 @@
     }
   },
   "root": {
-    "color": "#61AFEF"
+    "color": "#6494ED"
   },
   "condition": {
-    "color": "#98C379"
+    "color": "#E2C08D"
   },
   "action": {
-    "color": "#ABB2BF"
+    "color": "#9DA5B4"
   },
   "other": {
-    "color": "#F0706A"
+    "color": "#FF6347"
   },
   "logic": {
-    "color": "#B5F940"
+    "color": "#50F244"
   }
 }
