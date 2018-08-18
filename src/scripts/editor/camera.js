@@ -137,9 +137,9 @@ module.exports.onScroll = (deltaX, deltaY, ctrlPressed, shiftPressed) => {
   if (!ctrlPressed) {
     // Scroll the view
     if (shiftPressed) {
-      setPosition(position.x + deltaY, position.y);
+      setPosition(position.x + deltaY * (1 + 4 * global.metaKeys.alt), position.y);
     } else {
-      setPosition(position.x + deltaX, position.y + deltaY);
+      setPosition(position.x + deltaX * (1 + 4 * global.metaKeys.alt), position.y + deltaY * (1 + 4 * global.metaKeys.alt));
     }
   } else {
     let targetScaling = scaling;
