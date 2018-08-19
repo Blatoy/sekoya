@@ -219,7 +219,6 @@ function hasAccelerator(action, accelerator = "") {
   return false;
 }
 
-
 module.exports.getActionAccelerator = getActionAccelerator;
 module.exports.handleKeyUp = handleKeyUp;
 module.exports.handleKeyDown = handleKeyDown;

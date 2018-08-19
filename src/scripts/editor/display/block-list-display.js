@@ -4,6 +4,9 @@ module.exports.addBlocksToLeftMenu = () => {
 
   for (let blockCategory in blockDefinitions) {
     let spanBlockCategory = document.createElement("span");
+    let divBlockCategoryList = document.createElement("div");
+
+    divBlockCategoryList.classList.add("block-category-list");
     spanBlockCategory.classList.add("block-header");
     spanBlockCategory.textContent = blockCategory[0].toUpperCase() + blockCategory.slice(1);
     divBlockList.appendChild(spanBlockCategory);
@@ -30,7 +33,8 @@ module.exports.addBlocksToLeftMenu = () => {
 
         actionHandler.trigger("blocks: add block", {block: newBlock});
       };
-      divBlockList.appendChild(spanBlock);
+      divBlockCategoryList.appendChild(spanBlock);
     }
+    divBlockList.appendChild(divBlockCategoryList);
   }
 };

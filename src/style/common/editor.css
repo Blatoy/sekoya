@@ -107,7 +107,7 @@ main {
   height: calc(100vh - 26px);
 }
 
-#quick-access-bar-background {
+#quick-access-bar-background, #block-properties-background {
   cursor: pointer;
   position: fixed;
   top: 0;
@@ -117,7 +117,7 @@ main {
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-#quick-access-bar-container {
+#quick-access-bar-container, #block-properties-container {
   cursor: default;
   padding: 10px;
   position: fixed;
@@ -127,6 +127,13 @@ main {
   background-color: white;
   border-radius: 1px;
   border: 1px solid lightgray;
+}
+
+#block-properties-container {
+  left: 30%;
+  right: 30%;
+  max-height: 80%;
+  overflow: auto;
 }
 
 #quick-access-bar-input {
@@ -169,4 +176,50 @@ main {
 .quick-access-bar-result-character-match {
   font-weight: bold;
 /*  color: #61AFEF;*/
+}
+
+.property-label {
+  display: inline-block;
+  width: calc(40% - 5px);
+  vertical-align: middle;
+}
+
+#block-properties-caption {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.checkbox-group {
+  display: inline-block;
+  width: calc(60% - 8px);
+  vertical-align: top;
+  border: 1px solid lightgray;
+}
+
+.property-checkbox {
+  margin-right: 10px;
+}
+
+.property-container {
+  border-top: 1px solid lightgray;
+  margin-bottom: 20px;
+  margin-top: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.property-textarea {
+  vertical-align: top;
+}
+
+#block-properties-buttons {
+  border-top: 1px solid lightgray;
+  margin-top: 5px;
+  padding-top: 10px;
+  text-align: right;
+}
+
+.property-select, .property-input, .property-textarea {
+  width: 60%;
 }

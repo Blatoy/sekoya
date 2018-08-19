@@ -4,6 +4,42 @@
   border-right: 1px solid black;
 }
 
+input, textarea, option, select {
+  border: none;
+  background-color: #1B1D23;
+  color: white;
+  padding: 5px;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+select, option {
+  background-color: #373C47;
+  cursor: pointer;
+}
+
+option {
+  padding: 10px;
+  margin: 20px;
+}
+
+input[type=checkbox] {
+  cursor: pointer;
+  padding: 7px;
+  -webkit-appearance: none;
+}
+
+input[type=checkbox]:checked {
+   background: #949BAA;
+}
+
+input[type=button], button {
+  padding: 10px;
+  width: 100px;
+  cursor: pointer;
+  background-color: #373D48;
+}
+
 .block-header, .block-title {
   color: white;
 }
@@ -32,20 +68,20 @@
   background-color: #282C34;
 }
 
-#quick-access-bar-background {
+#quick-access-bar-background, #block-properties-background {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-#quick-access-bar-container {
+#quick-access-bar-container, #block-properties-container {
   color: white;
   background-color: #252830;
   border: 1px solid #222;
 }
 
 #quick-access-bar-input {
-  border: none;
+/*  border: none;
   background-color: #111;
-  color: white;
+  color: white;*/
 }
 
 #quick-access-bar-results {
@@ -74,4 +110,17 @@
 
 .tab-input {
   color: white;
+}
+
+.property-container, #block-properties-buttons {
+  border-top: none;
+}
+
+.checkbox-group {
+  border: none;
+  overflow: auto;
+  background-color: #373C47;
+  padding-left: 4px;
+  padding-top: 4px;
+  padding-bottom: 4px;
 }

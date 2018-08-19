@@ -34,18 +34,18 @@
     }
   },
   "root": {
-    "color": "#0092CC"
+    "color": "blue"
   },
   "condition": {
-    "color": "#323232"
+    "color": "black"
   },
   "action": {
-    "color": "#779933"
+    "color": "#808080"
   },
   "other": {
-    "color": "#FF3333"
+    "color": "red"
   },
   "logic": {
-    "color": "#DCD427"
+    "color": "#00FF00"
   }
 }
