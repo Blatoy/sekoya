@@ -28,7 +28,7 @@ function handleKeyDown(e) {
       keybind.alt === e.altKey) {
       // Prevent the user to use inexisting shorcuts
       if (actions[keybind.action]) {
-        if ((actions[keybind.action].preventTriggerWhenInputFocused && document.activeElement.tagName === "INPUT") || hasAccelerator(keybind.action, getAccelerator(keybind))) {
+        if ((actions[keybind.action].preventTriggerWhenInputFocused && (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "SELECT" || document.activeElement.tagName === "TEXTAREA")) || hasAccelerator(keybind.action, getAccelerator(keybind))) {
           continue;
         } else {
           suitableActions.push(actions[keybind.action]);

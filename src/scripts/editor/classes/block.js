@@ -108,7 +108,7 @@ class Block {
     for (let type in blockDefinition.blockPropertiesGroupedByType) {
       for (let i = 0; i < blockDefinition.blockPropertiesGroupedByType[type].length; ++i) {
         if (!this.attributes[type]) {
-          this.attributes[type] = [];
+          this.attributes[type] = {};
         }
 
         let templateAttribute = blockDefinition.blockPropertiesGroupedByType[type][i];
@@ -128,6 +128,7 @@ class Block {
           name: templateAttribute.name,
           shortName: templateAttribute.shortName,
           predefinedValues: templateAttribute.values,
+          multiSelect: templateAttribute.multiselect
         };
 
         this.attributeCount++;
@@ -147,6 +148,171 @@ class Block {
         name: config.commentAttributeName
       });
     }
+  }
+
+  displayPropertyWindow() {
+    // Display background and handle closing
+    let divBackground = document.getElementById("block-properties-background");
+    divBackground.style.display = "block";
+    divBackground.onclick = (event) => {
+      if (event.target == divBackground) {
+        this.closePropertyWindow();
+      }
+    };
+
+    // Settings caption
+    let spanPropertiesCaption = document.getElementById("block-properties-caption");
+    spanPropertiesCaption.textContent = "Block properties - " + this.name;
+
+    // Properties container
+    let divPropertiesInputList = document.getElementById("block-properties-inputs");
+    divPropertiesInputList.innerHTML = "";
+
+    let firstElementFocused = false;
+    let hasComment = false, commentValue = "";
+    let elementToFocus;
+
+    for (let type in this.attributes) {
+      for (let name in this.attributes[type]) {
+        let attribute = this.attributes[type][name];
+
+        // Add container and label
+        let divPropertyContainer = document.createElement("div");
+        divPropertyContainer.classList.add("property-container");
+
+        let labelPropertyName = document.createElement("label");
+        labelPropertyName.classList.add("property-label");
+        labelPropertyName.textContent = name;
+
+        divPropertyContainer.appendChild(labelPropertyName);
+
+        let predefinedValues = blockLoader.getPredefinedValues()[attribute.predefinedValues];
+        // The block has predefined values, it's either a select or checkboxes
+        if (predefinedValues) {
+          // Check boxes
+          if (attribute.multiSelect) {
+            let divCheckboxGroup = document.createElement("div");
+            divCheckboxGroup.classList.add("checkbox-group");
+
+            let selectedValues = attribute.value.split(config.multiSelectSeparator);
+
+            // Makes sure we don't accidently delete any custom attributes that wouldn't be in the block definition
+            for(let i = 0; i < selectedValues.length; ++i) {
+              if(!predefinedValues.includes(selectedValues[i]) && selectedValues[i] !== "") {
+                predefinedValues.push(predefinedValues[i]);
+              }
+            }
+
+            for (let i = 0; i < predefinedValues.length; ++i) {
+              let inputCheckBox = document.createElement("input");
+              inputCheckBox.type = "checkbox";
+              inputCheckBox.value = predefinedValues[i];
+              inputCheckBox.id = "__" + i + "-" + predefinedValues[i];
+              inputCheckBox.classList.add("property-checkbox")
+
+              if(selectedValues.includes(predefinedValues[i])) {
+                inputCheckBox.checked = "checked";
+              }
+
+              let labelName = document.createElement("label");
+              labelName.textContent = predefinedValues[i];
+              labelName.for = inputCheckBox.id;
+
+              if (i !== 0) {
+                let newLine = document.createElement("br");
+                divCheckboxGroup.appendChild(newLine);
+              }
+
+              if (!firstElementFocused) {
+                elementToFocus = inputCheckBox;
+                firstElementFocused = true;
+              }
+
+              divCheckboxGroup.appendChild(inputCheckBox);
+              divCheckboxGroup.appendChild(labelName);
+            }
+
+            divPropertyContainer.appendChild(divCheckboxGroup);
+          } else {
+            // Select
+            let select = document.createElement("select");
+            let selectedElementFound = false; // Adds an option if the element isn't found to make sure we don't erase values
+            select.classList.add("property-select");
+
+            for (let i = 0; i < predefinedValues.length; ++i) {
+              let option = document.createElement("option");
+              option.textContent = predefinedValues[i];
+
+
+              if (predefinedValues[i] === attribute.value) {
+                option.selected = "selected";
+                selectedElementFound = true;
+              }
+
+              select.appendChild(option);
+            }
+
+            if(!selectedElementFound && attribute.value !== "") {
+              let option = document.createElement("option");
+              option.textContent = attribute.value;
+              option.value = attribute.value;
+              option.selected = "selected";
+              select.appendChild(option);
+            }
+
+            if (!firstElementFocused) {
+              elementToFocus = select;
+              firstElementFocused = true;
+            }
+
+            divPropertyContainer.appendChild(select);
+          }
+        } else {
+          if(name === config.commentAttributeName) {
+            hasComment = true;
+            commentValue = attribute.value;
+            continue;
+          }
+          // Normal input
+          let inputText = document.createElement("input");
+          inputText.type = "text";
+          inputText.value = attribute.value;
+          inputText.classList.add("property-input");
+
+          if (!firstElementFocused) {
+            elementToFocus = inputText;
+            firstElementFocused = true;
+          }
+
+          divPropertyContainer.appendChild(inputText);
+        }
+        divPropertiesInputList.appendChild(divPropertyContainer);
+        elementToFocus.focus();
+      }
+    }
+
+    if(hasComment) {
+      let divPropertyContainer = document.createElement("div");
+      divPropertyContainer.classList.add("property-container");
+
+      let labelPropertyName = document.createElement("label");
+      labelPropertyName.classList.add("property-label");
+      labelPropertyName.textContent = config.commentAttributeName;
+
+      divPropertyContainer.appendChild(labelPropertyName);
+
+      let textareaComment = document.createElement("textarea");
+      textareaComment.value = commentValue;
+      textareaComment.classList.add("property-textarea");
+      
+      divPropertyContainer.appendChild(textareaComment);
+      divPropertiesInputList.appendChild(divPropertyContainer);
+    }
+  }
+
+  closePropertyWindow(save = true) {
+    let divBackground = document.getElementById("block-properties-background");
+    divBackground.style.display = "none";
   }
 
   // Returns true if linkType can be a child link of this block
@@ -329,7 +495,7 @@ class Block {
     for (let i = 0; i < this.children.length; ++i) {
       if (getLinkStyleProperty(this.children[i].linkToParentType, "displayBelowParent") === true) {
         this.children[i].position.x = this.position.x + this.style.blockBelowParentMargin.x;
-        this.children[i].position.y = belowParentHeight + this.position.y;
+        this.children[i].position.y = belowParentHeight + this.getYPosition();
         belowParentHeight += this.children[i].getFullHeight();
       } else {
         if (previousBlock) {
@@ -544,7 +710,7 @@ class Block {
             this.mouseOver = true;
             mouseOverAnyBlock = true;
 
-            if(global.metaKeys.ctrl && global.mouse.buttons[1]) {
+            if (global.metaKeys.ctrl && global.mouse.buttons[1]) {
               this.copySelected = true;
             }
 
@@ -570,7 +736,7 @@ class Block {
             }
 
             if (global.mouse.buttons[1] && !this.selected) {
-              if(!global.metaKeys.ctrl) {
+              if (!global.metaKeys.ctrl) {
                 this.setSelected();
               }
             }
@@ -605,18 +771,19 @@ class Block {
         this.startLinkingLinkAllowed = true;
       }
     } else {
-      let x1 = mouseClickPosition.x, x2 = global.mouse.cameraX;
-      let y1 = mouseClickPosition.y, y2 = global.mouse.cameraY;
-      if(x2 < x1) [x1, x2] = [x2, x1];
-      if(y2 < y1) [y1, y2] = [y2, y1];
+      let x1 = mouseClickPosition.x,
+        x2 = global.mouse.cameraX;
+      let y1 = mouseClickPosition.y,
+        y2 = global.mouse.cameraY;
+      if (x2 < x1)[x1, x2] = [x2, x1];
+      if (y2 < y1)[y1, y2] = [y2, y1];
 
-      if (this.position.x + this.size.width > x1 && this.getYPosition() + this.size.height> y1 &&
-          this.position.x < x2 &&
-          this.getYPosition() < y2
+      if (this.position.x + this.size.width > x1 && this.getYPosition() + this.size.height > y1 &&
+        this.position.x < x2 &&
+        this.getYPosition() < y2
       ) {
         this.copySelected = true;
-      }
-      else {
+      } else {
         this.copySelected = false;
       }
     }
@@ -644,11 +811,11 @@ class Block {
       selectedBlock.position.x = mouseClickPositionRelativeToBlock.x + global.mouse.cameraX;
       selectedBlock.position.y = mouseClickPositionRelativeToBlock.y + global.mouse.cameraY;
     } else if (global.mouse.buttons["1"]) {
-    //  if (global.mouse.cameraX != mouseClickPosition.x && global.mouse.cameraY != mouseClickPosition.y) {
-        if(!global.metaKeys.ctrl) {
-          selectingBlocks = true;
-        }
-    //  }
+      //  if (global.mouse.cameraX != mouseClickPosition.x && global.mouse.cameraY != mouseClickPosition.y) {
+      if (!global.metaKeys.ctrl) {
+        selectingBlocks = true;
+      }
+      //  }
     } else {
       if (selectingBlocks) {
         selectingBlocks = false;
@@ -875,7 +1042,7 @@ class Block {
             if (camera.getScaling() < 0.4) {
               ctx.fillRect(this.position.x, this.size.height + this.getYPosition() + this.style.font.size * lineCounter, this.attributes[type][i].name.length * 5, 2);
             } else {
-              let value = this.attributes[type][i].value || "";
+              let value = this.attributes[type][i].value === undefined ? "" : this.attributes[type][i].value + "";
               ctx.fillText((this.attributes[type][i].shortName || this.attributes[type][i].name) + ": " + value.slice(0, 15), this.position.x, this.size.height + this.getYPosition() + this.style.font.size * lineCounter);
             }
             lineCounter++;

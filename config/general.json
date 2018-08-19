@@ -27,6 +27,7 @@
       "text": "",
       "char": ""
     },
+  "multiSelectSeparator": ";;",
   "//": "This allows to automatically add an attribute with a custom name that will be used for comments. Leave empty for none",
     "commentAttributeName": "Comment",
   "//" : "Do not enable if you don't want to get scare in case of an AI editor fatal error",

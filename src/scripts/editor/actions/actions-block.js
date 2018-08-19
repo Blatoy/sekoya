@@ -12,6 +12,10 @@ module.exports.registerActions = () => {
     Block.getSelectedBlock().cancelBlockLinking();
   });
 
+  actionHandler.addAction("blocks: display settings for selected block", () => {
+    Block.getSelectedBlock().displayPropertyWindow();
+  });
+
   actionHandler.addAction("blocks: unlink selected block", () => {
     actionHandler.trigger("blocks: link block", {parentBlock: rootBlock, targetBlock: Block.getSelectedBlock()});
   });

@@ -4,19 +4,6 @@
 // A key code: 'KeyA', 'Digit1', 'Escape' etc
 // Note: the only reason to use a keycode is if you want to use shift and a number
 
-// Default:
-// ctrl-z         => undo
-// ctrl-y         => redo
-// ctrl-s         => save
-// r              => auto block layout
-// ctrl-t         => open new tab
-// ctrl-w         => close current tab
-// ctrl-Tab       => switch to next tab
-// ctrl-shift-Tab => switch to previous tab
-// Delete         => delete selected block
-// Delete         => delete selected link
-// ctrl-Delete    => delete selected block and children
-// Escape         => cancel block linking
 
 module.exports = [{
     key: 'z',
@@ -52,6 +39,20 @@ module.exports = [{
     alt: false,
     shift: false,
     action: "blocks: auto layout"
+  },
+  {
+    key: 'Space',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "blocks: display settings for selected block"
+  },
+  {
+    key: 'p',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "blocks: display settings for selected block"
   },
   {
     key: 'n',
