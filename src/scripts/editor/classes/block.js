@@ -5,7 +5,11 @@
 let root;
 let selectedBlock;
 
+let copiedBlocks = [];
+
 let mouseOverAnyBlock = false;
+let leftClickReleased = true;
+let selectingBlocks = false;
 let blockLinkingInProgress = false;
 
 let mouseClickPositionRelativeToBlock = {
@@ -54,6 +58,7 @@ class Block {
     this.type = blockDefinition.type;
     this.attributes = {};
     this.attributeCount = 0;
+    this.minimized = false;
 
     this.children = children;
     this.parent = parent;
@@ -62,6 +67,7 @@ class Block {
     this.isNewDraggedBlock = false;
     this.mouseOver = false;
     this.selected = false;
+    this.copySelected = false;
     this.dragged = false;
 
     this.linkingInProgress = false;
@@ -83,6 +89,7 @@ class Block {
       blockBelowParentMargin: getBlockStyleProperty(this.type, "blockBelowParentMargin"),
       border: getBlockStyleProperty(this.type, "border"),
       comment: getBlockStyleProperty(this.type, "comment"),
+      copySelectionColor: getBlockStyleProperty(this.type, "copySelectionColor"),
     };
 
     // Blocks cannot be orphan
@@ -158,7 +165,7 @@ class Block {
 
   // Returns the Y position at which the block can be clicked, displayed and stuff, comments are
   // displayed ABOVE this value
-  getYPosition()  {
+  getYPosition() {
     return this.position.y + this.commentHeight;
   }
 
@@ -528,68 +535,90 @@ class Block {
 
   handleMouseInteraction() {
     this.mouseOver = false;
+    if (!selectingBlocks) {
+      // Skip blocks if something was found
+      if (!mouseOverAnyBlock && (!selectedBlock.dragged || this.dragged)) {
+        // Handle mouse over display
+        if (this.isPositionOver(global.mouse.cameraX, global.mouse.cameraY)) {
+          if (!this.isRoot) {
+            this.mouseOver = true;
+            mouseOverAnyBlock = true;
 
-    // Skip blocks if something was found
-    if (!mouseOverAnyBlock && (!selectedBlock.dragged || this.dragged)) {
-      // Handle mouse over display
-      if (this.isPositionOver(global.mouse.cameraX, global.mouse.cameraY)) {
-        if (!this.isRoot) {
-          this.mouseOver = true;
-          mouseOverAnyBlock = true;
-
-          if (!this.dragged) {
-            this.dragged = true;
-            mouseClickPositionRelativeToBlock = {
-              x: this.position.x - global.mouse.cameraX,
-              y: this.position.y - global.mouse.cameraY
-            };
-          }
-
-          if (selectedBlock.linkingInProgress && (global.mouse.buttons[1] || global.mouse.buttons[3]) && !this.linkingInProgress && !selectedBlock.isRecursiveChild(this)) {
-            this.startLinkingLinkAllowed = false;
-            let linkChanged = actionHandler.trigger("blocks: link block", {
-              targetBlock: this,
-              parentBlock: selectedBlock,
-              linkType: config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : false
-            });
-
-            if (!global.metaKeys.ctrl && linkChanged) {
-              selectedBlock.cancelBlockLinking();
+            if(global.metaKeys.ctrl && global.mouse.buttons[1]) {
+              this.copySelected = true;
             }
-          }
 
-          if (global.mouse.buttons[1] && !this.selected) {
-            this.setSelected();
-          }
+            if (!this.dragged) {
+              this.dragged = true;
+              mouseClickPositionRelativeToBlock = {
+                x: this.position.x - global.mouse.cameraX,
+                y: this.position.y - global.mouse.cameraY
+              };
+            }
 
-          if (global.mouse.buttons[3] && !blockLinkingInProgress && this.startLinkingLinkAllowed) {
-            this.setSelected();
-            if (!this.isTerminalNode()) {
-              blockLinkingInProgress = true;
-              this.linkingInProgress = true;
+            if (selectedBlock.linkingInProgress && (global.mouse.buttons[1] || global.mouse.buttons[3]) && !this.linkingInProgress && !selectedBlock.isRecursiveChild(this)) {
+              this.startLinkingLinkAllowed = false;
+              let linkChanged = actionHandler.trigger("blocks: link block", {
+                targetBlock: this,
+                parentBlock: selectedBlock,
+                linkType: config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : false
+              });
+
+              if (!global.metaKeys.ctrl && linkChanged) {
+                selectedBlock.cancelBlockLinking();
+              }
+            }
+
+            if (global.mouse.buttons[1] && !this.selected) {
+              if(!global.metaKeys.ctrl) {
+                this.setSelected();
+              }
+            }
+
+            if (global.mouse.buttons[3] && !blockLinkingInProgress && this.startLinkingLinkAllowed) {
+              this.setSelected();
+              if (!this.isTerminalNode()) {
+                blockLinkingInProgress = true;
+                this.linkingInProgress = true;
+              }
             }
           }
         }
       }
-    }
 
-    if (this.dragged && !global.mouse.buttons[1]) {
-      this.dragged = false;
+      if (this.dragged && !global.mouse.buttons[1]) {
+        this.dragged = false;
 
-      if (this.isNewDraggedBlock) {
-        this.isNewDraggedBlock = false;
-        actionHandler.trigger("blocks: sort children using position - no undo", {
-          parentBlock: this.parent
-        });
-      } else {
-        actionHandler.trigger("blocks: sort children using position", {
-          parentBlock: this.parent
-        });
+        if (this.isNewDraggedBlock) {
+          this.isNewDraggedBlock = false;
+          actionHandler.trigger("blocks: sort children using position - no undo", {
+            parentBlock: this.parent
+          });
+        } else {
+          actionHandler.trigger("blocks: sort children using position", {
+            parentBlock: this.parent
+          });
+        }
       }
-    }
 
-    if (!global.mouse.buttons[3]) {
-      this.startLinkingLinkAllowed = true;
+      if (!global.mouse.buttons[3]) {
+        this.startLinkingLinkAllowed = true;
+      }
+    } else {
+      let x1 = mouseClickPosition.x, x2 = global.mouse.cameraX;
+      let y1 = mouseClickPosition.y, y2 = global.mouse.cameraY;
+      if(x2 < x1) [x1, x2] = [x2, x1];
+      if(y2 < y1) [y1, y2] = [y2, y1];
+
+      if (this.position.x + this.size.width > x1 && this.getYPosition() + this.size.height> y1 &&
+          this.position.x < x2 &&
+          this.getYPosition() < y2
+      ) {
+        this.copySelected = true;
+      }
+      else {
+        this.copySelected = false;
+      }
     }
 
     this.children.map((child) => {
@@ -601,13 +630,33 @@ class Block {
     mouseOverAnyBlock = false;
     this.handleMouseInteraction();
 
+    if (!global.mouse.buttons["1"]) {
+      leftClickReleased = true;
+    } else {
+      if (leftClickReleased) {
+        leftClickReleased = false;
+        mouseClickPosition.x = global.mouse.cameraX;
+        mouseClickPosition.y = global.mouse.cameraY;
+      }
+    }
+
     if (selectedBlock.dragged) {
       selectedBlock.position.x = mouseClickPositionRelativeToBlock.x + global.mouse.cameraX;
       selectedBlock.position.y = mouseClickPositionRelativeToBlock.y + global.mouse.cameraY;
+    } else if (global.mouse.buttons["1"]) {
+    //  if (global.mouse.cameraX != mouseClickPosition.x && global.mouse.cameraY != mouseClickPosition.y) {
+        if(!global.metaKeys.ctrl) {
+          selectingBlocks = true;
+        }
+    //  }
+    } else {
+      if (selectingBlocks) {
+        selectingBlocks = false;
+      }
     }
 
     // Prevent changing the moving canvas cursor
-    if(!global.mouse.buttons["2"]) {
+    if (!global.mouse.buttons["2"]) {
       if (mouseOverAnyBlock) {
         document.getElementById("main-canvas").style.cursor = "pointer";
       } else {
@@ -697,12 +746,11 @@ class Block {
       let words = this.attributes["string"][config.commentAttributeName].value.split(" ");
 
       let currentLine = "";
-      for(let i = 0; i < words.length; ++i) {
-        if(ctx.measureText(currentLine + words[i]).width >= this.size.width * this.style.comment.width - this.style.comment.padding.left * 2) {
+      for (let i = 0; i < words.length; ++i) {
+        if (ctx.measureText(currentLine + words[i]).width >= this.size.width * this.style.comment.width - this.style.comment.padding.left * 2) {
           lines.push(currentLine);
           currentLine = words[i] + " ";
-        }
-        else {
+        } else {
           currentLine += words[i] + " ";
         }
       }
@@ -733,30 +781,31 @@ class Block {
     if (!this.isRoot && this.isInView(camera)) {
       if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName] && this.attributes["string"][config.commentAttributeName].value) {
 
-        if(this.style.comment.border.thickness > 0) {
+        if (this.style.comment.border.thickness > 0) {
           ctx.fillStyle = this.style.comment.border.color;
           ctx.fillRect(this.position.x - this.style.comment.border.thickness, this.position.y - this.style.comment.border.thickness,
             this.size.width * this.style.comment.width + this.style.comment.border.thickness * 2, this.commentHeight + this.style.comment.border.thickness * 2);
         }
+        ctx.font = this.style.font.size + "px " + this.style.font.family;
         ctx.fillStyle = this.style.comment.backgroundColor;
         ctx.fillRect(this.position.x, this.position.y, this.size.width * this.style.comment.width, this.commentHeight);
         ctx.fillStyle = this.style.comment.textColor;
 
         let lines = this.getCommentLines(ctx);
-        for(let i = 0; i < lines.length; ++i) {
+        for (let i = 0; i < lines.length; ++i) {
           ctx.fillText(lines[i], this.position.x + this.style.comment.padding.left, this.position.y + i * this.style.font.size + this.style.comment.padding.top)
         }
       }
 
       // Render block
-      if(this.style.border) {
+      if (this.style.border) {
         ctx.fillStyle = this.style.border.color;
         ctx.fillRect(this.position.x - this.style.border.thickness, this.getYPosition() - this.style.border.thickness,
           this.size.width + this.style.border.thickness * 2, this.size.height + this.style.border.thickness * 2);
       }
 
       ctx.fillStyle = this.style.color;
-      ctx.fillRect(this.position.x, this.getYPosition() /** this.style.font.size*/, this.size.width, this.size.height);
+      ctx.fillRect(this.position.x, this.getYPosition() /** this.style.font.size*/ , this.size.width, this.size.height);
 
       // Selection border
       if (this.selected) {
@@ -786,6 +835,10 @@ class Block {
         ctx.fillRect(this.position.x, this.getYPosition(), this.size.width, this.size.height);
       }
 
+      if (this.copySelected) {
+        ctx.fillStyle = this.style.copySelectionColor;
+        ctx.fillRect(this.position.x, this.getYPosition(), this.size.width, this.size.height);
+      }
 
       ctx.fillStyle = textColour;
 
@@ -834,6 +887,14 @@ class Block {
     this.children.map((child) => {
       child.render(ctx);
     });
+
+    if (this.isRoot) {
+      // Render block selection
+      if (selectingBlocks) {
+        ctx.fillStyle = this.style.copySelectionColor;
+        ctx.fillRect(mouseClickPosition.x, mouseClickPosition.y, -mouseClickPosition.x + global.mouse.cameraX, -mouseClickPosition.y + global.mouse.cameraY);
+      }
+    }
   }
 }
 

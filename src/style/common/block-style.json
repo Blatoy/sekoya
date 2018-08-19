@@ -1,5 +1,6 @@
 {
   "all": {
+    "copySelectionColor": "rgba(50, 75, 220, 0.5)",
     "comment": {
       "backgroundColor": "#64DC64",
       "textColor": "black",
