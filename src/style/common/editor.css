@@ -132,7 +132,7 @@ main {
 #block-properties-container {
   left: 30%;
   right: 30%;
-  max-height: 80%;
+  max-height: 70%;
   overflow: auto;
 }
 
@@ -203,9 +203,9 @@ main {
 
 .property-container {
   border-top: 1px solid lightgray;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   margin-top: 5px;
-  padding-top: 5px;
+  padding-top: 15px;
   padding-bottom: 5px;
 }
 
@@ -221,5 +221,6 @@ main {
 }
 
 .property-select, .property-input, .property-textarea {
-  width: 60%;
+  width: 55%;
+  box-sizing: border-box;
 }
