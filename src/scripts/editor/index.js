@@ -36,34 +36,9 @@ const {
 } = require(editorFolderPath + "classes/block.js");
 
 themeLoader.addCSSToCurrentPage();
-tabManager.init();
 blockLoader.loadBlockDefinitions(() => {
   require(editorFolderPath + "display/block-list-display.js").addBlocksToLeftMenu();
-
-  // DEBUG
-
-  /*let r = new Block({
-    type: "root",
-    name: "root"
-  });
-  r.getRoot().autoLayout();*/
-  /*new Block(blockLoader.getBlockDefinitions().condition.isTargetInArea, r);
-  for(let i = 0; i < 50; ++i) {
-    if(i < 500) {
-      new Block(blockLoader.getBlockDefinitions().condition.isTargetInArea, r);
-    }
-    else {
-      new Block(blockLoader.getBlockDefinitions().condition.isTargetInArea, r.children[Math.floor(Math.random() * r.children.length)]);
-    }
-  }*/
-  /*  let c = new Block(blockLoader.getBlockDefinitions().test["1"], r);
-    new Block(blockLoader.getBlockDefinitions().test["3"], r);
-    new Block(blockLoader.getBlockDefinitions().condition.branch);
-    new Block(blockLoader.getBlockDefinitions().test["1"], c);
-    new Block(blockLoader.getBlockDefinitions().test["2"], c);
-    new Block(blockLoader.getBlockDefinitions().test["3"], c);
-    new Block(blockLoader.getBlockDefinitions().test["4"], c);*/
-  //c.getRoot().autoLayout()
+  tabManager.init();
 });
 
 require(actionsFolderPath + "actions-tab.js").registerActions();
