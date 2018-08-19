@@ -16,32 +16,29 @@ function switchTab(direction = 0) {
 }
 
 function newTab(name = "", blocks = [], fileLocation = "", selected = true) {
-  if(name === "") {
+  if (name === "") {
     name = DEFAULT_TAB_NAME + tabs.length + DEFAULT_TAB_EXTENSION;
   }
 
   let tab = new Tab(name, blocks, fileLocation, selected);
 
-  if(blocks.length === 0) {
+  if (blocks.length === 0) {
     // blockManager.initTab(tab);
   }
 
   tabs.push(tab);
 
-  if(selected) {
+  if (selected) {
     selectTab(tabs.length - 1);
-  }
-  else {
+  } else {
     // Display is handled in selectTab otherwise
     notifyTabDisplayer();
   }
 
-  // TEMP: Add root block if file location not set for cool "demo" purpose
-  if(!fileLocation) {
-    new Block({
-      type: "root",
-      name: "root"
-    });
+  if (!fileLocation) {
+    if (config.defaultBlock) {
+      new Block(blockLoader.getDefinitionByName(config.defaultBlock));
+    }
     rootBlock.autoLayout();
   }
 }
@@ -56,18 +53,16 @@ function renameTab(index, name) {
 }
 
 function closeTab(index = 0) {
-  if(tabs.length > 1) {
-    if(selectedTabIndex === index) {
-      if(index >= tabs.length - 1) {
+  if (tabs.length > 1) {
+    if (selectedTabIndex === index) {
+      if (index >= tabs.length - 1) {
         selectTab(tabs.length - 2);
-      }
-      else {
+      } else {
         selectTab(index + 1);
         selectedTabIndex--;
       }
-    }
-    else {
-      if(index < selectedTabIndex) {
+    } else {
+      if (index < selectedTabIndex) {
         selectedTabIndex--;
       }
     }
@@ -79,19 +74,18 @@ function closeTab(index = 0) {
 
 module.exports.handleNewTab = (fileName, fileLocation) => {
   let tabIndex = getTabIndexFromFileLocation(fileLocation + fileName);
-  if(tabIndex === -1) {
+  if (tabIndex === -1) {
     tabManager.newTab(fileName, [], fileLocation);
     return true;
-  }
-  else {
+  } else {
     selectTab(tabIndex);
     return false;
   }
 };
 
 function getTabIndexFromFileLocation(fileLocation) {
-  for(let i = 0; i < tabs.length; ++i) {
-    if(tabs[i].getFileLocation() === fileLocation) {
+  for (let i = 0; i < tabs.length; ++i) {
+    if (tabs[i].getFileLocation() === fileLocation) {
       return i;
     }
   }
@@ -104,23 +98,26 @@ function openTab() {
 
 function selectTab(index) {
   // Allow cycling using switchTab
-  if(index > tabs.length - 1) {
+  if (index > tabs.length - 1) {
     index = 0;
-  }
-  else if(index < 0){
+  } else if (index < 0) {
     index = tabs.length - 1;
   }
 
   let previousSelectedTab = tabs[selectedTabIndex];
   let newSelectedTab = tabs[index];
 
-  if(previousSelectedTab) {
+  if (previousSelectedTab) {
     previousSelectedTab.setSelected(false);
-    previousSelectedTab.cameraState = {x: camera.getPosition().x, y: camera.getPosition().y, scaling: camera.getScaling()};
+    previousSelectedTab.cameraState = {
+      x: camera.getPosition().x,
+      y: camera.getPosition().y,
+      scaling: camera.getScaling()
+    };
     previousSelectedTab.history = actionHandler.setHistory(newSelectedTab.history);
 
     let selectedBlock = Block.getSelectedBlock();
-    if(selectedBlock && selectedBlock.parent) {
+    if (selectedBlock && selectedBlock.parent) {
       previousSelectedTab.selectedBlock = selectedBlock;
     }
   }
@@ -134,7 +131,7 @@ function selectTab(index) {
   newSelectedTab.setSelected(true);
   rootBlock.children = newSelectedTab.blocks;
 
-  if(newSelectedTab.selectedBlock) {
+  if (newSelectedTab.selectedBlock) {
     newSelectedTab.selectedBlock.setSelected();
   }
 
