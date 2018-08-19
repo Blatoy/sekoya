@@ -6,13 +6,11 @@ let fps = 0, displayedFps = 0;
 function mainLoop() {
   fps++;
   rootBlock.update();
-  
-  if(document.hasFocus()) {
+  camera.update();
+
+  if(document.hasFocus() || global.tick <= 3) {
     global.tick++,
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // NOTE: It could be an idea to set a fixed update speed in case the renderer is too slow, shouldn't happen but still
-    camera.update();
 
     camera.applyTransforms(ctx);
     rootBlock.renderConnections(ctx, camera);
