@@ -11,8 +11,8 @@
       {"name": "else", "linkableTo": ["condition", "logic"], "sortOrder": 2},
       {"name": "or", "linkableTo":  ["logic"], "sortOrder": 0, "allowedChildTypes": ["condition"], "childrenAreTerminalNodes": 1}
     ],
-  "//" : "The name of the block that will be added by default when creating a new file",
-    "defaultBlock": "root",
+  "//" : "The name of the block that will be added by default when creating a new file, leave empty for none",
+    "defaultBlock": "Root",
   "//" : "Used when loading a block to set a default value when it's not specified in the definition. You can add custom ones. If missing, empty string is set a default",
     "defaultEmptyValues": {
       "float": 0,
