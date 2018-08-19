@@ -4,12 +4,11 @@ global.tick = 0;
 let fps = 0, displayedFps = 0;
 
 function mainLoop() {
-  fps++;
+  global.tick++,
   rootBlock.update();
   camera.update();
 
-  if(document.hasFocus() || global.tick <= 3) {
-    global.tick++,
+  if(document.hasFocus() || global.tick % 10 === 0) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     camera.applyTransforms(ctx);
@@ -17,14 +16,18 @@ function mainLoop() {
     rootBlock.render(ctx, camera);
     camera.resetTransforms(ctx);
 
-    let currentHistory = actionHandler.setHistory({undo: [], redo: []});
-    ctx.fillStyle = "gray";
-    ctx.fillText("FPS: " + displayedFps, canvas.width - 50, 10)
-    for(let i = 0; i < currentHistory.undo.length; ++i) {
-      let s = ctx.measureText(" - " + currentHistory.undo[i].actionName);
-      ctx.fillText(" - " + currentHistory.undo[i].actionName, canvas.width - s.width - 10, 18 + i * 18)
-    }
-    actionHandler.setHistory(currentHistory);
+    /// DEBUG
+      fps++;
+      let currentHistory = actionHandler.setHistory({undo: [], redo: []});
+      ctx.fillStyle = "gray";
+      ctx.fillText("FPS: " + displayedFps, canvas.width - 50, 10)
+      for(let i = 0; i < currentHistory.undo.length; ++i) {
+        let s = ctx.measureText(" - " + currentHistory.undo[i].actionName);
+        ctx.fillText(" - " + currentHistory.undo[i].actionName, canvas.width - s.width - 10, 18 + i * 18)
+      }
+      actionHandler.setHistory(currentHistory);
+    /// END DEBUG
+
   }
   requestAnimationFrame(mainLoop);
 }
