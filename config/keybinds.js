@@ -223,6 +223,20 @@ module.exports = [{
     shift: false,
     action: "blocks: select child"
   },
+  {
+    key: 'ArrowLeft',
+    ctrl: false,
+    alt: true,
+    shift: false,
+    action: "blocks: select parent"
+  },
+  {
+    key: 'ArrowRight',
+    ctrl: false,
+    alt: true,
+    shift: false,
+    action: "blocks: select child"
+  },
 
   {
     key: 'ArrowDown',
@@ -268,6 +282,41 @@ module.exports = [{
     action: "blocks: select right block"
   },
 
+  {
+    key: 'KeyW',
+    ctrl: false,
+    alt: true,
+    shift: false,
+    action: "camera: move up fast"
+  },
+  {
+    key: 'KeyS',
+    ctrl: false,
+    alt: true,
+    shift: false,
+    action: "camera: move down fast"
+  },
+  {
+    key: 'KeyA',
+    ctrl: false,
+    alt: true,
+    shift: false,
+    action: "camera: move left fast"
+  },
+  {
+    key: 'KeyD',
+    ctrl: false,
+    alt: true,
+    shift: false,
+    action: "camera: move right fast"
+  },
+  {
+    key: 'AltLeft',
+    ctrl: false,
+    alt: true,
+    shift: false,
+    action: "camera: notify move fast" // allows to start moving fast after the camera started moving
+  },
 
   {
     key: 'KeyW',

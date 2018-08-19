@@ -9,6 +9,7 @@ let targetPosition = {
 };
 
 let mouseDownPosition = {x: 0, y: 0};
+let moveFast = false;
 
 let renderedSegments = {};
 let speed = 0.1;
@@ -163,11 +164,15 @@ module.exports.onScroll = (deltaX, deltaY, ctrlPressed, shiftPressed) => {
   }
 };
 
+module.exports.setMoveFast = (moveFast_) => {
+  moveFast = moveFast_;
+};
+
 module.exports.update = () => {
-  if (moveUp) setPosition(position.x, position.y - SPEED);
-  if (moveDown) setPosition(position.x, position.y + SPEED);
-  if (moveLeft) setPosition(position.x - SPEED, position.y);
-  if (moveRight) setPosition(position.x + SPEED, position.y);
+  if (moveUp) setPosition(position.x, position.y - SPEED * (1 + 4 * moveFast));
+  if (moveDown) setPosition(position.x, position.y + SPEED * (1 + 4 * moveFast));
+  if (moveLeft) setPosition(position.x - SPEED * (1 + 4 * moveFast), position.y);
+  if (moveRight) setPosition(position.x + SPEED * (1 + 4 * moveFast), position.y);
 
   if(global.mouse.buttons["2"]) {
     position.x = targetPosition.x = mouseDownPosition.x - global.mouse.canvasX;
