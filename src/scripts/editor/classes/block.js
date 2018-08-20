@@ -60,6 +60,8 @@ class Block {
     this.attributeCount = 0;
     this.minimized = false;
 
+    this.propertyDialogDisplayed = true;
+
     this.children = children;
     this.parent = parent;
     this.isRoot = blockDefinition.isRoot || false;
@@ -151,6 +153,8 @@ class Block {
   }
 
   displayPropertyWindow() {
+    this.propertyDialogDisplayed = true;
+    global.dialogOpen = true;
     // Display background and handle closing
     let divBackground = document.getElementById("block-properties-background");
     divBackground.style.display = "block";
@@ -304,13 +308,15 @@ class Block {
       let textareaComment = document.createElement("textarea");
       textareaComment.value = commentValue;
       textareaComment.classList.add("property-textarea");
-      
+
       divPropertyContainer.appendChild(textareaComment);
       divPropertiesInputList.appendChild(divPropertyContainer);
     }
   }
 
   closePropertyWindow(save = true) {
+    this.propertyDialogDisplayed = false;
+    global.dialogOpen = false;
     let divBackground = document.getElementById("block-properties-background");
     divBackground.style.display = "none";
   }

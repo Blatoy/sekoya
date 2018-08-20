@@ -125,6 +125,13 @@ module.exports = [{
     action: "blocks: cancel block linking"
   },
   {
+    key: 'Escape',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "blocks: close settings dialog and discard changes"
+  },
+  {
     key: 'Space',
     ctrl: false,
     alt: false,

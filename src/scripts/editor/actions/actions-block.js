@@ -5,15 +5,42 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction("blocks: change current linking type", () => {
-    Block.getSelectedBlock().switchLinkingLinkType();
+    if(Block.getSelectedBlock().linkingInProgress) {
+      Block.getSelectedBlock().switchLinkingLinkType();
+      return true;
+    }
+    else {
+      return false;
+    }
   });
 
   actionHandler.addAction("blocks: cancel block linking", () => {
-    Block.getSelectedBlock().cancelBlockLinking();
+    if(Block.getSelectedBlock().linkingInProgress) {
+      Block.getSelectedBlock().cancelBlockLinking();
+      return true;
+    }
+    else {
+      return false;
+    }
   });
 
+  actionHandler.addAction("blocks: close settings dialog and discard changes", () => {
+    Block.getSelectedBlock().closePropertyWindow(false);
+  });
+
+  actionHandler.addAction("blocks: close settings dialog", () => {
+    Block.getSelectedBlock().closePropertyWindow();
+  });
+
+
   actionHandler.addAction("blocks: display settings for selected block", () => {
-    Block.getSelectedBlock().displayPropertyWindow();
+    if(!Block.getSelectedBlock().linkingInProgress && !global.dialogOpen) {
+      Block.getSelectedBlock().displayPropertyWindow();
+      return true;
+    }
+    else {
+      return false;
+    }
   });
 
   actionHandler.addAction("blocks: unlink selected block", () => {
@@ -43,7 +70,7 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction("blocks: delete selected", (data) => {
     data.block.delete();
-    rootBlock.autoLayout();
+  //  rootBlock.autoLayout();
   }, () => {
     let children = [];
     let selectedBlock = Block.getSelectedBlock();
@@ -72,13 +99,13 @@ module.exports.registerActions = () => {
       data.children[i].child.changeParent(data.block, data.children[i].linkToParentType);
     }
 
-    rootBlock.autoLayout();
+  //  rootBlock.autoLayout();
     data.block.setSelected(true);
   });
 
   actionHandler.addAction("blocks: delete selected and children", (data) => {
     data.block.deleteRecursive();
-    rootBlock.autoLayout();
+    //rootBlock.autoLayout();
   }, () => {
     let selectedBlock = Block.getSelectedBlock();
 
@@ -88,7 +115,7 @@ module.exports.registerActions = () => {
     };
   }, (data) => {
     data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
-    rootBlock.autoLayout();
+    //rootBlock.autoLayout();
     data.block.setSelected(true);
   });
 
@@ -109,7 +136,7 @@ module.exports.registerActions = () => {
     }
 
     if (!data.block.isNewDraggedBlock) {
-      rootBlock.autoLayout();
+      //rootBlock.autoLayout();
     }
 
 
@@ -146,7 +173,7 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction("blocks: sort children using position", (data) => {
     data.parentBlock.children = data.newChildOrder;
-    data.parentBlock.autoLayout();
+    // data.parentBlock.autoLayout();
   }, (data, actionHandlerParameters) => {
     let originalChildOrder = [];
     let newChildOrder = [];
@@ -174,7 +201,7 @@ module.exports.registerActions = () => {
     };
   }, (data) => {
     data.parentBlock.children = data.originalChildOrder;
-    data.parentBlock.autoLayout();
+    //data.parentBlock.autoLayout();
   });
 
   // Block moving: closest one

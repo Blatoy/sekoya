@@ -32,7 +32,7 @@ module.exports.registerActions = () => {
   }, false, false, 1000, false, false);
 
   actionHandler.addAction("quick access bar: hide dialog", () => {
-    quickAccess.hide();
+    return quickAccess.hide();
   }, false, false, 0, false, false);
 };
 /*

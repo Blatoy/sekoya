@@ -21,7 +21,8 @@ function addEvents() {
 }
 
 function hide() {
-  if (visible) {
+  if (visible && global.dialogOpen) {
+    global.dialogOpen = false;
     visible = false;
     elementBackground.style.display = "none";
     return true;
@@ -31,10 +32,11 @@ function hide() {
 }
 
 function show(caption) {
-  setCaption(caption);
-  if (visible) {
+  if (visible || global.dialogOpen) {
     return false;
   } else {
+    setCaption(caption);
+    global.dialogOpen = true;
     visible = true;
     elementBackground.style.display = "block";
     elementInput.value = "";
