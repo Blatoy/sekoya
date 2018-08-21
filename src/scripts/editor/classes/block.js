@@ -160,7 +160,7 @@ class Block {
     divBackground.style.display = "block";
     divBackground.onclick = (event) => {
       if (event.target == divBackground) {
-        this.closePropertyWindow();
+        actionHandler.trigger("blocks: close settings dialog and discard changes", false);
       }
     };
 
@@ -212,7 +212,10 @@ class Block {
               inputCheckBox.type = "checkbox";
               inputCheckBox.value = predefinedValues[i];
               inputCheckBox.id = "__" + i + "-" + predefinedValues[i];
+              inputCheckBox.dataset.attributeType = type;
+              inputCheckBox.dataset.attributeName = name;
               inputCheckBox.classList.add("property-checkbox")
+              inputCheckBox.classList.add("__property-value-checkbox")
 
               if(selectedValues.includes(predefinedValues[i])) {
                 inputCheckBox.checked = "checked";
@@ -220,7 +223,7 @@ class Block {
 
               let labelName = document.createElement("label");
               labelName.textContent = predefinedValues[i];
-              labelName.for = inputCheckBox.id;
+              labelName.htmlFor = inputCheckBox.id;
 
               if (i !== 0) {
                 let newLine = document.createElement("br");
@@ -242,7 +245,9 @@ class Block {
             let select = document.createElement("select");
             let selectedElementFound = false; // Adds an option if the element isn't found to make sure we don't erase values
             select.classList.add("property-select");
-
+            select.classList.add("__property-value")
+            select.dataset.attributeType = type;
+            select.dataset.attributeName = name;
             for (let i = 0; i < predefinedValues.length; ++i) {
               let option = document.createElement("option");
               option.textContent = predefinedValues[i];
@@ -282,6 +287,9 @@ class Block {
           inputText.type = "text";
           inputText.value = attribute.value;
           inputText.classList.add("property-input");
+          inputText.classList.add("__property-value")
+          inputText.dataset.attributeType = type;
+          inputText.dataset.attributeName = name;
 
           if (!firstElementFocused) {
             elementToFocus = inputText;
@@ -308,6 +316,9 @@ class Block {
       let textareaComment = document.createElement("textarea");
       textareaComment.value = commentValue;
       textareaComment.classList.add("property-textarea");
+      textareaComment.classList.add("__property-value")
+      textareaComment.dataset.attributeType = "string";
+      textareaComment.dataset.attributeName = config.commentAttributeName;
 
       divPropertyContainer.appendChild(textareaComment);
       divPropertiesInputList.appendChild(divPropertyContainer);
@@ -315,6 +326,33 @@ class Block {
   }
 
   closePropertyWindow(save = true) {
+    if(save) {
+        let propertyElementList = document.getElementsByClassName("__property-value");
+        for(let i = 0; i < propertyElementList.length; ++i) {
+          let propertyElement = propertyElementList[i];
+          this.attributes[propertyElement.dataset.attributeType][propertyElement.dataset.attributeName].value = propertyElement.value;
+        }
+        let propertyCheckboxList = document.getElementsByClassName("__property-value-checkbox");
+        let checkedValues = [];
+        let lastType = "", lastName = "";
+        for(let i = 0; i < propertyCheckboxList.length; ++i) {
+          let checkbox = propertyCheckboxList[i];
+          if(lastName !== checkbox.dataset.attributeName) {
+            if(lastName !== "") {
+              this.attributes[lastType][lastName].value = checkedValues.join(config.multiSelectSeparator);
+            }
+            lastName = checkbox.dataset.attributeName;
+            lastType = checkbox.dataset.attributeType;
+          }
+          if(checkbox.checked) {
+            checkedValues.push(checkbox.value);
+          }
+        }
+        if(lastName !== "") {
+          this.attributes[lastType][lastName].value = checkedValues.join(config.multiSelectSeparator);
+        }
+    }
+
     this.propertyDialogDisplayed = false;
     global.dialogOpen = false;
     let divBackground = document.getElementById("block-properties-background");
@@ -960,6 +998,7 @@ class Block {
             this.size.width * this.style.comment.width + this.style.comment.border.thickness * 2, this.commentHeight + this.style.comment.border.thickness * 2);
         }
         ctx.font = this.style.font.size + "px " + this.style.font.family;
+        ctx.textBaseline = "top";
         ctx.fillStyle = this.style.comment.backgroundColor;
         ctx.fillRect(this.position.x, this.position.y, this.size.width * this.style.comment.width, this.commentHeight);
         ctx.fillStyle = this.style.comment.textColor;

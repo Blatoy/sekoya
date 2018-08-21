@@ -22,90 +22,10 @@
   <div id="block-properties-background" style="display: none;">
     <div id="block-properties-container">
       <span id="block-properties-caption">Block properties</span>
-      <div id="block-properties-inputs">
-        <div class='property-container'>
-          <label class="property-label">group to select</label>
-          <div class="checkbox-group">
-            <input class="property-checkbox" name="PLAYERS" type="checkbox"><label>PLAYERS</label>
-            <br><input class="property-checkbox" name="CREEPS" type="checkbox"><label>CREEPS</label>
-            <br><input class="property-checkbox" name="DESTROYABLE_OBSTACLES" type="checkbox"><label>DESTROYABLE_OBSTACLES</label>
-          </div>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">teams</label>
-          <div class="checkbox-group">
-            <input class="property-checkbox" name="PLAYERS" type="checkbox"><label>OWN_TEAM</label>
-            <br><input class="property-checkbox" name="CREEPS" type="checkbox"><label>ENEMY_TEAM</label>
-            <br><input class="property-checkbox" name="DESTROYABLE_OBSTACLES" type="checkbox"><label>NEUTRAL_TEAM</label>
-          </div>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">class</label>
-          <input type='input' class='property-input'>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">only check parent</label>
-          <select class="property-select">
-            <option>No</option>
-            <option>Yes</option>
-          </select>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">remove if not found</label>
-          <select class="property-select">
-            <option>No</option>
-            <option>Yes</option>
-          </select>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">xOffset</label>
-          <input type='input' class='property-input'>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">yOffset</label>
-          <input type='input' class='property-input'>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">width</label>
-          <input type='input' class='property-input'>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">height</label>
-          <input type='input' class='property-input'>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">horizontal alignment to character</label>
-          <select class="property-select">
-            <option>Centre</option>
-            <option>FacingDirection</option>
-          </select>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">vertical alignment to character</label>
-          <select class="property-select">
-            <option>Centre</option>
-            <option>FacingDirection</option>
-          </select>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">debugAreaColour</label>
-          <input type='input' class='property-input'>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">compare method</label>
-          <select class="property-select">
-            <option>Centre</option>
-            <option>FacingDirection</option>
-          </select>
-        </div>
-        <div class='property-container'>
-          <label class="property-label">comment</label>
-          <textarea class="property-textarea"></textarea>
-        </div>
-      </div>
+      <div id="block-properties-inputs"></div>
       <div id="block-properties-buttons">
-        <input class="button-cancel" type="button" value="Cancel">
-        <input class="button-confirm" type="button" value="Save">
+        <input class="button-cancel" type="button" onclick="actionHandler.trigger('blocks: close settings dialog and discard changes', false);" value="Cancel">
+        <input class="button-confirm" type="button" onclick="actionHandler.trigger('blocks: close settings dialog');" value="Save">
       </div>
     </div>
   </div>

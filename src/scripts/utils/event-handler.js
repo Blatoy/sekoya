@@ -36,7 +36,7 @@ module.exports.addEditorEvents = () => {
   });
 
   window.addEventListener("dblclick", (e) => {
-
+    actionHandler.trigger("blocks: display settings for selected block")
   });
 
   window.addEventListener("keydown", (e) => {

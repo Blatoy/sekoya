@@ -157,6 +157,13 @@ module.exports = [{
     ctrl: false,
     alt: false,
     shift: false,
+    action: "blocks: close settings dialog"
+  },
+  {
+    key: 'Enter',
+    ctrl: false,
+    alt: false,
+    shift: false,
     action: "quick access bar: add linked normal block dialog"
   },
   {
