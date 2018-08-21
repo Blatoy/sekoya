@@ -50,8 +50,6 @@ function handleKeyDown(e) {
   // Actions with higher priorities at top
   suitableActions.sort(compareActionPriority);
 
-  e.preventDefault();
-
   for (let i = 0; i < suitableActions.length; ++i) {
     let currentAction = suitableActions[i];
     let nextAction = suitableActions[i + 1];
@@ -135,8 +133,7 @@ function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false)
         (
           action.preventTriggerWhenDialogOpen && global.dialogOpen
         )
-      )
-    ) {
+      )) {
       return false;
     }
 
