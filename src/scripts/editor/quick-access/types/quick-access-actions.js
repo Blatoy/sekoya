@@ -15,7 +15,7 @@ function display() {
 }
 
 function onResultSelected(action) {
-  actionHandler.trigger(action);
+  actionHandler.trigger(action, undefined, false, true);
 }
 
 module.exports.display = display;

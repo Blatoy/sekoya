@@ -28,7 +28,15 @@ function handleKeyDown(e) {
       keybind.alt === e.altKey) {
       // Prevent the user to use inexisting shorcuts
       if (actions[keybind.action]) {
-        if ((actions[keybind.action].preventTriggerWhenInputFocused && (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "SELECT" || document.activeElement.tagName === "TEXTAREA")) || hasAccelerator(keybind.action, getAccelerator(keybind))) {
+        if (
+          (actions[keybind.action].preventTriggerWhenInputFocused &&
+            (document.activeElement.tagName === "INPUT" ||
+              document.activeElement.tagName === "SELECT" ||
+              document.activeElement.tagName === "TEXTAREA")
+          ) ||
+          hasAccelerator(keybind.action, getAccelerator(keybind)) ||
+          (actions[keybind.action].preventTriggerWhenDialogOpen && global.dialogOpen)
+        ) {
           continue;
         } else {
           suitableActions.push(actions[keybind.action]);
@@ -74,11 +82,11 @@ function handleKeyUp(e) {
     if ((keybind.key.toLowerCase() === keyPressed.toLowerCase())) {
       // Prevent the user to use inexisting shorcuts
       if (actions[keybind.action]) {
-        if (actions[keybind.action].preventTriggerWhenInputFocused && document.activeElement.tagName === "INPUT") {
-          continue;
-        } else {
-          actions[keybind.action].onShortcutRelease();
-        }
+        /*  if (actions[keybind.action].preventTriggerWhenInputFocused && document.activeElement.tagName === "INPUT") {
+            continue;
+          } else {*/
+        actions[keybind.action].onShortcutRelease();
+        //  }
       }
     }
   }
@@ -108,9 +116,28 @@ function redo() {
   }
 }
 
-function trigger(name, args, ignoreCommandHistory = false) {
+function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false) {
   if (actions[name] !== undefined) {
+
     let action = actions[name];
+
+    // TODO: Fix the code in the keydown thingy to not have a duplicate here
+    // this is also done here because of accelerators...
+    if (!bypassChecks && (
+        (action.preventTriggerWhenInputFocused &&
+          (document.activeElement.tagName === "INPUT" ||
+            document.activeElement.tagName === "SELECT" ||
+            document.activeElement.tagName === "TEXTAREA"
+          )
+        ) ||
+        (
+          action.preventTriggerWhenDialogOpen && global.dialogOpen
+        )
+      )
+    ) {
+      return false;
+    }
+
 
     if (typeof action.setData !== "function") {
       action.setData = () => {};
@@ -155,17 +182,32 @@ function trigger(name, args, ignoreCommandHistory = false) {
  * @param  {bool} [preventTriggerWhenInputFocused = true]  Prevents the action to be triggered using shortcuts when an input is focused
  * @param  {bool} [onShortcutRelease = function(){}]                 Called when the shortcut is released... I hate my life, this arg is so far in the arg list >>
  */
-function addAction(name, doAction, setData = () => {}, undoAction = false, priority = 0, displayable = true, preventTriggerWhenInputFocused = true, onShortcutRelease = () => {}) {
-  actions[name] = {
-    name: name,
-    doAction: doAction,
-    setData: setData,
-    undoAction: undoAction,
-    priority: priority,
-    displayable: displayable,
-    onShortcutRelease: onShortcutRelease,
-    preventTriggerWhenInputFocused: preventTriggerWhenInputFocused
-  };
+function addAction(name, action, setData = () => {}, undoAction = false, priority = 0, displayable = true, preventTriggerWhenInputFocused = true, onShortcutRelease = () => {}, preventTriggerWhenDialogOpen = true) {
+  if (typeof name === "object") {
+    actions[name.name] = {
+      name: name.name,
+      doAction: name.action,
+      setData: name.setData === undefined ? false : name.setData,
+      undoAction: name.undoAction === undefined ? false : name.undoAction,
+      priority: name.priority || 0,
+      displayable: name.displayable === undefined ? true : name.displayable,
+      onShortcutRelease: name.onShortcutRelease || (() => {}),
+      preventTriggerWhenInputFocused: name.preventTriggerWhenInputFocused === undefined ? true : name.preventTriggerWhenInputFocused,
+      preventTriggerWhenDialogOpen: name.preventTriggerWhenDialogOpen === undefined ? true : name.preventTriggerWhenDialogOpen
+    };
+  } else {
+    actions[name] = {
+      name: name,
+      doAction: action,
+      setData: setData,
+      undoAction: undoAction,
+      priority: priority,
+      displayable: displayable,
+      onShortcutRelease: onShortcutRelease,
+      preventTriggerWhenInputFocused: preventTriggerWhenInputFocused,
+      preventTriggerWhenDialogOpen: preventTriggerWhenDialogOpen
+    };
+  }
 }
 
 function setHistory(newHistory) {

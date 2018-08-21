@@ -5,50 +5,61 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction("blocks: change current linking type", () => {
-    if(Block.getSelectedBlock().linkingInProgress) {
+    if (Block.getSelectedBlock().linkingInProgress) {
       Block.getSelectedBlock().switchLinkingLinkType();
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   });
 
   actionHandler.addAction("blocks: cancel block linking", () => {
-    if(Block.getSelectedBlock().linkingInProgress) {
+    if (Block.getSelectedBlock().linkingInProgress) {
       Block.getSelectedBlock().cancelBlockLinking();
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   });
 
-  actionHandler.addAction("blocks: close settings dialog and discard changes", () => {
-    Block.getSelectedBlock().closePropertyWindow(false);
+  actionHandler.addAction({
+    name: "blocks: close settings dialog and discard changes",
+    action: () => {
+      Block.getSelectedBlock().closePropertyWindow(false);
+    },
+    displayable: false,
+    preventTriggerWhenInputFocused: false,
+    preventTriggerWhenDialogOpen: false
   });
 
-  actionHandler.addAction("blocks: close settings dialog", () => {
-    Block.getSelectedBlock().closePropertyWindow();
+  actionHandler.addAction({
+    name: "blocks: close settings dialog",
+    action: () => {
+      Block.getSelectedBlock().closePropertyWindow();
+    },
+    displayable: false,
+    preventTriggerWhenInputFocused: false,
+    preventTriggerWhenDialogOpen: false
   });
-
 
   actionHandler.addAction("blocks: display settings for selected block", () => {
-    if(!Block.getSelectedBlock().linkingInProgress && !global.dialogOpen) {
+    if (!Block.getSelectedBlock().linkingInProgress && !global.dialogOpen) {
       Block.getSelectedBlock().displayPropertyWindow();
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   });
 
   actionHandler.addAction("blocks: unlink selected block", () => {
-    actionHandler.trigger("blocks: link block", {parentBlock: rootBlock, targetBlock: Block.getSelectedBlock()});
+    actionHandler.trigger("blocks: link block", {
+      parentBlock: rootBlock,
+      targetBlock: Block.getSelectedBlock()
+    });
   });
 
   actionHandler.addAction("blocks: link block", (data, actionHandlerParameters) => {
-    if(!data.targetBlock.changeParent(data.parentBlock, data.linkType)) {
+    if (!data.targetBlock.changeParent(data.parentBlock, data.linkType)) {
       actionHandlerParameters.cancelUndo = true;
       return false;
     }
@@ -70,7 +81,7 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction("blocks: delete selected", (data) => {
     data.block.delete();
-  //  rootBlock.autoLayout();
+    //  rootBlock.autoLayout();
   }, () => {
     let children = [];
     let selectedBlock = Block.getSelectedBlock();
@@ -99,7 +110,7 @@ module.exports.registerActions = () => {
       data.children[i].child.changeParent(data.block, data.children[i].linkToParentType);
     }
 
-  //  rootBlock.autoLayout();
+    //  rootBlock.autoLayout();
     data.block.setSelected(true);
   });
 
