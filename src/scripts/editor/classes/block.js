@@ -299,7 +299,11 @@ class Block {
           divPropertyContainer.appendChild(inputText);
         }
         divPropertiesInputList.appendChild(divPropertyContainer);
-        elementToFocus.focus();
+        // This is a temp fix to prevent adding a space when focusing the input
+        // using the "space" shortcut......
+        setTimeout(() => {
+          elementToFocus.focus();
+        }, 5);
       }
     }
 
@@ -322,6 +326,18 @@ class Block {
 
       divPropertyContainer.appendChild(textareaComment);
       divPropertiesInputList.appendChild(divPropertyContainer);
+
+      if(!elementToFocus) {
+        /// TODO:
+        // FIX TAB REMOVING APP FOCUS
+        // FIX LINK NOT WORKING (probably related to stuff with the changes in quick-access and action priority not acting when closed actually idk)
+        //
+        // This is a temp fix to prevent adding a space when focusing the input
+        // using the "space" shortcut......
+        setTimeout(() => {
+          textareaComment.focus();
+        }, 5);
+      }
     }
   }
 

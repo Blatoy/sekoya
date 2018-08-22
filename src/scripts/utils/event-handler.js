@@ -50,6 +50,7 @@ module.exports.addEditorEvents = () => {
   });
 
   window.addEventListener("keyup", (e) => {
+    window.focus(); // Shitty fix to prevent tab focusing something strange?
     actionHandler.handleKeyUp(e);
     metaKeys = {
       ctrl: e.ctrlKey,
