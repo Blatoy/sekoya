@@ -107,7 +107,7 @@ function selectTab(index) {
   let previousSelectedTab = tabs[selectedTabIndex];
   let newSelectedTab = tabs[index];
 
-  if (previousSelectedTab) {
+  if (previousSelectedTab && index !== selectedTabIndex) {
     previousSelectedTab.setSelected(false);
     previousSelectedTab.cameraState = {
       x: camera.getPosition().x,
