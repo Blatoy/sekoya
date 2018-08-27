@@ -269,6 +269,22 @@ module.exports = [{
   },
 
   {
+    key: 'Tab',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "blocks: select next sibling"
+  },
+  {
+    key: 'Tab',
+    ctrl: false,
+    alt: false,
+    shift: true,
+    action: "blocks: select previous sibling"
+  },
+
+
+  {
     key: 'ArrowDown',
     ctrl: false,
     alt: false,
