@@ -82,6 +82,7 @@ function handleKeyUp(e) {
     if ((keybind.key.toLowerCase() === keyPressed.toLowerCase())) {
       // Prevent the user to use inexisting shorcuts
       if (actions[keybind.action]) {
+        // Most keyup should be executed even if there's something that should prevent it
         /*  if (actions[keybind.action].preventTriggerWhenInputFocused && document.activeElement.tagName === "INPUT") {
             continue;
           } else {*/
@@ -104,7 +105,14 @@ function undo() {
   if (undoStack.length > 0) {
     let actionHistory = undoStack.pop();
     redoStack.push(actionHistory);
-    actions[actionHistory.actionName].undoAction(actionHistory.parameters);
+    if(!Array.isArray(actionHistory)) {
+      actions[actionHistory.actionName].undoAction(actionHistory.parameters);
+    }
+    else {
+      for(let i = 0; i < actionHistory.length; ++i) {
+        actions[actionHistory[0].actionName].undoAction(actionHistory[i].parameters);
+      }
+    }
   }
 }
 
@@ -112,11 +120,19 @@ function redo() {
   if (redoStack.length > 0) {
     let actionHistory = redoStack.pop();
     undoStack.push(actionHistory);
-    actions[actionHistory.actionName].doAction(actionHistory.parameters);
+    if(!Array.isArray(actionHistory)) {
+      actions[actionHistory.actionName].doAction(actionHistory.parameters);
+    }
+    else {
+      for(let i = 0; i < actionHistory.length; ++i) {
+        actions[actionHistory[0].actionName].doAction(actionHistory[i].parameters);
+      }
+    }
   }
 }
 
-function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false) {
+function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false, mergeUndo = false) {
+//console.log(name, undoStack);
   if (actions[name] !== undefined) {
 
     let action = actions[name];
@@ -155,10 +171,33 @@ function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false)
 
     if (action.undoAction)
       if (!actionHandlerParameters.cancelUndo && action.undoAction && !ignoreCommandHistory) {
-        undoStack.push({
-          actionName: name,
-          parameters: parameters
-        });
+        let previousUndo = undoStack[undoStack.length - 1];
+        if(mergeUndo && previousUndo !== undefined &&
+          (Array.isArray(previousUndo) && previousUndo[0].actionName === name)) {
+          let previousUndo = undoStack[undoStack.length - 1];
+
+          if(!Array.isArray(previousUndo)) {
+            undoStack[undoStack.length - 1] = [previousUndo];
+          }
+
+          undoStack[undoStack.length - 1].push({
+            parameters: parameters
+          });
+        }
+        else {
+          if(mergeUndo) {
+            undoStack.push([{
+              actionName: name,
+              parameters: parameters
+            }]);
+          }
+          else {
+            undoStack.push({
+              actionName: name,
+              parameters: parameters
+            });
+          }
+        }
         redoStack = [];
       }
 

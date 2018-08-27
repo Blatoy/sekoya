@@ -42,6 +42,28 @@ module.exports.registerActions = () => {
     preventTriggerWhenDialogOpen: false
   });
 
+  actionHandler.addAction({
+    name: "blocks: move block",
+    action: (data, actionHandlerParameters) => {
+      if(data.newPosition.x === data.oldPosition.x && data.newPosition.y === data.oldPosition.y) {
+        actionHandlerParameters.cancelUndo = true;
+      }
+
+      data.block.position.x = data.newPosition.x;
+      data.block.position.y = data.newPosition.y;
+    },
+    setData: (data) => {
+      return data;
+    },
+    undoAction: (data) => {
+      data.block.position.x = data.oldPosition.x;
+      data.block.position.y = data.oldPosition.y;
+    },
+    displayable: false,
+    preventTriggerWhenInputFocused: false,
+    preventTriggerWhenDialogOpen: false
+  });
+
   actionHandler.addAction("blocks: display settings for selected block", () => {
     if (!Block.getSelectedBlock().linkingInProgress && !global.dialogOpen) {
       Block.getSelectedBlock().displayPropertyWindow();
@@ -80,38 +102,59 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction("blocks: delete selected", (data) => {
-    data.block.delete();
+    for(let i = 0; i < data.length; ++i) {
+      data[i].block.delete();
+    }
     //  rootBlock.autoLayout();
   }, () => {
-    let children = [];
-    let selectedBlock = Block.getSelectedBlock();
-    // We have to restore it at the right position
-    let blockIndex = selectedBlock.parent.children.indexOf(selectedBlock);
+    let selectedBlocks = rootBlock.getSelectedForGroupAction();
 
-    // We must track a reference to all the children since they are manually deleted from the block
-    for (let i = 0; i < selectedBlock.children.length; ++i) {
-      children.push({
-        child: selectedBlock.children[i],
-        linkToParentType: selectedBlock.children[i].linkToParentType
+    // We delete the selected block only if there was no selected block for group action
+    if(selectedBlocks.length === 0) {
+      selectedBlocks = [Block.getSelectedBlock()];
+    }
+
+    let deletedBlocks = [];
+    for(let i = 0; i < selectedBlocks.length; ++i) {
+      let children = [];
+      let selectedBlock = selectedBlocks[i];
+      // We have to restore it at the right position
+      let blockIndex = selectedBlock.parent.children.indexOf(selectedBlock);
+      selectedBlock.selectedForGroupAction = false;
+
+      // We must keep a reference to all the children since they are manually deleted from the block
+      for (let j = 0; j < selectedBlock.children.length; ++j) {
+        let child = selectedBlock.children[j];
+        let childIndex = child.parent.children.indexOf(child);
+        selectedBlock.children[j].selectedForGroupAction = false;
+        children.push({
+          child: selectedBlock.children[j],
+          linkToParentType: selectedBlock.children[j].linkToParentType,
+          index: childIndex
+        });
+      }
+
+      deletedBlocks.push({
+        block: selectedBlock,
+        children: children,
+        index: blockIndex
       });
     }
 
-    return {
-      block: selectedBlock,
-      children: children,
-      index: blockIndex
-    };
+    return deletedBlocks;
   }, (data) => {
+    for(let i = 0; i < data.length ; ++i) {
+      let blockInfo = data[i];
+      // Using addChild is fine here since the block is deleted
+      blockInfo.block.parent.addChild(blockInfo.block, blockInfo.block.linkToParentType, blockInfo.index);
 
-    // Using addChild is fine here since the block is deleted
-    data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
+      for (let j = 0; j < blockInfo.children.length; ++j) {
+        blockInfo.children[j].child.changeParent(blockInfo.block, blockInfo.children[j].linkToParentType, blockInfo.children[j].index);
+      }
 
-    for (let i = 0; i < data.children.length; ++i) {
-      data.children[i].child.changeParent(data.block, data.children[i].linkToParentType);
+      //  rootBlock.autoLayout();
+      blockInfo.block.setSelected(true);
     }
-
-    //  rootBlock.autoLayout();
-    data.block.setSelected(true);
   });
 
   actionHandler.addAction("blocks: delete selected and children", (data) => {
@@ -150,11 +193,10 @@ module.exports.registerActions = () => {
       //rootBlock.autoLayout();
     }
 
-
-    if (!data.block.isTerminalNode()) {
+    //if (!data.block.isTerminalNode()) {
       // New dragged block are set to selected with the mouse down event
       data.block.setSelected(!data.block.isNewDraggedBlock);
-    }
+    //}
 
   }, (data) => {
     return {
@@ -164,7 +206,7 @@ module.exports.registerActions = () => {
     };
   }, (data) => {
     data.block.delete();
-    rootBlock.autoLayout();
+    // rootBlock.autoLayout();
     /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
       data.block.setSelected();
       rootBlock.autoLayout();*/
@@ -183,6 +225,13 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction("blocks: sort children using position", (data) => {
+    data.parentBlock.sortChildrenByYPosition();
+  });
+
+  // This is currently not in used as we now undo the position as well
+  // This still may be useful in the future and since it's work
+  // the code will only be deleted if it's reall proven useless
+  /*actionHandler.addAction("blocks: sort children using position", (data) => {
     data.parentBlock.children = data.newChildOrder;
     // data.parentBlock.autoLayout();
   }, (data, actionHandlerParameters) => {
@@ -213,7 +262,7 @@ module.exports.registerActions = () => {
   }, (data) => {
     data.parentBlock.children = data.originalChildOrder;
     //data.parentBlock.autoLayout();
-  });
+  });*/
 
   // Block moving: closest one
   actionHandler.addAction("blocks: select block below", () => {

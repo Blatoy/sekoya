@@ -69,7 +69,7 @@ class Block {
     this.isNewDraggedBlock = false;
     this.mouseOver = false;
     this.selected = false;
-    this.copySelected = false;
+    this.selectedForGroupAction = false;
     this.dragged = false;
 
     this.linkingInProgress = false;
@@ -79,6 +79,8 @@ class Block {
     this.startLinkingLinkAllowed = true;
 
     this.position = position;
+    this.blockMovedPosition = {x: this.position.x, y: this.position.y};
+
     this.size = getBlockStyleProperty(this.type, "size");
     this.commentHeight = 0;
 
@@ -173,7 +175,8 @@ class Block {
     divPropertiesInputList.innerHTML = "";
 
     let firstElementFocused = false;
-    let hasComment = false, commentValue = "";
+    let hasComment = false,
+      commentValue = "";
     let elementToFocus;
 
     for (let type in this.attributes) {
@@ -201,8 +204,8 @@ class Block {
             let selectedValues = attribute.value.split(config.multiSelectSeparator);
 
             // Makes sure we don't accidently delete any custom attributes that wouldn't be in the block definition
-            for(let i = 0; i < selectedValues.length; ++i) {
-              if(!predefinedValues.includes(selectedValues[i]) && selectedValues[i] !== "") {
+            for (let i = 0; i < selectedValues.length; ++i) {
+              if (!predefinedValues.includes(selectedValues[i]) && selectedValues[i] !== "") {
                 predefinedValues.push(predefinedValues[i]);
               }
             }
@@ -217,7 +220,7 @@ class Block {
               inputCheckBox.classList.add("property-checkbox")
               inputCheckBox.classList.add("__property-value-checkbox")
 
-              if(selectedValues.includes(predefinedValues[i])) {
+              if (selectedValues.includes(predefinedValues[i])) {
                 inputCheckBox.checked = "checked";
               }
 
@@ -261,7 +264,7 @@ class Block {
               select.appendChild(option);
             }
 
-            if(!selectedElementFound && attribute.value !== "") {
+            if (!selectedElementFound && attribute.value !== "") {
               let option = document.createElement("option");
               option.textContent = attribute.value;
               option.value = attribute.value;
@@ -277,7 +280,7 @@ class Block {
             divPropertyContainer.appendChild(select);
           }
         } else {
-          if(name === config.commentAttributeName) {
+          if (name === config.commentAttributeName) {
             hasComment = true;
             commentValue = attribute.value;
             continue;
@@ -307,7 +310,7 @@ class Block {
       }
     }
 
-    if(hasComment) {
+    if (hasComment) {
       let divPropertyContainer = document.createElement("div");
       divPropertyContainer.classList.add("property-container");
 
@@ -327,7 +330,7 @@ class Block {
       divPropertyContainer.appendChild(textareaComment);
       divPropertiesInputList.appendChild(divPropertyContainer);
 
-      if(!elementToFocus) {
+      if (!elementToFocus) {
         /// TODO:
         // FIX TAB REMOVING APP FOCUS
         // FIX LINK NOT WORKING (probably related to stuff with the changes in quick-access and action priority not acting when closed actually idk)
@@ -342,31 +345,33 @@ class Block {
   }
 
   closePropertyWindow(save = true) {
-    if(save) {
-        let propertyElementList = document.getElementsByClassName("__property-value");
-        for(let i = 0; i < propertyElementList.length; ++i) {
-          let propertyElement = propertyElementList[i];
-          this.attributes[propertyElement.dataset.attributeType][propertyElement.dataset.attributeName].value = propertyElement.value;
-        }
-        let propertyCheckboxList = document.getElementsByClassName("__property-value-checkbox");
-        let checkedValues = [];
-        let lastType = "", lastName = "";
-        for(let i = 0; i < propertyCheckboxList.length; ++i) {
-          let checkbox = propertyCheckboxList[i];
-          if(lastName !== checkbox.dataset.attributeName) {
-            if(lastName !== "") {
-              this.attributes[lastType][lastName].value = checkedValues.join(config.multiSelectSeparator);
-            }
-            lastName = checkbox.dataset.attributeName;
-            lastType = checkbox.dataset.attributeType;
+    if (save) {
+      let propertyElementList = document.getElementsByClassName("__property-value");
+      for (let i = 0; i < propertyElementList.length; ++i) {
+        let propertyElement = propertyElementList[i];
+        console.log(propertyElement.dataset.attributeName);
+        this.attributes[propertyElement.dataset.attributeType][propertyElement.dataset.attributeName].value = propertyElement.value;
+      }
+      let propertyCheckboxList = document.getElementsByClassName("__property-value-checkbox");
+      let checkedValues = [];
+      let lastType = "",
+        lastName = "";
+      for (let i = 0; i < propertyCheckboxList.length; ++i) {
+        let checkbox = propertyCheckboxList[i];
+        if (lastName !== checkbox.dataset.attributeName) {
+          if (lastName !== "") {
+            this.attributes[lastType][lastName].value = checkedValues.join(config.multiSelectSeparator);
           }
-          if(checkbox.checked) {
-            checkedValues.push(checkbox.value);
-          }
+          lastName = checkbox.dataset.attributeName;
+          lastType = checkbox.dataset.attributeType;
         }
-        if(lastName !== "") {
-          this.attributes[lastType][lastName].value = checkedValues.join(config.multiSelectSeparator);
+        if (checkbox.checked) {
+          checkedValues.push(checkbox.value);
         }
+      }
+      if (lastName !== "") {
+        this.attributes[lastType][lastName].value = checkedValues.join(config.multiSelectSeparator);
+      }
     }
 
     this.propertyDialogDisplayed = false;
@@ -395,7 +400,6 @@ class Block {
     return this.position.y + this.commentHeight;
   }
 
-  // TODO: Make it take into account comment and properties
   getFullHeight() {
     let extraHeight = 0;
 
@@ -404,7 +408,7 @@ class Block {
     extraHeight += this.commentHeight;
 
     // Everything displayed below the parents count as the block's height
-    this.children.map((child) => {
+    this.children.forEach((child) => {
       if (getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
         extraHeight += child.getFullHeight();
       }
@@ -415,7 +419,7 @@ class Block {
 
   getMaxRecursiveHeight(previousHeight = 0) {
     let childrenTotalHeight = 0;
-    this.children.map((child) => {
+    this.children.forEach((child) => {
       // This is already taken into account in the getFullHeight()
       if (!getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
         childrenTotalHeight += child.getMaxRecursiveHeight();
@@ -446,7 +450,7 @@ class Block {
     }
   }
 
-  changeParent(newParent, linkToParentType = false) {
+  changeParent(newParent, linkToParentType = false, insertionIndex = -1) {
     if (newParent === this || (newParent === this.parent && this.linkToParentType === linkToParentType) || !newParent) {
       return false;
     }
@@ -460,7 +464,14 @@ class Block {
     this.parent.children.splice(this.parent.children.indexOf(this), 1);
 
     this.parent = newParent;
-    newParent.children.push(this);
+    if (insertionIndex === -1) {
+      newParent.children.push(this);
+    } else {
+      console.log("Inserting " + this.name + "at index", insertionIndex);
+      newParent.children.splice(insertionIndex, 0, this);
+    }
+
+
     this.setLinkToParentType(linkToParentType);
     return true;
   }
@@ -501,9 +512,9 @@ class Block {
         let previousSibling = this.getSibling(-1);
 
         if (nextSibling !== false) {
-          nextSibling.setSelected();
+          nextSibling.setSelected(true);
         } else if (previousSibling !== false) {
-          previousSibling.setSelected();
+          previousSibling.setSelected(true);
         } else {
           this.parent.setSelected(true);
         }
@@ -552,24 +563,41 @@ class Block {
     let previousBlock = false;
     let previousIsBelowParent = false;
 
-    for (let i = 0; i < this.children.length; ++i) {
-      if (getLinkStyleProperty(this.children[i].linkToParentType, "displayBelowParent") === true) {
-        this.children[i].position.x = this.position.x + this.style.blockBelowParentMargin.x;
-        this.children[i].position.y = belowParentHeight + this.getYPosition();
-        belowParentHeight += this.children[i].getFullHeight();
+    this.children.forEach((child) => {
+      let targetPosition = {x: 0, y: 0};
+      if (getLinkStyleProperty(child.linkToParentType, "displayBelowParent") === true) {
+        targetPosition = {
+          x: this.position.x + this.style.blockBelowParentMargin.x,
+          y: belowParentHeight + this.getYPosition()
+        };
+        belowParentHeight += child.getFullHeight();
       } else {
         if (previousBlock) {
           totalRecursiveHeightCount += previousBlock.getMaxRecursiveHeight();
         }
 
-        this.children[i].position.x = this.style.margin.x + this.position.x;
-        this.children[i].position.y = totalRecursiveHeightCount + this.position.y;
+        targetPosition = {
+          x: this.style.margin.x + this.position.x,
+          y: totalRecursiveHeightCount + this.position.y
+        };
 
-        previousBlock = this.children[i];
+        previousBlock = child;
       }
 
-      this.children[i].autoLayout();
-    }
+      actionHandler.trigger("blocks: move block", {
+        block: child,
+        oldPosition: {
+          x: child.position.x,
+          y: child.position.y
+        },
+        newPosition: {
+          x: targetPosition.x,
+          y: targetPosition.y
+        }
+      }, false, false, true);
+
+      child.autoLayout();
+    });
   }
 
   isPositionOver(x, y) {
@@ -657,7 +685,7 @@ class Block {
 
     let bestBlock = this;
 
-    initialBlock.children.map((child) => {
+    initialBlock.children.forEach((child) => {
       let vx = child.position.x - targetBlock.position.x;
       let vy = child.position.y - targetBlock.position.y;
       let dist = Math.sqrt(vx ** 2 + vy ** 2);
@@ -732,7 +760,7 @@ class Block {
 
   setChildrenPositionRelative() {
     let totalRecursiveHeightCount = 0;
-    this.children.map((child, i) => {
+    this.children.forEach((child, i) => {
       if (i > 0) {
         totalRecursiveHeightCount += this.children[i - 1].getMaxRecursiveHeight();
       }
@@ -759,23 +787,41 @@ class Block {
     }
   }
 
+  getSelectedForGroupAction() {
+    let blocks = [];
+    this.children.forEach((child) => {
+      let childSelectedBlocks = child.getSelectedForGroupAction();
+      for (let i = 0; i < childSelectedBlocks.length; ++i) {
+        blocks.push(childSelectedBlocks[i]);
+      }
+      if (child.selectedForGroupAction) {
+        blocks.push(child);
+      }
+    });
+    return blocks;
+  }
+
   handleMouseInteraction() {
     this.mouseOver = false;
     if (!selectingBlocks) {
       // Skip blocks if something was found
       if (!mouseOverAnyBlock && (!selectedBlock.dragged || this.dragged)) {
         // Handle mouse over display
-        if (this.isPositionOver(global.mouse.cameraX, global.mouse.cameraY)) {
+        if (this.isPositionOver(global.mouse.cameraX, global.mouse.cameraY) && !global.dialogOpen) {
           if (!this.isRoot) {
             this.mouseOver = true;
             mouseOverAnyBlock = true;
 
             if (global.metaKeys.ctrl && global.mouse.buttons[1]) {
-              this.copySelected = true;
+              this.selectedForGroupAction = true;
             }
 
-            if (!this.dragged) {
+            if (!this.dragged && global.mouse.buttons[1]) {
               this.dragged = true;
+
+              this.blockMovedPosition.x = this.position.x;
+              this.blockMovedPosition.y = this.position.y;
+
               mouseClickPositionRelativeToBlock = {
                 x: this.position.x - global.mouse.cameraX,
                 y: this.position.y - global.mouse.cameraY
@@ -817,14 +863,25 @@ class Block {
 
         if (this.isNewDraggedBlock) {
           this.isNewDraggedBlock = false;
-          actionHandler.trigger("blocks: sort children using position - no undo", {
+          /*actionHandler.trigger("blocks: sort children using position - no undo", {
             parentBlock: this.parent
-          });
+          });*/
         } else {
-          actionHandler.trigger("blocks: sort children using position", {
-            parentBlock: this.parent
+          actionHandler.trigger("blocks: move block", {
+            block: this,
+            oldPosition: {
+              x: this.blockMovedPosition.x,
+              y: this.blockMovedPosition.y
+            },
+            newPosition: {
+              x: this.position.x,
+              y: this.position.y
+            }
           });
         }
+        actionHandler.trigger("blocks: sort children using position", {
+          parentBlock: this.parent
+        });
       }
 
       if (!global.mouse.buttons[3]) {
@@ -835,6 +892,7 @@ class Block {
         x2 = global.mouse.cameraX;
       let y1 = mouseClickPosition.y,
         y2 = global.mouse.cameraY;
+
       if (x2 < x1)[x1, x2] = [x2, x1];
       if (y2 < y1)[y1, y2] = [y2, y1];
 
@@ -842,13 +900,13 @@ class Block {
         this.position.x < x2 &&
         this.getYPosition() < y2
       ) {
-        this.copySelected = true;
+        this.selectedForGroupAction = true;
       } else {
-        this.copySelected = false;
+        this.selectedForGroupAction = false;
       }
     }
 
-    this.children.map((child) => {
+    this.children.forEach((child) => {
       child.handleMouseInteraction();
     });
   }
@@ -926,7 +984,7 @@ class Block {
     }
 
     // Render links
-    this.children.map((child, i) => {
+    this.children.forEach((child, i) => {
       // We don't want to draw the connection from the hidden root to its children, except for the first element
       if (!this.isRoot || i == 0) {
         const dashInterval = getLinkStyleProperty(child.linkToParentType, "dashInterval");
@@ -1063,7 +1121,7 @@ class Block {
         ctx.fillRect(this.position.x, this.getYPosition(), this.size.width, this.size.height);
       }
 
-      if (this.copySelected) {
+      if (this.selectedForGroupAction) {
         ctx.fillStyle = this.style.copySelectionColor;
         ctx.fillRect(this.position.x, this.getYPosition(), this.size.width, this.size.height);
       }
@@ -1076,7 +1134,7 @@ class Block {
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
 
-        ctx.fillText(this.name /* + " - " + this.parent.children.indexOf(this) */ /* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
+        ctx.fillText(this.name  + " - " + this.parent.children.indexOf(this)  /* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
       }
 
 
@@ -1112,7 +1170,7 @@ class Block {
       }
     }
 
-    this.children.map((child) => {
+    this.children.forEach((child) => {
       child.render(ctx);
     });
 
