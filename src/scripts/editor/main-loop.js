@@ -8,7 +8,7 @@ function mainLoop() {
   rootBlock.update();
   camera.update();
 
-  if(document.hasFocus() || global.tick % 10 === 0) {
+  if(document.hasFocus() || global.tick % 10 === 0 || global.tabDown) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     camera.applyTransforms(ctx);

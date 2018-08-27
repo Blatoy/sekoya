@@ -12,8 +12,10 @@ global.metaKeys = {
   shift: false
 }
 
+global.tabDown = false;
+
 function setMousePosition(e) {
-  var rect = canvas.getBoundingClientRect();
+  let rect = canvas.getBoundingClientRect();
   global.mouse.x = e.clientX;
   global.mouse.y = e.clientY;
   global.mouse.canvasX = e.clientX - rect.left;
@@ -42,6 +44,7 @@ module.exports.addEditorEvents = () => {
   window.addEventListener("keydown", (e) => {
     actionHandler.handleKeyDown(e);
 
+    if(e.key === "Tab") global.tabDown = true;
     metaKeys = {
       ctrl: e.ctrlKey,
       shift: e.shiftKey,
@@ -51,7 +54,9 @@ module.exports.addEditorEvents = () => {
 
   window.addEventListener("keyup", (e) => {
     window.focus(); // Shitty fix to prevent tab focusing something strange?
+    
     actionHandler.handleKeyUp(e);
+    if(e.key === "Tab") global.tabDown = false;
     metaKeys = {
       ctrl: e.ctrlKey,
       shift: e.shiftKey,
