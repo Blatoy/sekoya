@@ -207,7 +207,7 @@ module.exports.registerActions = () => {
         linkType: data.linkType
       };
     },
-    undo: (data) => {
+    undoAction: (data) => {
       data.block.delete();
     }
   });
@@ -291,6 +291,17 @@ module.exports.registerActions = () => {
     Block.getSelectedBlock().setSelectedLastSibling();
   });
 
+  actionHandler.addAction("blocks: tab next", () => {
+    if(!Block.getSelectedBlock().setSelectedChild()) {
+      Block.getSelectedBlock().setSelectedNextSibling();
+    }
+  });
+
+  actionHandler.addAction("blocks: tab previous", () => {
+    if(!Block.getSelectedBlock().setSelectedPreviousSibling()) {
+      Block.getSelectedBlock().setSelectedParent();
+    }
+  });
 
   actionHandler.addAction("blocks: select parent", () => {
     Block.getSelectedBlock().setSelectedParent();

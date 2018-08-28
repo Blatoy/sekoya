@@ -273,14 +273,14 @@ module.exports = [{
     ctrl: false,
     alt: false,
     shift: false,
-    action: "blocks: select next sibling"
+    action: "blocks: tab next"
   },
   {
     key: 'Tab',
     ctrl: false,
     alt: false,
     shift: true,
-    action: "blocks: select previous sibling"
+    action: "blocks: tab previous"
   },
 
 
