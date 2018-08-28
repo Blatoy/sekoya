@@ -551,7 +551,7 @@ class Block {
       this.children = stable(this.children, linkToParentComparator);*/
   }
 
-  autoLayout() {
+  autoLayout(ignoreUndoStack = false) {
     if (this.isRoot) {
       const rootPosition = getBlockStyleProperty("all", "rootPosition");
       this.position.x = rootPosition.x - this.style.margin.x;
@@ -594,9 +594,9 @@ class Block {
           x: targetPosition.x,
           y: targetPosition.y
         }
-      }, false, false, true);
+      }, ignoreUndoStack, false, true);
 
-      child.autoLayout();
+      child.autoLayout(ignoreUndoStack);
     });
   }
 
@@ -689,8 +689,8 @@ class Block {
       let vx = child.position.x - targetBlock.position.x;
       let vy = child.position.y - targetBlock.position.y;
       let dist = Math.sqrt(vx ** 2 + vy ** 2);
-      // crappy workaround for or blocks
-      if (vy === 0) {
+      // crappy workaround for or blocks (and now also for other stuff)
+      if (vy === 0 || vx === 0) {
         dist /= 100;
       }
       if (axis === "y" && (direction * child.position.y > direction * targetBlock.position.y) ||
@@ -725,13 +725,19 @@ class Block {
   setSelectedChild() {
     if (this.children.length > 0) {
       this.children[0].setSelected(true);
+      return true;
     }
+
+    return false;
   }
 
   setSelectedParent() {
     if (!this.parent.isRoot) {
       this.parent.setSelected(true);
+      return true;
     }
+
+    return false;
   }
 
   setSelectedNextSibling() {
@@ -739,7 +745,10 @@ class Block {
 
     if (indexInParentArray < this.parent.children.length - 1) {
       this.parent.children[indexInParentArray + 1].setSelected(true);
+      return true;
     }
+
+    return false;
   }
 
   setSelectedPreviousSibling() {
@@ -747,7 +756,10 @@ class Block {
 
     if (indexInParentArray > 0) {
       this.parent.children[indexInParentArray - 1].setSelected(true);
+      return true;
     }
+
+    return false;
   }
 
   setSelectedLastSibling() {
@@ -1188,13 +1200,15 @@ Block.getSelectedBlock = () => {
   return selectedBlock;
 };
 
+Block.getLinkStyleProperty = getLinkStyleProperty;
+
 root = new Block({
   name: "root",
   type: "root",
   isRoot: true
 }, false);
 
-root.autoLayout();
+root.autoLayout(true);
 
 selectedBlock = root;
 
