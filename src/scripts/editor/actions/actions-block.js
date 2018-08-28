@@ -173,43 +173,43 @@ module.exports.registerActions = () => {
     data.block.setSelected(true);
   });
 
-  actionHandler.addAction("blocks: add block", (data) => {
-    // Deleted block are kept until they are deleted from the history
-    if (data.block.isDeleted) {
-      if (data.parent) {
-        data.block.parent.addChild(data.block, data.linkType);
+  actionHandler.addAction({
+    name: "blocks: add block",
+    action: (data) => {
+      // Deleted block are kept until they are deleted from the history
+      if (data.block.isDeleted) {
+        if (data.parent) {
+          data.block.parent.addChild(data.block, data.linkType);
+        } else {
+          data.block.parent.addChild(data.block);
+        }
       } else {
-        data.block.parent.addChild(data.block);
+        if (data.parent) {
+          data.block.changeParent(data.parent, data.linkType);
+        } else {
+          data.block.changeParent(rootBlock);
+        }
       }
-    } else {
-      if (data.parent) {
-        data.block.changeParent(data.parent, data.linkType);
-      } else {
-        data.block.changeParent(rootBlock);
+
+      if (!data.block.isNewDraggedBlock) {
+        //rootBlock.autoLayout();
       }
+
+      //if (!data.block.isTerminalNode()) {
+        // New dragged block are set to selected with the mouse down event
+        data.block.setSelected(!data.block.isNewDraggedBlock);
+      //}
+    },
+    setData: (data) => {
+      return {
+        block: data.block,
+        parent: data.parent,
+        linkType: data.linkType
+      };
+    },
+    undo: (data) => {
+      data.block.delete();
     }
-
-    if (!data.block.isNewDraggedBlock) {
-      //rootBlock.autoLayout();
-    }
-
-    //if (!data.block.isTerminalNode()) {
-      // New dragged block are set to selected with the mouse down event
-      data.block.setSelected(!data.block.isNewDraggedBlock);
-    //}
-
-  }, (data) => {
-    return {
-      block: data.block,
-      parent: data.parent,
-      linkType: data.linkType
-    };
-  }, (data) => {
-    data.block.delete();
-    // rootBlock.autoLayout();
-    /*  data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
-      data.block.setSelected();
-      rootBlock.autoLayout();*/
   });
 
   actionHandler.addAction("blocks: exchange block order", (data) => {

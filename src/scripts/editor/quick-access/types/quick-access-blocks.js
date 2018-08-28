@@ -43,10 +43,10 @@ function onResultSelected(blockName) {
   });
 
   if(lastLinkedIndex === -1) {
-    actionHandler.trigger("blocks: add block", {block: newBlock});
+    actionHandler.trigger("blocks: add block", {block: newBlock}, false, true);
   }
   else {
-    actionHandler.trigger("blocks: add block", {block: newBlock, parent: Block.getSelectedBlock(), linkType: linkType});
+    actionHandler.trigger("blocks: add block", {block: newBlock, parent: Block.getSelectedBlock(), linkType: linkType}, false, true);
   }
 
 }
