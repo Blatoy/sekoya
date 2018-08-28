@@ -39,7 +39,7 @@ function newTab(name = "", blocks = [], fileLocation = "", selected = true) {
     if (config.defaultBlock) {
       new Block(blockLoader.getDefinitionByName(config.defaultBlock));
     }
-    rootBlock.autoLayout();
+    rootBlock.autoLayout(true);
   }
 }
 
