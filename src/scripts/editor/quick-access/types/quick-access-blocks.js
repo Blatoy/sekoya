@@ -37,9 +37,10 @@ function display() {
 }
 
 function onResultSelected(blockName) {
+  let selectedBlock = Block.getSelectedBlock();
   let newBlock = new Block(blockLoader.getDefinitionByName(blockName), false, false, [], {
-    x: global.mouse.cameraX,
-    y: global.mouse.cameraY
+    x: selectedBlock.style.margin.x + selectedBlock.position.x,
+    y: selectedBlock.children.length > 0 ? selectedBlock.getYPosition() + selectedBlock.getMaxRecursiveHeight() : selectedBlock.getYPosition()
   });
 
   if(lastLinkedIndex === -1) {
