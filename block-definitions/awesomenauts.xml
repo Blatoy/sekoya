@@ -397,8 +397,8 @@
       <string name="teams" values="teamswithtarget" multiselect="true"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
-      <string name="width"/>
-      <string name="height"/>
+      <float name="width"/>
+      <float name="height"/>
       <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
       <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
       <string name="debugAreaColour" defaultvalue="255 0 0 51"/>
@@ -412,8 +412,8 @@
       <string name="teams" values="teams" multiselect="true"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
-      <string name="width"/>
-      <string name="height"/>
+      <float name="width"/>
+      <float name="height"/>
       <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
       <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
       <string name="debugAreaColour" defaultvalue="0 255 0 51"/>
@@ -557,13 +557,13 @@
       <string name="remove if not found" values="yesno" defaultvalue="no"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
-      <string name="width"/>
-      <string name="height"/>
+      <float name="width"/>
+      <float name="height"/>
       <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
       <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
       <string name="debugAreaColour" defaultvalue="0 255 255 51"/>
       <string name="compare method" values="valuecompare2" defaultvalue="greater or equal" shortName="compare"/>
-      <string name="health value"/>
+      <float name="health value"/>
       <string name="distance check" values="distance check" defaultvalue="NONE"/>
       <string name="check line of sight" values="yesno" defaultvalue="no"/>
       <string name="ignore invisibility" values="yesno" defaultvalue="no"/>
@@ -637,8 +637,8 @@
       <string name="compare method" values="valuecompare" defaultvalue="greater or equal" shortName="compare"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
-      <string name="width"/>
-      <string name="height"/>
+      <float name="width"/>
+      <float name="height"/>
       <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
       <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
       <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
@@ -791,8 +791,8 @@
       <string name="character minimum"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
-      <string name="width"/>
-      <string name="height"/>
+      <float name="width"/>
+      <float name="height"/>
       <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
       <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
       <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
@@ -817,8 +817,8 @@
       <string name="areaName" defaultvalue=""/>
       <float name="xOffset"/>
       <float name="yOffset"/>
-      <string name="width"/>
-      <string name="height"/>
+      <float name="width"/>
+      <float name="height"/>
       <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
       <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
       <string name="debugAreaColour" defaultvalue="255 255 255 51"/>
@@ -844,8 +844,8 @@
     <condition name="isNextWaypointInArea">
       <float name="xOffset"/>
       <float name="yOffset"/>
-      <string name="width"/>
-      <string name="height"/>
+      <float name="width"/>
+      <float name="height"/>
       <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
       <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
       <string name="debugAreaColour" defaultvalue="255 255 127 255"/>
@@ -886,8 +886,8 @@
       <string name="condition" values="yesno" defaultvalue="yes"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
-      <string name="width"/>
-      <string name="height"/>
+      <float name="width"/>
+      <float name="height"/>
       <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
       <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
       <string name="debugAreaColour" defaultvalue="0 0 255 51"/>
@@ -923,12 +923,15 @@
       <string name="health"/>
       <float name="xOffset"/>
       <float name="yOffset"/>
-      <string name="width"/>
-      <string name="height"/>
+      <float name="width"/>
+      <float name="height"/>
       <string name="horizontal alignment to character" values="alignmentToCharacterHorizontal" defaultvalue="Centre"/>
       <string name="vertical alignment to character" values="alignmentToCharacterVertical" defaultvalue="Centre"/>
       <string name="debugAreaColour" defaultvalue="153 255 76 51"/>
       <string name="check line of sight" values="yesno" defaultvalue="no"/>
+
+
+
     </condition>
 
     <condition name="isTutorialMatch"/>
