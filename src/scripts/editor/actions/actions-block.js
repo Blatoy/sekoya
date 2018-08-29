@@ -228,6 +228,57 @@ module.exports.registerActions = () => {
     data.parentBlock.sortChildrenByYPosition();
   });
 
+  let copiedBlocks = [];
+
+  actionHandler.addAction({
+    name: "blocks: copy selection",
+    action: (data) => {
+      let selectedBlocks = rootBlock.getSelectedForGroupAction();
+
+      copiedBlocks = [];
+
+      // We delete the selected block only if there was no selected block for group action
+      if(selectedBlocks.length === 0) {
+        selectedBlocks = [Block.getSelectedBlock()];
+      }
+
+      copiedBlocks = [];
+      for(let i = 0; i < selectedBlocks.length; ++i) {
+        copiedBlocks.push(selectedBlocks[i].getCopy());
+      }
+    }
+  });
+
+  actionHandler.addAction({
+    name: "blocks: paste selection",
+    action: (data) => {
+      for(let i = 0; i < copiedBlocks.length; ++i) {
+        let newBlock = copiedBlocks[i].getCopy()
+        newBlock.position.x = global.mouse.cameraX;
+        newBlock.position.y = global.mouse.cameraY;
+        // TODO: Merge with previous or something like this
+        actionHandler.trigger("blocks: add block", {block: newBlock});
+      }
+      /*let selectedBlocks = rootBlock.getSelectedForGroupAction();
+
+      copiedBlocks = [];
+
+      // We delete the selected block only if there was no selected block for group action
+      if(selectedBlocks.length === 0) {
+        selectedBlocks = [Block.getSelectedBlock()];
+      }
+      console.log("Selected:", selectedBlocks);
+
+      copiedBlocks = [];
+      for(let i = 0; i < selectedBlocks.length; ++i) {
+        copiedBlocks.push(selectedBlocks[i].getCopy());
+      }*/
+    }
+  });
+  /*"blocks: copy selection", () => {
+
+  });
+*/
   // This is currently not in used as we now undo the position as well
   // This still may be useful in the future and since it's work
   // the code will only be deleted if it's reall proven useless

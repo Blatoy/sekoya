@@ -405,4 +405,18 @@ module.exports = [{
     shift: false,
     action: "debug: reload"
   },
+  {
+    key: 'c',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "blocks: copy selection"
+  },
+  {
+    key: 'v',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "blocks: paste selection"
+  },
 ];

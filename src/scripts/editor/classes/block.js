@@ -79,7 +79,10 @@ class Block {
     this.startLinkingLinkAllowed = true;
 
     this.position = position;
-    this.blockMovedPosition = {x: this.position.x, y: this.position.y};
+    this.blockMovedPosition = {
+      x: this.position.x,
+      y: this.position.y
+    };
 
     this.size = getBlockStyleProperty(this.type, "size");
     this.commentHeight = 0;
@@ -178,7 +181,7 @@ class Block {
     let hasComment = false,
       commentValue = "";
     let elementToFocus;
-
+    console.log(this.attributes);
     for (let type in this.attributes) {
       for (let name in this.attributes[type]) {
         let attribute = this.attributes[type][name];
@@ -206,7 +209,7 @@ class Block {
             // Makes sure we don't accidently delete any custom attributes that wouldn't be in the block definition
             for (let i = 0; i < selectedValues.length; ++i) {
               if (!predefinedValues.includes(selectedValues[i]) && selectedValues[i] !== "") {
-                predefinedValues.push(predefinedValues[i]);
+                predefinedValues.push(selectedValues[i]);
               }
             }
 
@@ -349,18 +352,20 @@ class Block {
       let propertyElementList = document.getElementsByClassName("__property-value");
       for (let i = 0; i < propertyElementList.length; ++i) {
         let propertyElement = propertyElementList[i];
-        console.log(propertyElement.dataset.attributeName);
         this.attributes[propertyElement.dataset.attributeType][propertyElement.dataset.attributeName].value = propertyElement.value;
       }
+
       let propertyCheckboxList = document.getElementsByClassName("__property-value-checkbox");
       let checkedValues = [];
       let lastType = "",
         lastName = "";
+
       for (let i = 0; i < propertyCheckboxList.length; ++i) {
         let checkbox = propertyCheckboxList[i];
         if (lastName !== checkbox.dataset.attributeName) {
           if (lastName !== "") {
             this.attributes[lastType][lastName].value = checkedValues.join(config.multiSelectSeparator);
+            checkedValues = [];
           }
           lastName = checkbox.dataset.attributeName;
           lastType = checkbox.dataset.attributeType;
@@ -502,6 +507,26 @@ class Block {
     }
   }
 
+  getCopy() {
+    let copiedBlock = new Block(blockLoader.getDefinitionByName(this.name));
+
+    for (let attributeType in this.attributes) {
+      copiedBlock.attributes[attributeType] = {};
+      for (let attributeName in this.attributes[attributeType]) {
+        copiedBlock.attributes[attributeType][attributeName] = {};
+        for (let attributeAttributes in this.attributes[attributeType][attributeName]) {
+          copiedBlock.attributes[attributeType][attributeName][attributeAttributes] = this.attributes[attributeType][attributeName][attributeAttributes];
+        }
+      }
+      // console.log(this.attributes[attributeGroupedByType], attributeGroupedByType);
+    }
+
+    // TODO: Set all properties, position offset to keep stuff when pasted, ...
+
+    return copiedBlock.delete()[0];
+
+  }
+
   // Removes the block and all children
   deleteRecursive() {
     // root cannot be deleted
@@ -533,7 +558,7 @@ class Block {
     }
 
     // Note: delete recusive only delete this block since we removed all children
-    this.deleteRecursive();
+    return this.deleteRecursive();
   }
 
   sortChildrenByYPosition() {
@@ -564,7 +589,10 @@ class Block {
     let previousIsBelowParent = false;
 
     this.children.forEach((child) => {
-      let targetPosition = {x: 0, y: 0};
+      let targetPosition = {
+        x: 0,
+        y: 0
+      };
       if (getLinkStyleProperty(child.linkToParentType, "displayBelowParent") === true) {
         targetPosition = {
           x: this.position.x + this.style.blockBelowParentMargin.x,
@@ -1146,7 +1174,7 @@ class Block {
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
 
-        ctx.fillText(this.name  + " - " + this.parent.children.indexOf(this)  /* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
+        ctx.fillText(this.name + " - " + this.parent.children.indexOf(this) /* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
       }
 
 
