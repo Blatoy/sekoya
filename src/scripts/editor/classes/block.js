@@ -938,7 +938,8 @@ class Block {
 
       if (this.position.x + this.size.width > x1 && this.getYPosition() + this.size.height > y1 &&
         this.position.x < x2 &&
-        this.getYPosition() < y2
+        this.getYPosition() < y2 &&
+        !global.dialogOpen
       ) {
         this.selectedForGroupAction = true;
       } else {
@@ -1216,7 +1217,7 @@ class Block {
 
     if (this.isRoot) {
       // Render block selection
-      if (selectingBlocks) {
+      if (selectingBlocks && !global.dialogOpen) {
         ctx.fillStyle = this.style.copySelectionColor;
         ctx.fillRect(mouseClickPosition.x, mouseClickPosition.y, -mouseClickPosition.x + global.mouse.cameraX, -mouseClickPosition.y + global.mouse.cameraY);
       }
