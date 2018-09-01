@@ -23,6 +23,17 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction({
+    name: "blocks: unselect all",
+    action: () => {
+      rootBlock.unselectAll();
+    },
+    displayable: false,
+    preventTriggerWhenInputFocused: false,
+    preventTriggerWhenDialogOpen: false
+  });
+
+
+  actionHandler.addAction({
     name: "blocks: close settings dialog and discard changes",
     action: () => {
       Block.getSelectedBlock().closePropertyWindow(false);
@@ -45,7 +56,7 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "blocks: move block",
     action: (data, actionHandlerParameters) => {
-      if(data.newPosition.x === data.oldPosition.x && data.newPosition.y === data.oldPosition.y) {
+      if (data.newPosition.x === data.oldPosition.x && data.newPosition.y === data.oldPosition.y) {
         actionHandlerParameters.cancelUndo = true;
       }
 
@@ -102,7 +113,7 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction("blocks: delete selected", (data) => {
-    for(let i = 0; i < data.length; ++i) {
+    for (let i = 0; i < data.length; ++i) {
       data[i].block.delete();
     }
     //  rootBlock.autoLayout();
@@ -110,12 +121,12 @@ module.exports.registerActions = () => {
     let selectedBlocks = rootBlock.getSelectedForGroupAction();
 
     // We delete the selected block only if there was no selected block for group action
-    if(selectedBlocks.length === 0) {
+    if (selectedBlocks.length === 0) {
       selectedBlocks = [Block.getSelectedBlock()];
     }
 
     let deletedBlocks = [];
-    for(let i = 0; i < selectedBlocks.length; ++i) {
+    for (let i = 0; i < selectedBlocks.length; ++i) {
       let children = [];
       let selectedBlock = selectedBlocks[i];
       // We have to restore it at the right position
@@ -143,7 +154,7 @@ module.exports.registerActions = () => {
 
     return deletedBlocks;
   }, (data) => {
-    for(let i = 0; i < data.length ; ++i) {
+    for (let i = 0; i < data.length; ++i) {
       let blockInfo = data[i];
       // Using addChild is fine here since the block is deleted
       blockInfo.block.parent.addChild(blockInfo.block, blockInfo.block.linkToParentType, blockInfo.index);
@@ -196,8 +207,8 @@ module.exports.registerActions = () => {
       }
 
       //if (!data.block.isTerminalNode()) {
-        // New dragged block are set to selected with the mouse down event
-        data.block.setSelected(!data.block.isNewDraggedBlock);
+      // New dragged block are set to selected with the mouse down event
+      data.block.setSelected(!data.block.isNewDraggedBlock);
       //}
     },
     setData: (data) => {
@@ -238,12 +249,12 @@ module.exports.registerActions = () => {
       copiedBlocks = [];
 
       // We delete the selected block only if there was no selected block for group action
-      if(selectedBlocks.length === 0) {
+      if (selectedBlocks.length === 0) {
         selectedBlocks = [Block.getSelectedBlock()];
       }
 
       copiedBlocks = [];
-      for(let i = 0; i < selectedBlocks.length; ++i) {
+      for (let i = 0; i < selectedBlocks.length; ++i) {
         copiedBlocks.push(selectedBlocks[i].getCopy());
       }
     }
@@ -252,12 +263,14 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "blocks: paste selection",
     action: (data) => {
-      for(let i = 0; i < copiedBlocks.length; ++i) {
+      for (let i = 0; i < copiedBlocks.length; ++i) {
         let newBlock = copiedBlocks[i].getCopy()
         newBlock.position.x = global.mouse.cameraX;
         newBlock.position.y = global.mouse.cameraY;
         // TODO: Merge with previous or something like this
-        actionHandler.trigger("blocks: add block", {block: newBlock});
+        actionHandler.trigger("blocks: add block", {
+          block: newBlock
+        });
       }
       /*let selectedBlocks = rootBlock.getSelectedForGroupAction();
 
@@ -343,13 +356,13 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction("blocks: tab next", () => {
-    if(!Block.getSelectedBlock().setSelectedChild()) {
+    if (!Block.getSelectedBlock().setSelectedChild()) {
       Block.getSelectedBlock().setSelectedNextSibling();
     }
   });
 
   actionHandler.addAction("blocks: tab previous", () => {
-    if(!Block.getSelectedBlock().setSelectedPreviousSibling()) {
+    if (!Block.getSelectedBlock().setSelectedPreviousSibling()) {
       Block.getSelectedBlock().setSelectedParent();
     }
   });

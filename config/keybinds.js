@@ -129,6 +129,13 @@ module.exports = [{
     ctrl: false,
     alt: false,
     shift: false,
+    action: "blocks: unselect all"
+  },
+  {
+    key: 'Escape',
+    ctrl: false,
+    alt: false,
+    shift: false,
     action: "blocks: close settings dialog and discard changes"
   },
   {

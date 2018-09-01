@@ -952,6 +952,18 @@ class Block {
     });
   }
 
+  unselectAll() {
+    // I'm currently reading a book about design pattern
+    // I just want to start over
+    // If I start over I'll never release anything
+    // I'll finish it and I will try to clean it later
+    // I mean, some small part of the code isn't garbage
+    this.children.forEach((child) => {
+      child.selectedForGroupAction = false;
+      child.unselectAll();
+    });
+  }
+
   update() {
     mouseOverAnyBlock = false;
     this.handleMouseInteraction();
