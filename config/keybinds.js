@@ -145,6 +145,15 @@ module.exports = [{
     shift: false,
     action: "blocks: change current linking type"
   },
+
+  {
+    key: 'ShiftLeft',
+    ctrl: false,
+    alt: false,
+    shift: true,
+    action: "blocks: select nearest to screen center"
+  },
+
   {
     key: 'p',
     ctrl: true,

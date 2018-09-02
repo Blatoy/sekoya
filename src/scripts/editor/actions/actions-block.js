@@ -346,6 +346,10 @@ module.exports.registerActions = () => {
     Block.getSelectedBlock().moveSelectedLeftRight(1);
   });
 
+  actionHandler.addAction("blocks: select nearest to screen center", () => {
+    Block.setSelectedCenterView();
+  });
+
   // Block moving: using tree
   actionHandler.addAction("blocks: select first sibling", () => {
     Block.getSelectedBlock().setSelectedFirstSibling();

@@ -53,7 +53,6 @@ class Block {
     x: 0,
     y: 0
   }) {
-
     this.name = blockDefinition.name;
     this.type = blockDefinition.type;
     this.attributes = {};
@@ -71,6 +70,7 @@ class Block {
     this.selected = false;
     this.selectedForGroupAction = false;
     this.dragged = false;
+    this.commentHeightLoaded = false;
 
     this.linkingInProgress = false;
     this.linkingLinkTypeIndex = 0;
@@ -181,7 +181,7 @@ class Block {
     let hasComment = false,
       commentValue = "";
     let elementToFocus;
-    console.log(this.attributes);
+
     for (let type in this.attributes) {
       for (let name in this.attributes[type]) {
         let attribute = this.attributes[type][name];
@@ -472,7 +472,6 @@ class Block {
     if (insertionIndex === -1) {
       newParent.children.push(this);
     } else {
-      console.log("Inserting " + this.name + "at index", insertionIndex);
       newParent.children.splice(insertionIndex, 0, this);
     }
 
@@ -1075,10 +1074,11 @@ class Block {
     });
   }
 
+  // TODO: Only call this when comment is changed to improve render speed
   getCommentLines(ctx) {
     let lines = [];
 
-    if (!this.attributes["string"] || !this.attributes["string"][config.commentAttributeName]) {
+    if (!this.attributes["string"] || !this.attributes["string"][config.commentAttributeName] || this.attributes["string"][config.commentAttributeName].value === "") {
       return lines;
     } else {
       let words = this.attributes["string"][config.commentAttributeName].value.split(" ");
@@ -1095,11 +1095,16 @@ class Block {
 
       lines.push(currentLine);
 
-      // probably not the best place to put this...
-      this.commentHeight = (lines.length + 1) * this.style.font.size;
-
       return lines;
     }
+  }
+
+  getChildrenRecursively(blockList = []) {
+    this.children.forEach((child) => {
+      blockList.push(child);
+      child.getChildrenRecursively(blockList);
+    });
+    return blockList;
   }
 
   isInView() {
@@ -1115,7 +1120,22 @@ class Block {
     return true;
   }
 
+  // probably not the best place to put this...
+  loadCommentHeight(ctx) {
+    ctx.font = this.style.font.size + "px " + this.style.font.family;
+    let lineCount = this.getCommentLines(ctx).length;
+
+    if (lineCount > 0) lineCount++; // Dirty margin fix
+    this.commentHeight = lineCount * this.style.font.size;
+
+    this.commentHeightLoaded = true;
+  }
+
   render(ctx) {
+    if (!this.commentHeightLoaded) {
+      this.loadCommentHeight(ctx);
+    }
+
     if (!this.isRoot && this.isInView(camera)) {
       if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName] && this.attributes["string"][config.commentAttributeName].value) {
 
@@ -1234,6 +1254,42 @@ class Block {
         ctx.fillRect(mouseClickPosition.x, mouseClickPosition.y, -mouseClickPosition.x + global.mouse.cameraX, -mouseClickPosition.y + global.mouse.cameraY);
       }
     }
+  }
+}
+/*
+
+  getNearest(position, smallestDist = Infinity) {
+    let dist = Math.sqrt((this.position.x - position.x)**2 + (this.position.y - position.y)**2);
+    let closestChild = this; // i don't really want to select rootBlock though uh fk i'm tired
+    this.children.forEach((child) => {
+
+      /*if(child.getNearest(position, smallestDist) < smallestDist) {
+
+      }
+    });
+    return closestChild;
+  }
+  */
+
+Block.setSelectedCenterView = () => {
+  let minDistance = Infinity; // guhguguu0
+  let minDistanceBlock = undefined;
+
+  let centerX = global.camera.bounds.x + global.camera.bounds.width / 2,
+    centerY = global.camera.bounds.y + global.camera.bounds.height / 2;
+  let allBlocks = rootBlock.getChildrenRecursively();
+
+  allBlocks.forEach((block) => {
+    let dist = Math.sqrt((block.position.x - centerX) ** 2 + (block.position.y - centerY) ** 2);
+
+    if (dist < minDistance) {
+      minDistance = dist;
+      minDistanceBlock = block;
+    }
+  });
+
+  if (minDistanceBlock !== undefined) {
+    minDistanceBlock.setSelected(true);
   }
 }
 
