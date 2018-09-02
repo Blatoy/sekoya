@@ -50,7 +50,6 @@ function addBlockRecursively(xml, parentBlock) {
             if (xml[attributeOrLinkToParentType][i][j][k].$) {
               let blockName = xml[attributeOrLinkToParentType][i][j][k].$.id;
               let parent = new Block(blockLoader.getDefinitionByName(blockName), parentBlock, attributeOrLinkToParentType);
-
               xml[attributeOrLinkToParentType][i][j][k]
               addBlockRecursively(xml[attributeOrLinkToParentType][i][j][k], parent)
             } else {
@@ -110,6 +109,14 @@ function open(file) {
           }
         }
       }
+
+      // At this point I'm just trying to releasing it I
+      rootBlock.autoLayout(true);
+      // For some reason block height is tied to the rendered because of comments so auto layout doesn't
+      // exactly take everything into account .........................
+      setTimeout(() => {
+        rootBlock.autoLayout(true);
+      }, 1);
     })
   });
 }
