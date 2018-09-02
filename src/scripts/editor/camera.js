@@ -197,6 +197,9 @@ module.exports.applyTransforms = (ctx) => {
   position.x = Math.max(position.x, 0);
   position.y = Math.max(position.y, 0);
 
+  global.camera.scaling = scaling;
+  global.camera.bounds = getBounds();
+
   ctx.save();
   ctx.translate(-position.x, -position.y);
   ctx.scale(scaling, scaling);

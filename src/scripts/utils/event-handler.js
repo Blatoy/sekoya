@@ -12,6 +12,8 @@ global.metaKeys = {
   shift: false
 }
 
+global.camera = {bounds: {x:0, y:0, width: 0, height: 0}, scaling: 1};
+
 global.tabDown = false;
 
 function setMousePosition(e) {
@@ -54,7 +56,7 @@ module.exports.addEditorEvents = () => {
 
   window.addEventListener("keyup", (e) => {
     window.focus(); // Shitty fix to prevent tab focusing something strange?
-    
+
     actionHandler.handleKeyUp(e);
     if(e.key === "Tab") global.tabDown = false;
     metaKeys = {
