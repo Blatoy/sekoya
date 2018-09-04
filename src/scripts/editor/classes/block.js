@@ -512,7 +512,7 @@ class Block {
 
     for (let attributeType in this.attributes) {
       copiedBlock.attributes[attributeType] = {};
-      copiedBlock.position.x  = this.position.x;
+      copiedBlock.position.x = this.position.x;
       copiedBlock.position.y = this.position.y;
       for (let attributeName in this.attributes[attributeType]) {
         copiedBlock.attributes[attributeType][attributeName] = {};
@@ -861,6 +861,16 @@ class Block {
             if (!this.dragged && global.mouse.buttons[1]) {
               this.dragged = true;
 
+              rootBlock.getSelectedForGroupAction().forEach((block) => {
+                // This is super sad
+                block.mouseClickPositionRelativeToBlock = {
+                  x: block.position.x - global.mouse.cameraX,
+                  y: block.position.y - global.mouse.cameraY
+                };
+                block.blockMovedPosition.x = block.position.x;
+                block.blockMovedPosition.y = block.position.y;
+              });
+
               this.blockMovedPosition.x = this.position.x;
               this.blockMovedPosition.y = this.position.y;
 
@@ -909,6 +919,23 @@ class Block {
             parentBlock: this.parent
           });*/
         } else {
+          let movedMultipleBlocks = false;
+          rootBlock.getSelectedForGroupAction().forEach((block) => {
+            // This is super sad
+            movedMultipleBlocks = true;
+            actionHandler.trigger("blocks: move block", {
+              block: block,
+              oldPosition: {
+                x: block.blockMovedPosition.x,
+                y: block.blockMovedPosition.y
+              },
+              newPosition: {
+                x: block.position.x,
+                y: block.position.y
+              }
+            }, false, false, true);
+          });
+
           actionHandler.trigger("blocks: move block", {
             block: this,
             oldPosition: {
@@ -919,7 +946,7 @@ class Block {
               x: this.position.x,
               y: this.position.y
             }
-          });
+          }, false, false, movedMultipleBlocks);
         }
         actionHandler.trigger("blocks: sort children using position", {
           parentBlock: this.parent
@@ -983,6 +1010,12 @@ class Block {
     if (selectedBlock.dragged) {
       selectedBlock.position.x = mouseClickPositionRelativeToBlock.x + global.mouse.cameraX;
       selectedBlock.position.y = mouseClickPositionRelativeToBlock.y + global.mouse.cameraY;
+      rootBlock.getSelectedForGroupAction().forEach((block) => {
+        if (!block.dragged) {
+          block.position.x = block.mouseClickPositionRelativeToBlock.x + global.mouse.cameraX;
+          block.position.y = block.mouseClickPositionRelativeToBlock.y + global.mouse.cameraY;
+        }
+      });
     } else if (global.mouse.buttons["1"]) {
       //  if (global.mouse.cameraX != mouseClickPosition.x && global.mouse.cameraY != mouseClickPosition.y) {
       if (!global.metaKeys.ctrl) {
