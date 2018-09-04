@@ -512,6 +512,8 @@ class Block {
 
     for (let attributeType in this.attributes) {
       copiedBlock.attributes[attributeType] = {};
+      copiedBlock.position.x  = this.position.x;
+      copiedBlock.position.y = this.position.y;
       for (let attributeName in this.attributes[attributeType]) {
         copiedBlock.attributes[attributeType][attributeName] = {};
         for (let attributeAttributes in this.attributes[attributeType][attributeName]) {

@@ -263,10 +263,21 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "blocks: paste selection",
     action: (data) => {
+      rootBlock.unselectAll();
+
+      let leftestPosition = {x: copiedBlocks[0].position.x, y: copiedBlocks[0].position.y};
+      for (let i = 0; i < copiedBlocks.length; ++i) {
+        if(leftestPosition.x > copiedBlocks[i].position.x) {
+           leftestPosition.x = copiedBlocks[i].position.x;
+           leftestPosition.y = copiedBlocks[i].position.y;
+        }
+      }
+
       for (let i = 0; i < copiedBlocks.length; ++i) {
         let newBlock = copiedBlocks[i].getCopy()
-        newBlock.position.x = global.mouse.cameraX;
-        newBlock.position.y = global.mouse.cameraY;
+        newBlock.position.x += global.mouse.cameraX - leftestPosition.x;
+        newBlock.position.y += global.mouse.cameraY - leftestPosition.y;
+        newBlock.selectedForGroupAction = true;
         // TODO: Merge with previous or something like this
         actionHandler.trigger("blocks: add block", {
           block: newBlock
