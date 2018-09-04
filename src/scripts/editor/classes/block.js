@@ -349,6 +349,7 @@ class Block {
 
   closePropertyWindow(save = true) {
     if (save) {
+      this.commentHeightLoaded = false;
       let propertyElementList = document.getElementsByClassName("__property-value");
       for (let i = 0; i < propertyElementList.length; ++i) {
         let propertyElement = propertyElementList[i];
