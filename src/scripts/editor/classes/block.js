@@ -920,6 +920,7 @@ class Block {
           });*/
         } else {
           let movedMultipleBlocks = false;
+          actionHandler.separateMergeUndo();
           rootBlock.getSelectedForGroupAction().forEach((block) => {
             // This is super sad
             movedMultipleBlocks = true;

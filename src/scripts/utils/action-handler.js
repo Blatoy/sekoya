@@ -105,12 +105,19 @@ function undo() {
   if (undoStack.length > 0) {
     let actionHistory = undoStack.pop();
     redoStack.push(actionHistory);
-    if(!Array.isArray(actionHistory)) {
-      actions[actionHistory.actionName].undoAction(actionHistory.parameters);
+
+    while(actionHistory && actionHistory.isDummy) {
+      actionHistory = undoStack.pop();
+      redoStack.push(actionHistory);
     }
-    else {
-      for(let i = 0; i < actionHistory.length; ++i) {
-        actions[actionHistory[0].actionName].undoAction(actionHistory[i].parameters);
+
+    if(actionHistory !== undefined) {
+      if (!Array.isArray(actionHistory)) {
+        actions[actionHistory.actionName].undoAction(actionHistory.parameters);
+      } else {
+        for (let i = 0; i < actionHistory.length; ++i) {
+          actions[actionHistory[0].actionName].undoAction(actionHistory[i].parameters);
+        }
       }
     }
   }
@@ -120,19 +127,29 @@ function redo() {
   if (redoStack.length > 0) {
     let actionHistory = redoStack.pop();
     undoStack.push(actionHistory);
-    if(!Array.isArray(actionHistory)) {
-      actions[actionHistory.actionName].doAction(actionHistory.parameters);
+
+    while(actionHistory && actionHistory.isDummy) {
+      actionHistory = redoStack.pop();
+      undoStack.push(actionHistory);
     }
-    else {
-      for(let i = 0; i < actionHistory.length; ++i) {
-        actions[actionHistory[0].actionName].doAction(actionHistory[i].parameters);
+
+    if(actionHistory !== undefined) {
+      if (!Array.isArray(actionHistory)) {
+          actions[actionHistory.actionName].doAction(actionHistory.parameters);
+      } else {
+        for (let i = 0; i < actionHistory.length; ++i) {
+          actions[actionHistory[0].actionName].doAction(actionHistory[i].parameters);
+        }
       }
     }
   }
 }
 
+function separateMergeUndo() {
+    undoStack.push({actionName: "dummy", isDummy: true});
+}
+
 function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false, mergeUndo = false) {
-//console.log(name, undoStack);
   if (actions[name] !== undefined) {
 
     let action = actions[name];
@@ -170,28 +187,31 @@ function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false,
     let actionReturnedValue = actions[name].doAction(parameters, actionHandlerParameters);
 
     if (action.undoAction)
-      if (!actionHandlerParameters.cancelUndo && action.undoAction && !ignoreCommandHistory) {
+      if (!actionHandlerParameters.cancelUndo &&
+        action.undoAction &&
+        !ignoreCommandHistory
+      ) {
         let previousUndo = undoStack[undoStack.length - 1];
-        if(mergeUndo && previousUndo !== undefined &&
-          (Array.isArray(previousUndo) && previousUndo[0].actionName === name)) {
+        if (
+          mergeUndo &&
+          previousUndo !== undefined &&
+          (
+            Array.isArray(previousUndo) &&
+            previousUndo[0].actionName === name
+          )
+        ) {
+
           let previousUndo = undoStack[undoStack.length - 1];
-
-          if(!Array.isArray(previousUndo)) {
-            undoStack[undoStack.length - 1] = [previousUndo];
-          }
-
           undoStack[undoStack.length - 1].push({
             parameters: parameters
           });
-        }
-        else {
-          if(mergeUndo) {
+        } else {
+          if (mergeUndo) {
             undoStack.push([{
               actionName: name,
               parameters: parameters
             }]);
-          }
-          else {
+          } else {
             undoStack.push({
               actionName: name,
               parameters: parameters
@@ -299,6 +319,7 @@ function hasAccelerator(action, accelerator = "") {
   return false;
 }
 
+module.exports.separateMergeUndo = separateMergeUndo;
 module.exports.getActionAccelerator = getActionAccelerator;
 module.exports.handleKeyUp = handleKeyUp;
 module.exports.handleKeyDown = handleKeyDown;
