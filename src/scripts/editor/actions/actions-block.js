@@ -187,6 +187,10 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "blocks: add block",
     action: (data) => {
+      if (data.block.isNewDraggedBlock) {
+        rootBlock.unselectAll();
+      }
+
       // Deleted block are kept until they are deleted from the history
       if (data.block.isDeleted) {
         if (data.parent) {
@@ -202,13 +206,9 @@ module.exports.registerActions = () => {
         }
       }
 
-      if (!data.block.isNewDraggedBlock) {
-        //rootBlock.autoLayout();
-      }
-
       //if (!data.block.isTerminalNode()) {
       // New dragged block are set to selected with the mouse down event
-      data.block.setSelected(!data.block.isNewDraggedBlock);
+      data.block.setSelected(!data.block.isNewDraggedBlock && !data.block.preventCameraCentering);
       //}
     },
     setData: (data) => {
@@ -263,6 +263,7 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "blocks: paste selection",
     action: (data) => {
+      if(copiedBlocks.length < 1) return false;
       rootBlock.unselectAll();
 
       let leftestPosition = {x: copiedBlocks[0].position.x, y: copiedBlocks[0].position.y};
@@ -278,6 +279,7 @@ module.exports.registerActions = () => {
         newBlock.position.x += global.mouse.cameraX - leftestPosition.x;
         newBlock.position.y += global.mouse.cameraY - leftestPosition.y;
         newBlock.selectedForGroupAction = true;
+        newBlock.preventCameraCentering = true;
         // TODO: Merge with previous or something like this
         actionHandler.trigger("blocks: add block", {
           block: newBlock
