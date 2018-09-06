@@ -108,7 +108,9 @@ function undo() {
 
     while(actionHistory && actionHistory.isDummy) {
       actionHistory = undoStack.pop();
-      redoStack.push(actionHistory);
+      if(actionHistory !== undefined) {
+        redoStack.push(actionHistory);
+      }
     }
 
     if(actionHistory !== undefined) {
@@ -130,7 +132,9 @@ function redo() {
 
     while(actionHistory && actionHistory.isDummy) {
       actionHistory = redoStack.pop();
-      undoStack.push(actionHistory);
+      if(actionHistory !== undefined) {
+        undoStack.push(actionHistory);
+      }
     }
 
     if(actionHistory !== undefined) {
