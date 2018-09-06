@@ -1200,12 +1200,20 @@ class Block {
           this.size.width + this.style.border.thickness * 2, this.size.height + this.style.border.thickness * 2);
       }
 
-      ctx.fillStyle = this.style.color;
+      if (this.selectedForGroupAction) {
+        // Selected color
+        ctx.fillStyle = this.style.copySelectionColor;
+        ctx.strokeStyle = this.style.copySelectionColor;
+      }
+      else {
+        // Normal block color
+        ctx.fillStyle = this.style.color;
+        ctx.strokeStyle = this.style.color;
+      }
       ctx.fillRect(this.position.x, this.getYPosition() /** this.style.font.size*/ , this.size.width, this.size.height);
 
       // Selection border
       if (this.selected) {
-        ctx.strokeStyle = this.style.color;
         ctx.setLineDash([this.style.selected.dashInterval]);
         ctx.lineDashOffset = tick / this.style.selected.speedDivider;
         ctx.lineWidth = this.style.selected.width;
@@ -1228,11 +1236,6 @@ class Block {
       // Mouse over color
       if (this.mouseOver) {
         ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
-        ctx.fillRect(this.position.x, this.getYPosition(), this.size.width, this.size.height);
-      }
-
-      if (this.selectedForGroupAction) {
-        ctx.fillStyle = this.style.copySelectionColor;
         ctx.fillRect(this.position.x, this.getYPosition(), this.size.width, this.size.height);
       }
 
