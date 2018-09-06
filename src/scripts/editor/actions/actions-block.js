@@ -273,7 +273,8 @@ module.exports.registerActions = () => {
            leftestPosition.y = copiedBlocks[i].position.y;
         }
       }
-
+      
+      actionHandler.separateMergeUndo();
       for (let i = 0; i < copiedBlocks.length; ++i) {
         let newBlock = copiedBlocks[i].getCopy()
         newBlock.position.x += global.mouse.cameraX - leftestPosition.x;
@@ -283,7 +284,7 @@ module.exports.registerActions = () => {
         // TODO: Merge with previous or something like this
         actionHandler.trigger("blocks: add block", {
           block: newBlock
-        });
+        }, false, false, true);
       }
       /*let selectedBlocks = rootBlock.getSelectedForGroupAction();
 
