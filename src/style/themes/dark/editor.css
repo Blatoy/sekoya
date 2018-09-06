@@ -124,3 +124,7 @@ input[type=button], button {
   padding-top: 4px;
   padding-bottom: 4px;
 }
+
+.shortcut-background {
+  background-color: #373C47;
+}

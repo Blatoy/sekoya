@@ -224,3 +224,16 @@ main {
   width: 55%;
   box-sizing: border-box;
 }
+
+.quick-access-shortcut {
+  float: right;
+  margin-top: -5px;
+}
+
+.shortcut-background {
+  display: inline-block;
+  padding: 5px;
+  font-size: 0.8em;
+  background-color: #eee;
+  border-radius: 2px;
+}

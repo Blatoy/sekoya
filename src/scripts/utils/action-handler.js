@@ -283,21 +283,25 @@ module.exports.getActions = () => {
   return actions;
 };
 
-function getAccelerator(keybind) {
+function getAccelerator(keybind, prettyPrint = false) {
   let accelerator = "";
-  if (keybind.ctrl) accelerator += "CmdOrCtrl+";
-  if (keybind.alt) accelerator += "Alt+";
-  if (keybind.shift) accelerator += "Shift+";
+  if (keybind.ctrl) accelerator += !prettyPrint ? "CmdOrCtrl+" : "Ctrl + ";
+  if (keybind.alt) accelerator += !prettyPrint ? "Alt+" : "Alt + ";
+  if (keybind.shift) accelerator += !prettyPrint ? "Shift+" : "Shift + ";
 
-  accelerator += keybind.key.replace(/key/i, "");
+  let key = keybind.key.replace(/key/i, "");
+  if(prettyPrint && key.length == 1) {
+    key = key.toUpperCase();
+  }
+  accelerator += key;
   return accelerator;
 }
 
 // Returns the first shortcut available
-function getActionAccelerator(actionIdentifier) {
+function getActionAccelerator(actionIdentifier, prettyPrint = false) {
   for (let i = 0; i < keybinds.length; ++i) {
     if (actionIdentifier === keybinds[i].action) {
-      return getAccelerator(keybinds[i]);
+      return getAccelerator(keybinds[i], prettyPrint);
     }
   }
   return "";
