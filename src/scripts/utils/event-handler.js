@@ -81,4 +81,10 @@ module.exports.addEditorEvents = () => {
   document.onreadystatechange = () => {
     setCanvasSize();
   };
+
+  window.addEventListener('beforeunload', function (event) {
+     if(tabManager.closeAll()) {
+       event.returnValue = true;
+     }
+   });
 };

@@ -26,10 +26,6 @@ function newTab(name = "", blocks = [], fileLocation = "", selected = true) {
 
   let tab = new Tab(name, blocks, fileLocation, selected);
 
-  if (blocks.length === 0) {
-    // blockManager.initTab(tab);
-  }
-
   tabs.push(tab);
 
   if (selected) {
@@ -45,6 +41,8 @@ function newTab(name = "", blocks = [], fileLocation = "", selected = true) {
     }
     rootBlock.autoLayout(true);
   }
+
+  tab.setSaved(true);
 }
 
 function closeCurrentTab() {
@@ -57,17 +55,17 @@ function renameTab(index, name) {
 }
 
 function closeTab(index = 0) {
-  if(!tabs[index].saved) {
-    switch(dialog.showMessageBox({
+  if (!tabs[index].saved) {
+    switch (dialog.showMessageBox({
       type: "question",
       buttons: ["Save", "Discard changes", "Cancel"],
       title: "You have unsaved changes",
-      message: "Your changes will be lost if you close this without saving, proceed?"
+      message: tabs[index].getName() + " has unsaved changes.",
+      detail: "Your changes will be lost if you close this without saving, proceed?"
     })) {
       case 0:
         fileManager.save(tabs[index], tabs[index].getFileLocation(), () => {
-          console.log("Callbaked");
-          closeTab(index)
+          closeTab(index);
         });
         return false;
         break;
@@ -75,7 +73,8 @@ function closeTab(index = 0) {
         // Close anyway
         break;
       case 2:
-      return false;
+        // cancel
+        return false;
         break;
     }
   }
@@ -95,8 +94,18 @@ function closeTab(index = 0) {
     tabs.splice(index, 1);
     notifyTabDisplayer();
   }
-
+  return true;
 }
+
+module.exports.closeAll = () => {
+  let anyTabCancelled = false;
+  for (let i = 0; i < tabs.length; ++i) {
+    if (!closeTab(i)) {
+      anyTabCancelled = true;
+    }
+  }
+  return anyTabCancelled;
+};
 
 module.exports.handleNewTab = (fileName, fileLocation) => {
   let tabIndex = getTabIndexFromFileLocation(fileLocation + fileName);
