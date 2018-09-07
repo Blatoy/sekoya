@@ -20,11 +20,14 @@ function mainLoop() {
       fps++;
       let currentHistory = actionHandler.setHistory({undo: [], redo: []});
       ctx.fillStyle = "gray";
-      ctx.fillText("FPS: " + displayedFps, canvas.width - 50, 10)
+      ctx.fillText("Sekoya - ALPHA 0.1", canvas.width - 100, 10)
+      /*ctx.fillText("FPS: " + displayedFps, canvas.width - 50, 10)
       for(let i = 0; i < currentHistory.undo.length; ++i) {
-        let s = ctx.measureText(" - " + currentHistory.undo[i].actionName);
-        ctx.fillText(" - " + currentHistory.undo[i].actionName, canvas.width - s.width - 10, 18 + i * 18)
-      }
+        if(currentHistory.undo[i]) {
+          let s = ctx.measureText(" - " + (currentHistory.undo[i].actionName || currentHistory.undo[i][0].actionName));
+          ctx.fillText(" - " + (currentHistory.undo[i].actionName || currentHistory.undo[i][0].actionName), canvas.width - s.width - 10, 18 + i * 18)
+        }
+      }*/
       actionHandler.setHistory(currentHistory);
     /// END DEBUG
 
