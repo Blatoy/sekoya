@@ -261,6 +261,14 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction({
+    name: "blocks: cut selection",
+    action: (data) => {
+      actionHandler.trigger("blocks: copy selection");
+      actionHandler.trigger("blocks: delete selected");
+    }
+  });
+
+  actionHandler.addAction({
     name: "blocks: paste selection",
     action: (data) => {
       if(copiedBlocks.length < 1) return false;
@@ -273,7 +281,7 @@ module.exports.registerActions = () => {
            leftestPosition.y = copiedBlocks[i].position.y;
         }
       }
-      
+
       actionHandler.separateMergeUndo();
       for (let i = 0; i < copiedBlocks.length; ++i) {
         let newBlock = copiedBlocks[i].getCopy()
