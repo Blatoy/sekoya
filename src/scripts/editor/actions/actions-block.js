@@ -2,6 +2,7 @@ module.exports.registerActions = () => {
   actionHandler.addAction("blocks: auto layout", () => {
     rootBlock.sortChildrenByYPosition();
     rootBlock.autoLayout();
+    tabManager.setFileModified();
   });
 
   actionHandler.addAction("blocks: change current linking type", () => {
@@ -11,6 +12,7 @@ module.exports.registerActions = () => {
     } else {
       return false;
     }
+    tabManager.setFileModified();
   });
 
   actionHandler.addAction("blocks: cancel block linking", () => {
@@ -47,6 +49,7 @@ module.exports.registerActions = () => {
     name: "blocks: close settings dialog",
     action: () => {
       Block.getSelectedBlock().closePropertyWindow();
+      tabManager.setFileModified();
     },
     displayable: false,
     preventTriggerWhenInputFocused: false,
@@ -59,6 +62,9 @@ module.exports.registerActions = () => {
       if (data.newPosition.x === data.oldPosition.x && data.newPosition.y === data.oldPosition.y) {
         actionHandlerParameters.cancelUndo = true;
       }
+      else {
+        tabManager.setFileModified();
+      }
 
       data.block.position.x = data.newPosition.x;
       data.block.position.y = data.newPosition.y;
@@ -69,6 +75,7 @@ module.exports.registerActions = () => {
     undoAction: (data) => {
       data.block.position.x = data.oldPosition.x;
       data.block.position.y = data.oldPosition.y;
+      tabManager.setFileModified();
     },
     displayable: false,
     preventTriggerWhenInputFocused: false,
@@ -97,10 +104,13 @@ module.exports.registerActions = () => {
       return false;
     }
 
+    tabManager.setFileModified();
     return true;
   }, (data) => {
     let oldParent = data.targetBlock.parent;
     let oldLinkingType = data.targetBlock.linkToParentType;
+
+    tabManager.setFileModified();
     return {
       oldParent: data.targetBlock.parent,
       oldLinkingType: oldLinkingType,
@@ -116,6 +126,8 @@ module.exports.registerActions = () => {
     for (let i = 0; i < data.length; ++i) {
       data[i].block.delete();
     }
+
+    tabManager.setFileModified();
     //  rootBlock.autoLayout();
   }, () => {
     let selectedBlocks = rootBlock.getSelectedForGroupAction();
@@ -152,6 +164,7 @@ module.exports.registerActions = () => {
       });
     }
 
+    tabManager.setFileModified();
     return deletedBlocks;
   }, (data) => {
     for (let i = 0; i < data.length; ++i) {
@@ -170,6 +183,7 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction("blocks: delete selected and children", (data) => {
     data.block.deleteRecursive();
+    tabManager.setFileModified();
     //rootBlock.autoLayout();
   }, () => {
     let selectedBlock = Block.getSelectedBlock();
@@ -182,6 +196,7 @@ module.exports.registerActions = () => {
     data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
     //rootBlock.autoLayout();
     data.block.setSelected(true);
+    tabManager.setFileModified();
   });
 
   actionHandler.addAction({
@@ -209,6 +224,7 @@ module.exports.registerActions = () => {
       //if (!data.block.isTerminalNode()) {
       // New dragged block are set to selected with the mouse down event
       data.block.setSelected(!data.block.isNewDraggedBlock && !data.block.preventCameraCentering);
+      tabManager.setFileModified();
       //}
     },
     setData: (data) => {
@@ -220,6 +236,7 @@ module.exports.registerActions = () => {
     },
     undoAction: (data) => {
       data.block.delete();
+      tabManager.setFileModified();
     }
   });
 
@@ -237,6 +254,7 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction("blocks: sort children using position", (data) => {
     data.parentBlock.sortChildrenByYPosition();
+    tabManager.setFileModified();
   });
 
   let copiedBlocks = [];
@@ -265,6 +283,7 @@ module.exports.registerActions = () => {
     action: (data) => {
       actionHandler.trigger("blocks: copy selection");
       actionHandler.trigger("blocks: delete selected");
+      tabManager.setFileModified();
     }
   });
 
@@ -294,20 +313,8 @@ module.exports.registerActions = () => {
           block: newBlock
         }, false, false, true);
       }
-      /*let selectedBlocks = rootBlock.getSelectedForGroupAction();
 
-      copiedBlocks = [];
-
-      // We delete the selected block only if there was no selected block for group action
-      if(selectedBlocks.length === 0) {
-        selectedBlocks = [Block.getSelectedBlock()];
-      }
-      console.log("Selected:", selectedBlocks);
-
-      copiedBlocks = [];
-      for(let i = 0; i < selectedBlocks.length; ++i) {
-        copiedBlocks.push(selectedBlocks[i].getCopy());
-      }*/
+      tabManager.setFileModified();
     }
   });
   /*"blocks: copy selection", () => {

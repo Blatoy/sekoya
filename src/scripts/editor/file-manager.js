@@ -12,11 +12,13 @@ module.exports.openWithDialog = () => {
   }
 
   canOpenDialog = false;
-
   dialog.showOpenDialog({
     defaultPath: config.defaultOpenFileLocation,
     properties: ['openFile', 'multiSelections'],
-    filters: [{name: "XML file", extensions: ["xml"]}]
+    filters: [{
+      name: "XML file",
+      extensions: ["xml"]
+    }]
   }, function(files) {
     canOpenDialog = true;
     if (files !== undefined) {
@@ -88,6 +90,75 @@ function addBlockRecursively(xml, parentBlock) {
   }
 }
 
+function saveAs(tab, callback = () => {}) {
+  dialog.showSaveDialog({
+    title: "Save as...",
+    defaultPath: tab.getFileLocation(),
+    filters: [
+      { name: "", extensions: ['xml'] }
+    ]
+  }, (location) => {
+    if(location) {
+      tab.fileLocation = path.dirname(location) + path.sep;
+      tab.name = path.basename(location);
+
+      save(tab, location, callback);
+    }
+  });
+}
+
+function save(tab, path = false, callback = () => {}) {
+  fs.lstat(path, (err, stats) => {
+    if(!stats && tab.fileLocation === "") {
+      saveAs(tab, callback);
+    }
+    else {
+      let xmlData = '<?xml version="1.0" ?><enemy>';
+      for (let i = 0; i < tab.blocks.length; ++i) {
+        xmlData += getXMLRecursively(tab.blocks[i]);
+      }
+      xmlData += '</enemy>';
+      // console.log(xmlData);
+      fs.writeFile(path, xmlData, function() {
+        tab.setSaved(true);
+        tabManager.notifyTabDisplayer();
+        callback();
+      });
+    }
+  });
+}
+
+function getXMLRecursively(block, depth = 0) {
+  {
+    let blockData = "";
+    if (depth == 0) {
+      blockData += "<behaviour>";
+    }
+
+    blockData += "<" + block.type + ' id="' + block.name + '">';
+    for (let type in block.attributes) {
+      for (let attribute in block.attributes[type]) {
+        blockData += '<' + type + ' id="' + block.attributes[type][attribute].name + '">' + block.attributes[type][attribute].value.encodeXML() + '</' + type + '>';
+      }
+    }
+    for (let i = 0; i < block.children.length; ++i) {
+      blockData += "<" + block.children[i].linkToParentType + ">";
+      blockData += getXMLRecursively(block.children[i], depth + 1);
+      blockData += "</" + block.children[i].linkToParentType + ">";
+    }
+    blockData += "</" + block.type + ">";
+
+    if (depth == 0) {
+      blockData += "</behaviour>";
+    }
+
+    return blockData;
+  }
+}
+
+module.exports.save = save;
+module.exports.saveAs = saveAs;
+
 function open(file) {
   fs.readFile(file, 'utf-8', function(err, xml) {
     xml2js.parseString(xml, function(err, result) {
@@ -116,10 +187,20 @@ function open(file) {
       // exactly take everything into account .........................
       setTimeout(() => {
         rootBlock.autoLayout(true);
+        tabManager.getCurrentTab().setSaved(true);
+        tabManager.notifyTabDisplayer();
       }, 1);
     })
   });
 }
+
+String.prototype.encodeXML = function() {
+  return this.replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+};
 // TODO: Handle properly if invalid format
 /*  if (result.blockdefinitions) {
     for (let blockCategory in result.blockdefinitions) {

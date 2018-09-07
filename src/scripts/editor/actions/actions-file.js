@@ -5,10 +5,10 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction("file: save", () => {
-    // fileManager.openWithDialog();
+    fileManager.save(tabManager.getCurrentTab(), tabManager.getCurrentTab().getFileLocation());
   });
 
   actionHandler.addAction("file: save as", () => {
-    // fileManager.openWithDialog();
+    fileManager.saveAs(tabManager.getCurrentTab());
   });
 };

@@ -24,7 +24,14 @@ module.exports = [{
     ctrl: true,
     alt: false,
     shift: false,
-    action: "core: save"
+    action: "file: save"
+  },
+  {
+    key: 's',
+    ctrl: true,
+    alt: false,
+    shift: true,
+    action: "file: save as"
   },
   {
     key: 'o',
@@ -427,6 +434,13 @@ module.exports = [{
     alt: false,
     shift: false,
     action: "blocks: copy selection"
+  },
+  {
+    key: 'x',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "blocks: cut selection"
   },
   {
     key: 'v',

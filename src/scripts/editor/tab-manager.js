@@ -1,6 +1,10 @@
 const Tab = require(editorFolderPath + "classes/tab.js");
 const tabDisplay = require(editorFolderPath + "display/tab-display.js");
 
+const {
+  dialog
+} = require('electron').remote;
+
 const tabs = [];
 const DEFAULT_TAB_NAME = "untitled";
 const DEFAULT_TAB_EXTENSION = ".xml";
@@ -53,6 +57,28 @@ function renameTab(index, name) {
 }
 
 function closeTab(index = 0) {
+  if(!tabs[index].saved) {
+    switch(dialog.showMessageBox({
+      type: "question",
+      buttons: ["Save", "Discard changes", "Cancel"],
+      title: "You have unsaved changes",
+      message: "Your changes will be lost if you close this without saving, proceed?"
+    })) {
+      case 0:
+        fileManager.save(tabs[index], tabs[index].getFileLocation(), () => {
+          console.log("Callbaked");
+          closeTab(index)
+        });
+        return false;
+        break;
+      case 1:
+        // Close anyway
+        break;
+      case 2:
+      return false;
+        break;
+    }
+  }
   if (tabs.length > 1) {
     if (selectedTabIndex === index) {
       if (index >= tabs.length - 1) {
@@ -145,6 +171,16 @@ function notifyTabDisplayer() {
   tabDisplay.refreshView(tabs, selectTab, closeTab, renameTab);
 }
 
+module.exports.getCurrentTab = () => {
+  return tabs[selectedTabIndex];
+};
+
+module.exports.setFileModified = () => {
+  tabs[selectedTabIndex].setSaved(false);
+  notifyTabDisplayer();
+};
+
+module.exports.notifyTabDisplayer = notifyTabDisplayer;
 module.exports.switchTab = switchTab;
 module.exports.newTab = newTab;
 module.exports.closeCurrentTab = closeCurrentTab;
