@@ -14,11 +14,11 @@
         },
         {
           "label": "Save",
-          "action": "file: save current"
+          "action": "file: save"
         },
         {
           "label": "Save as",
-          "action": "file: save current as"
+          "action": "file: save as"
         },
         {
           "type": "separator"
@@ -46,30 +46,33 @@
         },
         {
           "label": "Copy",
-          "action": "blocks: copy selected blocks"
+          "action": "blocks: copy selection"
         },
         {
           "label": "Cut",
-          "action": "blocks: cut selected blocks"
+          "action": "blocks: cut selection"
         },
         {
           "label": "Paste",
-          "action": "blocks: paste copied blocks"
+          "action": "blocks: paste selection"
         },
         {
           "type": "separator"
         },
         {
           "label": "Find by comments",
-          "action": "blocks: find block - comment"
+          "action": "blocks: find block - comment",
+          "disabled": true
         },
         {
           "label": "Find by attributes",
-          "action": "blocks: find block - attributes"
+          "action": "blocks: find block - attributes",
+          "disabled": true
         },
         {
           "label": "Find by block name",
-          "action": "blocks: find block - name"
+          "action": "blocks: find block - name",
+          "disabled": true
         }
       ]
     },

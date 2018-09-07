@@ -20,6 +20,7 @@ module.exports.setMenu = function() {
           new MenuItem(
             {
               label: menuItem.label,
+              enabled: menuItem.disabled ? false : true,
               accelerator: accelerator,
               click(e) {
                 actionHandler.trigger(menuItem.action);
