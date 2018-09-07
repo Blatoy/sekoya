@@ -154,10 +154,10 @@ module.exports = [{
   },
 
   {
-    key: 'ShiftLeft',
+    key: 'c',
     ctrl: false,
     alt: false,
-    shift: true,
+    shift: false,
     action: "blocks: select nearest to screen center"
   },
 
