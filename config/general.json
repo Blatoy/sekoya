@@ -2,7 +2,7 @@
   "//": "Name of the theme located in themes, uses default values if not found",
     "theme": "dark",
     "forceAutoLayout": true,
-    "defaultOpenFileLocation": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Awesomenauts\\Modding\\OwnMods\\Super Awesome Nauts\\Behaviours",
+    "defaultOpenFileLocation": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Awesomenauts\\Modding\\OwnMods",
   "//": "Filename of the file to use in block-definitions",
     "blockDefinitionFile": "awesomenauts.xml",
   "//" : "name of the block to create followed by the block type it can be attached to. Use an empty array for no blocks. First one is the default one for some actions and must be connectable to root",
