@@ -185,6 +185,7 @@ function open(file) {
       rootBlock.autoLayout(true);
       // For some reason block height is tied to the rendered because of comments so auto layout doesn't
       // exactly take everything into account .........................
+      tabManager.getCurrentTab().setSaved(true);
       setTimeout(() => {
         rootBlock.autoLayout(true);
         tabManager.getCurrentTab().setSaved(true);
