@@ -94,11 +94,12 @@ function saveAs(tab, callback = () => {}) {
   dialog.showSaveDialog({
     title: "Save as...",
     defaultPath: tab.getFileLocation(),
-    filters: [
-      { name: "", extensions: ['xml'] }
-    ]
+    filters: [{
+      name: "",
+      extensions: ['xml']
+    }]
   }, (location) => {
-    if(location) {
+    if (location) {
       tab.fileLocation = path.dirname(location) + path.sep;
       tab.name = path.basename(location);
 
@@ -109,10 +110,9 @@ function saveAs(tab, callback = () => {}) {
 
 function save(tab, path = false, callback = () => {}) {
   fs.lstat(path, (err, stats) => {
-    if(!stats && tab.fileLocation === "") {
+    if (!stats && tab.fileLocation === "") {
       saveAs(tab, callback);
-    }
-    else {
+    } else {
       let xmlData = '<?xml version="1.0" ?><enemy>';
       for (let i = 0; i < tab.blocks.length; ++i) {
         xmlData += getXMLRecursively(tab.blocks[i]);
@@ -141,11 +141,23 @@ function getXMLRecursively(block, depth = 0) {
         blockData += '<' + type + ' id="' + block.attributes[type][attribute].name + '">' + block.attributes[type][attribute].value.encodeXML() + '</' + type + '>';
       }
     }
-    for (let i = 0; i < block.children.length; ++i) {
-      blockData += "<" + block.children[i].linkToParentType + ">";
-      blockData += getXMLRecursively(block.children[i], depth + 1);
-      blockData += "</" + block.children[i].linkToParentType + ">";
+    if (block.children.length > 0) {
+      let previousLinkToParentType = block.children[0].linkToParentType;
+      blockData += "<" + previousLinkToParentType + ">";
+
+      for (let i = 0; i < block.children.length; ++i) {
+        if (previousLinkToParentType != block.children[i].linkToParentType) {
+          blockData += "</" + previousLinkToParentType + ">";
+
+          previousLinkToParentType = block.children[i].linkToParentType;
+          blockData += "<" + block.children[i].linkToParentType + ">";
+        }
+
+        blockData += getXMLRecursively(block.children[i], depth + 1);
+      }
+      blockData += "</" + previousLinkToParentType + ">";
     }
+
     blockData += "</" + block.type + ">";
 
     if (depth == 0) {
