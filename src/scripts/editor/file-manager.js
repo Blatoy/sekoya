@@ -12,8 +12,13 @@ module.exports.openWithDialog = () => {
   }
 
   canOpenDialog = false;
+  let defaultPath = tabManager.getCurrentTab().fileLocation;
+  if(!defaultPath) {
+    defaultPath = config.defaultOpenFileLocation;
+  }
+
   dialog.showOpenDialog({
-    defaultPath: config.defaultOpenFileLocation,
+    defaultPath: defaultPath,
     properties: ['openFile', 'multiSelections'],
     filters: [{
       name: "XML file",
