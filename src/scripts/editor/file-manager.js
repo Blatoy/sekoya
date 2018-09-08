@@ -2,98 +2,10 @@ const {
   dialog
 } = require('electron').remote;
 const fs = require("fs");
-const xml2js = require("xml2js");
+const xmlConverter = require("xml-js");
 const path = require("path");
+
 let canOpenDialog = true;
-
-module.exports.openWithDialog = () => {
-  if (!canOpenDialog) {
-    return false;
-  }
-
-  canOpenDialog = false;
-  let defaultPath = tabManager.getCurrentTab().fileLocation;
-  if(!defaultPath) {
-    defaultPath = config.defaultOpenFileLocation;
-  }
-
-  dialog.showOpenDialog({
-    defaultPath: defaultPath,
-    properties: ['openFile', 'multiSelections'],
-    filters: [{
-      name: "XML file",
-      extensions: ["xml"]
-    }]
-  }, function(files) {
-    canOpenDialog = true;
-    if (files !== undefined) {
-      for (let i = 0; i < files.length; ++i) {
-        open(files[i]);
-      }
-    }
-  });
-  return true;
-};
-
-let validLinkTypes = {
-  "normal": 1,
-  "else": 1,
-  "orblock": 1,
-  "or": 1
-};
-
-function addBlockRecursively(xml, parentBlock) {
-  //  console.log(xml);
-  for (let attributeOrLinkToParentType in xml) {
-    if (attributeOrLinkToParentType === "$") {
-      continue;
-    }
-
-    for (let i = 0; i < xml[attributeOrLinkToParentType].length; ++i) {
-      // Sooooo, here we have to separate linking type and attributes
-      if (validLinkTypes[attributeOrLinkToParentType]) {
-        for (let j in xml[attributeOrLinkToParentType][i]) {
-          for (let k = 0; k < xml[attributeOrLinkToParentType][i][j].length; ++k) {
-            if (xml[attributeOrLinkToParentType][i][j][k].$) {
-              let blockName = xml[attributeOrLinkToParentType][i][j][k].$.id;
-              let parent = new Block(blockLoader.getDefinitionByName(blockName), parentBlock, attributeOrLinkToParentType);
-              xml[attributeOrLinkToParentType][i][j][k]
-              addBlockRecursively(xml[attributeOrLinkToParentType][i][j][k], parent)
-            } else {
-              // orblock / andblock / ??? handling
-              let blockName = j;
-
-              let parent = new Block(blockLoader.getDefinitionByName(blockName), parentBlock, attributeOrLinkToParentType);
-              addBlockRecursively(xml[attributeOrLinkToParentType][i][j][k], parent);
-            }
-
-          }
-        }
-      } else {
-        if (!parentBlock.attributes[attributeOrLinkToParentType]) {
-          parentBlock.attributes[attributeOrLinkToParentType] = {};
-        }
-        // console.log(xml[attributeOrLinkToParentType][i]);
-        if (parentBlock.attributes[attributeOrLinkToParentType][xml[attributeOrLinkToParentType][i].$.id] === undefined) {
-          parentBlock.attributes[attributeOrLinkToParentType][xml[attributeOrLinkToParentType][i].$.id] = {
-            name: xml[attributeOrLinkToParentType][i].$.id,
-          };
-          parentBlock.attributeCount++;
-        }
-        //console.log(xml[attributeOrLinkToParentType][i]);
-        parentBlock.attributes[attributeOrLinkToParentType][xml[attributeOrLinkToParentType][i].$.id].value = xml[attributeOrLinkToParentType][i]._ || "";
-        /*  console.log(parentBlock.attributes[attributeOrLinkToParentType]);
-          console.log(xml[attributeOrLinkToParentType][i].$.id);
-          parentBlock.attributes[attributeOrLinkToParentType][xml[attributeOrLinkToParentType][i].$.id] = {
-
-          };
-          xml[attributeOrLinkToParentType][i].$._;*/
-        //  console.log("ATTRIBUTE: ", attributeOrLinkToParentType, xml[attributeOrLinkToParentType][i]);
-        // Attribute
-      }
-    }
-  }
-}
 
 function saveAs(tab, callback = () => {}) {
   dialog.showSaveDialog({
@@ -118,11 +30,20 @@ function save(tab, path = false, callback = () => {}) {
     if (!stats && tab.fileLocation === "") {
       saveAs(tab, callback);
     } else {
-      let xmlData = '<?xml version="1.0" ?><enemy>';
+      let xmlData = '<?xml version="1.0" ?>';
+
+      if (config.topLevelBlocksContainer.length > 0) {
+        xmlData += "<" + config.topLevelBlocksContainer[0] + ">";
+      }
+
       for (let i = 0; i < tab.blocks.length; ++i) {
         xmlData += getXMLRecursively(tab.blocks[i]);
       }
-      xmlData += '</enemy>';
+
+      if (config.topLevelBlocksContainer.length > 0) {
+        xmlData += "</" + config.topLevelBlocksContainer[0] + ">";
+      }
+
       // console.log(xmlData);
       fs.writeFile(path, xmlData, function() {
         tab.setSaved(true);
@@ -136,20 +57,21 @@ function save(tab, path = false, callback = () => {}) {
 function getXMLRecursively(block, depth = 0) {
   {
     let blockData = "";
-    if (depth == 0) {
-      blockData += "<behaviour>";
+
+    if (depth + 1 < config.topLevelBlocksContainer.length) {
+      blockData += "<" + config.topLevelBlocksContainer[depth + 1] + ">";
     }
 
-    if(blockLoader.getDefinitionByName(block.name).useNameAttributeAsTagName) {
+
+    if (blockLoader.getDefinitionByName(block.name).useNameAttributeAsTagName) {
       blockData += "<" + block.name + ' id="' + block.name + '">';
-    }
-    else {
+    } else {
       blockData += "<" + block.type + ' id="' + block.name + '">';
     }
 
     for (let type in block.attributes) {
       for (let attribute in block.attributes[type]) {
-        blockData += '<' + type + ' id="' + block.attributes[type][attribute].name + '">' + block.attributes[type][attribute].value.encodeXML() + '</' + type + '>';
+        blockData += '<' + type + ' id="' + block.attributes[type][attribute].name + '">' + encodeXML(block.attributes[type][attribute].value) + '</' + type + '>';
       }
     }
     if (block.children.length > 0) {
@@ -169,27 +91,80 @@ function getXMLRecursively(block, depth = 0) {
       blockData += "</" + previousLinkToParentType + ">";
     }
 
-    if(blockLoader.getDefinitionByName(block.name).useNameAttributeAsTagName) {
+    if (blockLoader.getDefinitionByName(block.name).useNameAttributeAsTagName) {
       blockData += "</" + block.name + '>';
-    }
-    else {
+    } else {
       blockData += "</" + block.type + '>';
     }
 
-    if (depth == 0) {
-      blockData += "</behaviour>";
+    if (depth + 1 < config.topLevelBlocksContainer.length) {
+      blockData += "</" + config.topLevelBlocksContainer[depth + 1] + ">";
     }
 
     return blockData;
   }
 }
 
-module.exports.save = save;
-module.exports.saveAs = saveAs;
+function cleanTopLevelContainers(elements, targetDepth, depth = 1) {
+  let elementsClean = [];
+
+  for (let i = 0; i < elements.length; ++i) {
+    if (depth >= targetDepth) {
+      for (let j = 0; j < elements[i].elements.length; ++j) {
+        elementsClean.push(elements[i].elements[j]);
+      }
+    } else {
+      elementsClean.push.apply(elementsClean, cleanTopLevelContainers(elements[i].elements, targetDepth, depth + 1));
+    }
+  }
+
+  return elementsClean;
+}
+
+
+let validLinkTypes = [];
+for (let i = 0; i < config.connectionsTypes.length; ++i) {
+  validLinkTypes.push(config.connectionsTypes[i].name);
+}
+
+function createBlockRecursively(element, parentBlock, linkToParentType) {
+  let blockName = element.attributes ? (element.attributes.id || element.name) : element.name;
+  let newBlock = new Block(blockLoader.getDefinitionByName(blockName), parentBlock, linkToParentType);
+
+  if (element.elements) {
+    for (let i = 0; i < element.elements.length; ++i) {
+      let childElement = element.elements[i];
+      let childName = childElement.attributes ? (childElement.attributes.id || childElement.name) : childElement.name;
+
+      // This is a link to a child
+      if (validLinkTypes.includes(childName)) {
+        for (let j = 0; j < childElement.elements.length; ++j) {
+          createBlockRecursively(childElement.elements[j], newBlock, childName);
+        }
+      } else {
+        // This is an attribute of newBlock
+        if (!newBlock.attributes[childElement.name]) {
+          newBlock.attributes[childElement.name] = {};
+        }
+
+        let value = childElement.elements ? childElement.elements[0].text : undefined;
+        if (value !== undefined) {
+          newBlock.attributes[childElement.name][childElement.attributes.id] = {
+            value: value,
+            name: childName
+          };
+        }
+      }
+    }
+  }
+}
 
 function open(file) {
   fs.readFile(file, 'utf-8', function(err, xml) {
-    xml2js.parseString(xml, function(err, result) {
+    let JSONData = xmlConverter.xml2js(xml, {
+      compact: false
+    });
+    if (JSONData.elements) {
       // Make sure we don't have 2 tabs with the same file / location
       // Note: we don't check that sooner because readFile is async and we don't want to change tab before all the blocks
       // have been added
@@ -197,20 +172,12 @@ function open(file) {
         return false;
       }
 
-      let hiddenRoot = result.enemy;
-      for (let i = 0; i < hiddenRoot.behaviour.length; ++i) {
-        for (let blockType in hiddenRoot.behaviour[i]) {
-          for (let j = 0; j < hiddenRoot.behaviour[i][blockType].length; ++j) {
-            let blockName = hiddenRoot.behaviour[i][blockType][j].$.id;
-            let parent = new Block(blockLoader.getDefinitionByName(blockName || blockType));
+      let elements = cleanTopLevelContainers(JSONData.elements, config.topLevelBlocksContainer.length);
 
-            addBlockRecursively(hiddenRoot.behaviour[i][blockType][j], parent);
-          }
-        }
+      for (let i = 0; i < elements.length; ++i) {
+        createBlockRecursively(elements[i], rootBlock, "normal");
       }
 
-      // At this point I'm just trying to releasing it I
-      rootBlock.autoLayout(true);
       // For some reason block height is tied to the rendered because of comments so auto layout doesn't
       // exactly take everything into account .........................
       tabManager.getCurrentTab().setSaved(true);
@@ -219,63 +186,48 @@ function open(file) {
         tabManager.getCurrentTab().setSaved(true);
         tabManager.notifyTabDisplayer();
       }, 1);
-    })
+    }
   });
 }
 
-String.prototype.encodeXML = function() {
-  return this.replace(/&/g, '&amp;')
+module.exports.openWithDialog = () => {
+  if (!canOpenDialog) {
+    return false;
+  }
+
+  canOpenDialog = false;
+  let defaultPath = tabManager.getCurrentTab().fileLocation;
+  if (!defaultPath) {
+    defaultPath = config.defaultOpenFileLocation;
+  }
+
+  dialog.showOpenDialog({
+    defaultPath: defaultPath,
+    properties: ['openFile', 'multiSelections'],
+    filters: [{
+      name: "XML file",
+      extensions: ["xml"]
+    }]
+  }, function(files) {
+    canOpenDialog = true;
+    if (files !== undefined) {
+      for (let i = 0; i < files.length; ++i) {
+        open(files[i]);
+      }
+    }
+  });
+  return true;
+};
+
+function encodeXML(str = "") {
+  if (!str) str = "";
+
+  return str.replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
 };
-// TODO: Handle properly if invalid format
-/*  if (result.blockdefinitions) {
-    for (let blockCategory in result.blockdefinitions) {
-      if (blockCategory == "predefined_values") {
-        for(let i = 0; i < result.blockdefinitions[blockCategory].length; ++i) {
-          predefinedValues[result.blockdefinitions[blockCategory][i].$.id] = result.blockdefinitions[blockCategory][i].value;
-        }
-      } else {
-        blockDefinitions[blockCategory] = {};
-        // [0] is there because there can only be one blockType
-        for(let blockType in result.blockdefinitions[blockCategory][0]) {
-          for(let j = 0; j < result.blockdefinitions[blockCategory][0][blockType].length; ++j) {
-            let xmlBlock = result.blockdefinitions[blockCategory][0][blockType][j];
 
-            let blockName = xmlBlock["$"].name;
-            let displayName = xmlBlock["$"].displayName;
-            let useNameAttributeAsTagName = xmlBlock["$"].useNameAttributeAsTagName === undefined ? false : true;
-            let preventInteraction = xmlBlock["$"].preventInteraction === undefined ? false : true;
-            let hidden = xmlBlock["$"].hidden === undefined ? false : true;
-            let blockPropertiesGroupedByType = {};
-
-            for(let propertyType in xmlBlock) {
-              if(propertyType != "$") {
-                blockPropertiesGroupedByType[propertyType] = [];
-                // Append all properties by removing all the zork that is generated by xml2json
-                for(let i = 0; i < xmlBlock[propertyType].length; ++i) {
-                  // This mainly removes the $ because it's just annoying
-                  // i'm annoyed
-                  // this is annoying and unreadable
-                  blockPropertiesGroupedByType[propertyType].push(xmlBlock[propertyType][i]["$"]);
-                }
-              }
-            }
-
-            blockDefinitions[blockCategory][blockName] = {
-              name: blockName,
-              displayName: displayName,
-              hidden: hidden,
-              useNameAttributeAsTagName: useNameAttributeAsTagName,
-              blockPropertiesGroupedByType: blockPropertiesGroupedByType,
-              type: blockType,
-              preventInteraction: preventInteraction
-            };
-          }
-        }
-      }
-    }
-  }
-}*/
+module.exports.save = save;
+module.exports.saveAs = saveAs;

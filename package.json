@@ -21,6 +21,7 @@
     "electron": "^2.0.8"
   },
   "dependencies": {
+    "xml-js": "^1.6.7",
     "xml2js": "^0.4.19"
   }
 }
