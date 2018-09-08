@@ -46,15 +46,18 @@
         },
         {
           "label": "Copy",
-          "action": "blocks: copy selection"
+          "action": "blocks: copy selection",
+          "doNotUseAccelerator": true
         },
         {
           "label": "Cut",
-          "action": "blocks: cut selection"
+          "action": "blocks: cut selection",
+          "doNotUseAccelerator": true
         },
         {
           "label": "Paste",
-          "action": "blocks: paste selection"
+          "action": "blocks: paste selection",
+          "doNotUseAccelerator": true
         },
         {
           "type": "separator"
