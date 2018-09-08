@@ -135,7 +135,13 @@ function getXMLRecursively(block, depth = 0) {
       blockData += "<behaviour>";
     }
 
-    blockData += "<" + block.type + ' id="' + block.name + '">';
+    if(blockLoader.getDefinitionByName(block.name).useNameAttributeAsTagName) {
+      blockData += "<" + block.name + ' id="' + block.name + '">';
+    }
+    else {
+      blockData += "<" + block.type + ' id="' + block.name + '">';
+    }
+
     for (let type in block.attributes) {
       for (let attribute in block.attributes[type]) {
         blockData += '<' + type + ' id="' + block.attributes[type][attribute].name + '">' + block.attributes[type][attribute].value.encodeXML() + '</' + type + '>';
@@ -158,7 +164,12 @@ function getXMLRecursively(block, depth = 0) {
       blockData += "</" + previousLinkToParentType + ">";
     }
 
-    blockData += "</" + block.type + ">";
+    if(blockLoader.getDefinitionByName(block.name).useNameAttributeAsTagName) {
+      blockData += "</" + block.name + '>';
+    }
+    else {
+      blockData += "</" + block.type + '>';
+    }
 
     if (depth == 0) {
       blockData += "</behaviour>";
