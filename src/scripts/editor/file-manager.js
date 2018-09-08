@@ -149,10 +149,12 @@ function createBlockRecursively(element, parentBlock, linkToParentType) {
 
         let value = childElement.elements ? childElement.elements[0].text : undefined;
         if (value !== undefined) {
-          newBlock.attributes[childElement.name][childElement.attributes.id] = {
-            value: value,
-            name: childName
-          };
+          if(!newBlock.attributes[childElement.name][childElement.attributes.id]) {
+            newBlock.attributes[childElement.name][childElement.attributes.id] = {name: childName, value: value};
+          }
+          else {
+            newBlock.attributes[childElement.name][childElement.attributes.id].value = value;
+          }
         }
       }
     }
