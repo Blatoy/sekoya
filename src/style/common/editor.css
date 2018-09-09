@@ -107,7 +107,7 @@ main {
   height: calc(100vh - 26px);
 }
 
-#quick-access-bar-background, #block-properties-background {
+#quick-access-bar-background, #block-properties-background, #about-background {
   cursor: pointer;
   position: fixed;
   top: 0;
@@ -274,4 +274,24 @@ main {
 
 #search-result-current, #search-result-total {
   font-weight: bold;
+}
+
+#about {
+  cursor: default;
+  padding: 10px;
+  position: fixed;
+  top: 10%;
+  left: 20%;
+  right: 20%;
+  background-color: white;
+  border-radius: 1px;
+  border: 1px solid lightgray;
+  max-height: 80%;
+  overflow: auto;
+}
+
+#about label {
+  display: inline-block;
+  width: 150px;
+  height: 30px;
 }

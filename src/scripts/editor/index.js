@@ -50,6 +50,10 @@ require(editorFolderPath + "/menus/menu-top-bar.js").setMenu();
 // already used to link blocks
 // require(editorFolderPath + "/menus/menu-context.js").setMenu();
 
+if(!localStorage.firstLaunchDone) {
+  document.getElementById("about-background").style.display = "block";
+}
+
 window.onerror = (msg, script, line) => {
   let errorMessage = "[" + script + ":" + line +"] " + msg + "\n";
 

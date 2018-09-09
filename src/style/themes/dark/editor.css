@@ -68,7 +68,7 @@ input[type=button], button {
   background-color: #282C34;
 }
 
-#quick-access-bar-background, #block-properties-background {
+#quick-access-bar-background, #block-properties-background, #about-background {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -146,4 +146,22 @@ input[type=button], button {
 #search-result-current, #search-result-total {
   font-weight: bold;
   color: #66AF80;
+}
+
+.important {
+  color: #66AF80;
+}
+
+#about .shortcut-background {
+
+}
+
+#about {
+  color: #EFEFEF;
+  background-color: #282C34;
+  border: 1px solid #222;
+}
+
+#about label {
+  height: 40px;
 }

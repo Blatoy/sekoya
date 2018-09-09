@@ -76,6 +76,13 @@ module.exports = [{
     action: "tabs: create new tab"
   },
   {
+    key: 'h',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "core: display about"
+  },
+  {
     key: 't',
     ctrl: true,
     alt: false,
@@ -130,6 +137,13 @@ module.exports = [{
     alt: false,
     shift: false,
     action: "delete selected link"
+  },
+  {
+    key: 'Escape',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "core: hide about"
   },
   {
     key: 'Escape',

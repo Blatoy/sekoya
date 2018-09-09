@@ -25,7 +25,7 @@
         },
         {
           "label": "About",
-          "action": "core: about dialog"
+          "action": "core: display about"
         }
       ]
     },
@@ -63,19 +63,8 @@
           "type": "separator"
         },
         {
-          "label": "Find by comments",
-          "action": "blocks: find block - comment",
-          "disabled": true
-        },
-        {
-          "label": "Find by attributes",
-          "action": "blocks: find block - attributes",
-          "disabled": true
-        },
-        {
-          "label": "Find by block name",
-          "action": "blocks: find block - name",
-          "disabled": true
+          "label": "Search...",
+          "action": "search: display"
         }
       ]
     },
