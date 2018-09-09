@@ -1,3 +1,6 @@
+const remote = require('electron').remote
+
+global.forceAppReload = false;
 global.mouse = {
   x: 0,
   y: 0,
@@ -12,7 +15,15 @@ global.metaKeys = {
   shift: false
 }
 
-global.camera = {bounds: {x:0, y:0, width: 0, height: 0}, scaling: 1};
+global.camera = {
+  bounds: {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  },
+  scaling: 1
+};
 
 global.tabDown = false;
 
@@ -46,7 +57,7 @@ module.exports.addEditorEvents = () => {
   window.addEventListener("keydown", (e) => {
     actionHandler.handleKeyDown(e);
 
-    if(e.key === "Tab") global.tabDown = true;
+    if (e.key === "Tab") global.tabDown = true;
     metaKeys = {
       ctrl: e.ctrlKey,
       shift: e.shiftKey,
@@ -58,7 +69,7 @@ module.exports.addEditorEvents = () => {
     window.focus(); // Shitty fix to prevent tab focusing something strange?
 
     actionHandler.handleKeyUp(e);
-    if(e.key === "Tab") global.tabDown = false;
+    if (e.key === "Tab") global.tabDown = false;
     metaKeys = {
       ctrl: e.ctrlKey,
       shift: e.shiftKey,
@@ -82,9 +93,21 @@ module.exports.addEditorEvents = () => {
     setCanvasSize();
   };
 
-  window.addEventListener('beforeunload', function (event) {
-     if(tabManager.closeAll()) {
-       event.returnValue = true;
-     }
-   });
+  let closeAllowed = false;
+  window.addEventListener('beforeunload', function(event) {
+    if(global.forceAppReload) {
+      return true;
+    }
+
+    if(!closeAllowed) {
+      event.returnValue = true;
+    }
+
+    tabManager.closeAll(() => {
+      closeAllowed = true;
+      let mainWindow = remote.getCurrentWindow()
+      mainWindow.removeAllListeners('close');
+      mainWindow.destroy();
+    });
+  });
 };

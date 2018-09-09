@@ -54,7 +54,7 @@ function renameTab(index, name) {
   notifyTabDisplayer();
 }
 
-function closeTab(index = 0) {
+function closeTab(index = 0, callback = () => {}, saveAndCloseCallback = () => {}) {
   if (!tabs[index].saved) {
     switch (dialog.showMessageBox({
       type: "question",
@@ -65,19 +65,23 @@ function closeTab(index = 0) {
     })) {
       case 0:
         fileManager.save(tabs[index], tabs[index].getFileLocation(), () => {
-          closeTab(index);
+          saveAndCloseCallback();
+          tabs[index].saved = true;
+          // closeTab();
         });
-        return false;
+        // This needs to be improved, but is better than closing the editor before the save dialog is displayed
+        return "saveAndClose";
         break;
       case 1:
         // Close anyway
         break;
       case 2:
         // cancel
-        return false;
+        return "cancel";
         break;
     }
   }
+
   if (tabs.length > 1) {
     if (selectedTabIndex === index) {
       if (index >= tabs.length - 1) {
@@ -94,18 +98,49 @@ function closeTab(index = 0) {
     tabs.splice(index, 1);
     notifyTabDisplayer();
   }
-  return true;
+
+  callback();
+  return "closed";
 }
 
-module.exports.closeAll = () => {
-  let anyTabCancelled = false;
+module.exports.anyUnsavedFiles = () => {
   for (let i = 0; i < tabs.length; ++i) {
-    if (!closeTab(i)) {
-      anyTabCancelled = true;
+    if (!tabs[i].saved) {
+      return true;
     }
   }
-  return anyTabCancelled;
+  return false;
 };
+
+// Returns true if all tabs have been closed or false if cancel is pressed
+function closeAll(onAllClosed) {
+  let tabsClosedCount = 0;
+  let tabsCount = tabs.length;
+
+  for (let i = 0; i < tabs.length; ++i) {
+    let status = closeTab(i, () => {
+      tabsClosedCount++;
+
+      if(tabsClosedCount >= tabsCount) {
+        onAllClosed();
+      }
+    }, () => {
+      closeAll(onAllClosed);
+    });
+
+    if(status === "cancel") {
+      break;
+    }
+    else if(status === "closed") {
+      i--;
+    }
+    else if(status === "saveAndClose") {
+      return false;
+    }
+  }
+};
+
+module.exports.closeAll = closeAll;
 
 module.exports.handleNewTab = (fileName, fileLocation) => {
   let tabIndex = getTabIndexFromFileLocation(fileLocation + fileName);

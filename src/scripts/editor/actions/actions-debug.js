@@ -6,6 +6,7 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "debug: reload",
     action: () => {
+      global.forceAppReload = true;
       location.reload();
     },
     displayable: DISPLAY_DEBUG_COMMANDS,
