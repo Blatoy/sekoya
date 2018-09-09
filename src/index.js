@@ -17,7 +17,7 @@ function createWindow() {
   win.loadFile('src/html/editor.html');
 
   // Open DevTools
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   win.on('closed', () => {
     win = null
