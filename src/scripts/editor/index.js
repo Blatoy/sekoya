@@ -3,15 +3,6 @@ const basePath = remote.app.getAppPath();
 
 const config = require(basePath + "/config/general.json");
 const canvas = document.getElementById("main-canvas");
-const canvasMousePos = {
-    x: 0,
-    y: 0
-  },
-  mousePos = {
-    x: 0,
-    y: 0
-  },
-  mouseButtons = [false, false, false];
 
 const editorFolderPath = basePath + "/src/scripts/editor/";
 const utilsFolderPath = basePath + "/src/scripts/utils/";
@@ -23,6 +14,8 @@ const blockLoader = require(editorFolderPath + "block-loader.js");
 const tabManager = require(editorFolderPath + "tab-manager.js");
 const fileManager = require(editorFolderPath + "file-manager.js");
 const camera = require(editorFolderPath + "camera.js");
+
+const fs = require('fs');
 
 const STYLE = {
   BLOCKS: themeLoader.blocksStyle,
@@ -56,48 +49,10 @@ require(editorFolderPath + "/menus/menu-top-bar.js").setMenu();
 // already used to link blocks
 // require(editorFolderPath + "/menus/menu-context.js").setMenu();
 
+window.onerror = (msg, script, line) => {
+  let errorMessage = "[" + script + ":" + line +"] " + msg + "\n";
 
-/*const {remote} = require("electron");
-const basePath = remote.app.getAppPath();
-const config = require(basePath + "/config/general.json");
-const actionHandler = require(basePath + "/src/scripts/utils/action-handler.js");
-
-let canvasMousePos = {x: 0, y: 0}, mousePos = {x: 0, y: 0}, mouseButtons = [false, false, false];
-let canvas = document.getElementById("main-canvas");
-
-const dataManager = require(basePath + '/src/scripts/editor/data-manager.js');
-require(basePath + '/src/scripts/editor/main-renderer.js').startRendering();
-require(basePath + '/src/scripts/editor/main-updater.js').startUpdating();
-require(basePath + '/src/scripts/utils/theme-loader.js');
-require(basePath + "/src/scripts/editor/menu.js").setMenu();
-require(basePath + '/src/scripts/editor/menu-block-loader.js').load();
-require(basePath + '/src/scripts/editor/mouse-handler.js');
-require(basePath + '/src/scripts/editor/quick-access-bar.js');
-
-// Make sure the canvas is always using max space, called on resize
-function setCanvasSize() {
-
-}
-
-window.addEventListener("resize", () => {
-  setCanvasSize();
-});
-
-setCanvasSize();
-
-if(config.playFrenchSoundOnError) {
-  let errorAudio = new Audio();
-  errorAudio.src = "https://orikaru.net/dl/cul.mp3";
-  window.onerror = () => {
-    errorAudio.play();
-  };
-}
-*/
-
-if (config.playFrenchSoundOnError) {
-  let errorAudio = new Audio();
-  errorAudio.src = "https://orikaru.net/dl/cul.mp3";
-  window.onerror = () => {
-    errorAudio.play();
-  };
-}
+  fs.appendFile('sekoya-errors.log', errorMessage, function (err) {
+    if (err) throw err;
+  });
+};
