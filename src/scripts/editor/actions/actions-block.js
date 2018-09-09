@@ -328,14 +328,6 @@ module.exports.registerActions = () => {
     }
   });
 
-  actionHandler.addAction("blocks: exchange block order", (data) => {
-
-  }, () => {
-
-  }, (data) => {
-
-  });
-
   actionHandler.addAction("blocks: sort children using position - no undo", (data) => {
     data.parentBlock.sortChildrenByYPosition();
   });
