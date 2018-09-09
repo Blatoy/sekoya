@@ -857,6 +857,9 @@ class Block {
             if (global.metaKeys.ctrl && global.mouse.buttons[1]) {
               this.selectedForGroupAction = true;
             }
+            else if(global.mouse.buttons[1]) {
+              rootBlock.unselectAll();
+            }
 
             if (!this.dragged && global.mouse.buttons[1]) {
               this.dragged = true;
@@ -1247,7 +1250,7 @@ class Block {
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
 
-        ctx.fillText(this.name + " - " + this.parent.children.indexOf(this) /* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
+        ctx.fillText(this.name/* + " - " + this.parent.children.indexOf(this) *//* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
       }
 
 
