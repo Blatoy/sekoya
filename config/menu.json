@@ -95,6 +95,17 @@
         {
           "label": "Reset camera scaling",
           "action": "camera: reset zoom"
+        },
+        {
+            "type": "separator"
+        },
+        {
+          "label": "Fold all",
+          "action": "blocks: fold all"
+        },
+        {
+          "label": "Unfold all",
+          "action": "blocks: unfold all"
         }
       ]
     }

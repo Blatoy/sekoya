@@ -29,7 +29,6 @@ module.exports.registerActions = () => {
     action: () => {
       rootBlock.unselectAll();
     },
-    displayable: false,
     preventTriggerWhenInputFocused: false,
     preventTriggerWhenDialogOpen: false
   });
@@ -46,6 +45,38 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction({
+    name: "blocks: fold all",
+    action: () => {
+      let allBlocks = rootBlock.getChildrenRecursively();
+      actionHandler.separateMergeUndo();
+      for(let i = 0; i < allBlocks.length; ++i) {
+        if(!allBlocks[i].minimized) {
+          actionHandler.trigger("blocks: toggle children collapse", {
+            block: allBlocks[i],
+            minimized: false
+          }, false, true, true);
+        }
+      }
+    }
+  });
+
+  actionHandler.addAction({
+    name: "blocks: unfold all",
+    action: () => {
+      let allBlocks = rootBlock.getChildrenRecursively();
+      actionHandler.separateMergeUndo();
+      for(let i = 0; i < allBlocks.length; ++i) {
+        if(allBlocks[i].minimized) {
+          actionHandler.trigger("blocks: toggle children collapse", {
+            block: allBlocks[i],
+            minimized: true
+          }, false, true, true);
+        }
+      }
+    }
+  });
+
+  actionHandler.addAction({
     name: "blocks: toggle children collapse",
     action: (data, actionHandlerParameters) => {
       if (data.block.isRoot || data.block.children.length <= 0) {
@@ -53,7 +84,7 @@ module.exports.registerActions = () => {
         return false;
       }
       data.block.minimized = !data.minimizedState;
-      data.block.parent.autoLayout();
+      data.block.parent.autoLayout(true);
     },
     setData: (data = {}) => {
       let block = data.block,
@@ -74,9 +105,8 @@ module.exports.registerActions = () => {
     },
     undoAction: (data) => {
       data.block.minimized = data.minimizedState;
-      Block.getSelectedBlock().parent.autoLayout();
-    },
-    displayable: false
+      Block.getSelectedBlock().parent.autoLayout(true);
+    }
   });
 
   actionHandler.addAction({
