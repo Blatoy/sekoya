@@ -380,6 +380,7 @@ class Block {
         this.attributes[type][attributeName].value = attributes[type][attributeName];
       }
     }
+    this.commentHeightLoaded = false;
   }
 
   closePropertyWindow() {
