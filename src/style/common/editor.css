@@ -237,3 +237,41 @@ main {
   background-color: #eee;
   border-radius: 2px;
 }
+
+#search-container {
+  position: fixed;
+  right: 30px;
+  top: 40px;
+  width: 300px;
+  border-radius: 1px;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-bottom: 5px;
+  background-color: #eee;
+  box-shadow: 1px 1px 1px lightgray;
+}
+
+#search-block-text {
+  display: block;
+  width: calc(100% - 10px);
+  padding: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  box-sizing: border-box;
+}
+
+#search-result, #no-search-result {
+  margin-top: 5px;
+  display: inline-block;
+  color: #666;
+}
+
+#search-caption {
+  display: inline-block;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+#search-result-current, #search-result-total {
+  font-weight: bold;
+}

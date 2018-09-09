@@ -37,6 +37,7 @@ blockLoader.loadBlockDefinitions(() => {
 require(actionsFolderPath + "actions-tab.js").registerActions();
 require(actionsFolderPath + "actions-debug.js").registerActions();
 require(actionsFolderPath + "actions-block.js").registerActions();
+require(actionsFolderPath + "actions-search.js").registerActions();
 require(actionsFolderPath + "actions-core.js").registerActions();
 require(actionsFolderPath + "actions-file.js").registerActions();
 require(actionsFolderPath + "actions-quick-access.js").registerActions();

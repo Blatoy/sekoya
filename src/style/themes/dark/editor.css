@@ -128,3 +128,22 @@ input[type=button], button {
 .shortcut-background {
   background-color: #373C47;
 }
+
+#search-container {
+  background-color: #21252B;
+  box-shadow: 1px 1px 1px #111;
+}
+
+#search-result, #no-search-result {
+  color: white;
+}
+
+#no-search-result {
+  font-weight: bold;
+  color: #EE4444;
+}
+
+#search-result-current, #search-result-total {
+  font-weight: bold;
+  color: #66AF80;
+}

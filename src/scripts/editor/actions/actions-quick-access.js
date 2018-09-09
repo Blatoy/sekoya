@@ -8,12 +8,21 @@ module.exports.registerActions = () => {
     return quickAccessBlocks.display();
   }, false, false, 500, true, false);
 
+  actionHandler.addAction({
+    name: "quick access bar: add block dialog",
+    action: () => {return quickAccessBlocks.display();},
+    priority: 500,
+  });
+
   // We want an action for each user defined type
   for(let i = 0; i < config.connectionsTypes.length; ++i) {
-    actionHandler.addAction("quick access bar: add linked " + config.connectionsTypes[i].name + " block dialog", () => {
-        return quickAccessBlocks.displayLinked(i);
-    }, false, false, 500, true, false);
+    actionHandler.addAction({
+      name: "quick access bar: add linked " + config.connectionsTypes[i].name + " block dialog",
+      action: () => {return quickAccessBlocks.displayLinked(i);},
+      priority: 500,
+    });
   }
+
 
   actionHandler.addAction("quick access bar: execute action dialog", () => {
     quickAccessActions.display();

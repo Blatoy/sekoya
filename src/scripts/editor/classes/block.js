@@ -69,6 +69,7 @@ class Block {
     this.mouseOver = false;
     this.selected = false;
     this.selectedForGroupAction = false;
+    this.searchSelected = false;
     this.dragged = false;
     this.commentHeightLoaded = false;
 
@@ -350,9 +351,9 @@ class Block {
 
   getAttributesCopy() {
     let attributes = {};
-    for(let type in this.attributes) {
-      for(let attributeName in this.attributes[type]) {
-        if(!attributes[type]) {
+    for (let type in this.attributes) {
+      for (let attributeName in this.attributes[type]) {
+        if (!attributes[type]) {
           attributes[type] = {};
         }
         attributes[type][attributeName] = this.attributes[type][attributeName].value;
@@ -362,13 +363,13 @@ class Block {
   }
 
   setAttributes(attributes) {
-    for(let type in attributes) {
-      for(let attributeName in attributes[type]) {
-        if(!this.attributes[type]) {
+    for (let type in attributes) {
+      for (let attributeName in attributes[type]) {
+        if (!this.attributes[type]) {
           this.attributes[type] = {};
         }
 
-        if(!this.attributes[type][attributeName]) {
+        if (!this.attributes[type][attributeName]) {
           this.attributes[type][attributeName] = {
             value: "",
             defaultValue: "",
@@ -879,9 +880,9 @@ class Block {
       // Skip blocks if something was found
       if (!mouseOverAnyBlock && (!selectedBlock.dragged || this.dragged)) {
         // Handle mouse over display
-        if(this.children.length > 0 && this.isPositionOverMinimizeButton(global.mouse.cameraX, global.mouse.cameraY)) {
+        if (this.children.length > 0 && this.isPositionOverMinimizeButton(global.mouse.cameraX, global.mouse.cameraY)) {
           mouseOverAnyBlock = true;
-          if(global.mouse.buttons[1]) {
+          if (global.mouse.buttons[1]) {
             actionHandler.trigger("blocks: toggle children collapse", {
               block: this,
               minimized: this.minimized
@@ -1252,7 +1253,9 @@ class Block {
         ctx.fillStyle = this.style.color;
         ctx.strokeStyle = this.style.color;
       }
+
       ctx.fillRect(this.position.x, this.getYPosition() /** this.style.font.size*/ , this.size.width, this.size.height);
+
 
       // Selection border
       if (this.selected) {
@@ -1275,6 +1278,12 @@ class Block {
           parseInt(ctx.fillStyle.slice(5, 7), 16)) /
         3) <= 128 ? "white" : "black";
 
+      if (this.searchSelected) {
+        ctx.fillStyle = "rgba(255, 255, 255, " + Math.abs(Math.sin(tick * 0.05) * 0.8 + 0.1) + ")";
+        ctx.fillRect(this.position.x, this.getYPosition() /** this.style.font.size*/ , this.size.width, this.size.height);
+      }
+
+
       if (this.children.length > 0 && this.minimized) {
         // Draw an indicator that this block is minimized
         ctx.fillStyle = this.style.collapseCross.color;
@@ -1286,7 +1295,7 @@ class Block {
         );
         // |
         ctx.fillRect(
-          this.position.x + this.size.width + (this.style.collapseCross.padding - this.style.collapseCross.width + this.style.collapseCross.size) / 2 ,
+          this.position.x + this.size.width + (this.style.collapseCross.padding - this.style.collapseCross.width + this.style.collapseCross.size) / 2,
           this.getYPosition() + (this.size.height - (this.style.collapseCross.size)) / 2,
           this.style.collapseCross.width, this.style.collapseCross.size
         );

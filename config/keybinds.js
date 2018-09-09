@@ -456,4 +456,32 @@ module.exports = [{
     shift: false,
     action: "blocks: paste selection"
   },
+  {
+    key: 'f',
+    ctrl: true,
+    alt: false,
+    shift: false,
+    action: "search: display"
+  },
+  {
+    key: 'Escape',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "search: hide"
+  },
+  {
+    key: 'Enter',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "search: next result"
+  },
+  {
+    key: 'Enter',
+    ctrl: false,
+    alt: false,
+    shift: true,
+    action: "search: previous result"
+  },
 ];
