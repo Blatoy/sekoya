@@ -48,6 +48,13 @@ module.exports = [{
     action: "blocks: auto layout"
   },
   {
+    key: 'm',
+    ctrl: false,
+    alt: false,
+    shift: false,
+    action: "blocks: toggle children collapse"
+  },
+  {
     key: 'Space',
     ctrl: false,
     alt: false,

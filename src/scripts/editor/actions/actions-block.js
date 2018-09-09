@@ -46,6 +46,36 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction({
+    name: "blocks: toggle children collapse",
+    action: (data, actionHandlerParameters) => {
+      if(data.block.isRoot || data.block.children.length <= 0) {
+        actionHandlerParameters.cancelUndo = true;
+        return false;
+      }
+      data.block.minimized = !data.minimizedState;
+      data.block.parent.autoLayout();
+    },
+    setData: (data = {}) => {
+      let block = data.block, minimized = data.minimized;
+
+      if(block === undefined) {
+        block = Block.getSelectedBlock();
+      }
+
+      if(minimized === undefined) {
+        minimized = Block.getSelectedBlock().minimized;
+      }
+
+      return {block: block, minimizedState: minimized};
+    },
+    undoAction: (data) => {
+      data.block.minimized = data.minimizedState;
+      Block.getSelectedBlock().parent.autoLayout();
+    },
+    displayable: false
+  });
+
+  actionHandler.addAction({
     name: "blocks: close settings dialog",
     action: () => {
       Block.getSelectedBlock().closePropertyWindow();
@@ -317,10 +347,7 @@ module.exports.registerActions = () => {
       tabManager.setFileModified();
     }
   });
-  /*"blocks: copy selection", () => {
 
-  });
-*/
   // This is currently not in used as we now undo the position as well
   // This still may be useful in the future and since it's work
   // the code will only be deleted if it's reall proven useless

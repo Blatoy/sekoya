@@ -97,6 +97,7 @@ class Block {
       border: getBlockStyleProperty(this.type, "border"),
       comment: getBlockStyleProperty(this.type, "comment"),
       copySelectionColor: getBlockStyleProperty(this.type, "copySelectionColor"),
+      collapseCross: getBlockStyleProperty(this.type, "collapseCross")
     };
 
     // Blocks cannot be orphan
@@ -414,23 +415,27 @@ class Block {
     extraHeight += this.commentHeight;
 
     // Everything displayed below the parents count as the block's height
-    this.children.forEach((child) => {
-      if (getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
-        extraHeight += child.getFullHeight();
-      }
-    });
+    if (!this.minimized) {
+      this.children.forEach((child) => {
+        if (getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
+          extraHeight += child.getFullHeight();
+        }
+      });
+    }
 
     return this.size.height + this.style.margin.y + extraHeight;
   }
 
   getMaxRecursiveHeight(previousHeight = 0) {
     let childrenTotalHeight = 0;
-    this.children.forEach((child) => {
-      // This is already taken into account in the getFullHeight()
-      if (!getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
-        childrenTotalHeight += child.getMaxRecursiveHeight();
-      }
-    });
+    if (!this.minimized) {
+      this.children.forEach((child) => {
+        // This is already taken into account in the getFullHeight()
+        if (!getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
+          childrenTotalHeight += child.getMaxRecursiveHeight();
+        }
+      });
+    }
     return Math.max(childrenTotalHeight, this.getFullHeight());
   }
 
@@ -635,7 +640,14 @@ class Block {
       x < this.position.x + this.size.width;
   }
 
+  isPositionOverMinimizeButton(x, y) {
+    let crossX = this.position.x + this.size.width + this.style.collapseCross.padding / 2;
+    return y > this.getYPosition() && y < this.getYPosition() + this.size.height &&
+      x > crossX && x < crossX + this.style.collapseCross.size;
+  }
+
   setSelected(moveCamera = false) {
+    // We really don't want root to be selected so we try to select anything else
     if (this.isRoot) {
       if (this.children[1]) {
         if (selectedBlock) {
@@ -657,8 +669,25 @@ class Block {
         camera.centerOnSmooth(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2);
       }
 
+      if (this.isRecursiveParentMinimized() !== false) {
+        actionHandler.trigger("blocks: toggle children collapse", {
+          block: this.isRecursiveParentMinimized(),
+          minimized: true
+        });
+      }
+
       this.selected = true;
       selectedBlock = this;
+    }
+  }
+
+  isRecursiveParentMinimized() {
+    if (this.isRoot) {
+      return false;
+    } else if (this.parent.minimized) {
+      return this.parent;
+    } else {
+      return this.parent.isRecursiveParentMinimized();
     }
   }
 
@@ -736,18 +765,18 @@ class Block {
     return results;
   }
 
-  // Move to previous / next sibling
+  // Move to the closest block
   moveSelectedUpDown(direction) {
     let closestBlock = this.getNearestBlock(direction, "y").bestBlock;
-    if (closestBlock) {
+    if (closestBlock && closestBlock.isRecursiveParentMinimized() === false) {
       closestBlock.setSelected(true);
     }
   }
 
-  // Move to parent / first child
+  // Move to the closest block
   moveSelectedLeftRight(direction) {
     let closestBlock = this.getNearestBlock(direction, "x").bestBlock;
-    if (closestBlock) {
+    if (closestBlock && closestBlock.isRecursiveParentMinimized() === false) {
       closestBlock.setSelected(true);
     }
   }
@@ -849,6 +878,15 @@ class Block {
       // Skip blocks if something was found
       if (!mouseOverAnyBlock && (!selectedBlock.dragged || this.dragged)) {
         // Handle mouse over display
+        if(this.children.length > 0 && this.isPositionOverMinimizeButton(global.mouse.cameraX, global.mouse.cameraY)) {
+          mouseOverAnyBlock = true;
+          if(global.mouse.buttons[1]) {
+            actionHandler.trigger("blocks: toggle children collapse", {
+              block: this,
+              minimized: this.minimized
+            });
+          }
+        }
         if (this.isPositionOver(global.mouse.cameraX, global.mouse.cameraY) && !global.dialogOpen) {
           if (!this.isRoot) {
             this.mouseOver = true;
@@ -856,8 +894,7 @@ class Block {
 
             if (global.metaKeys.ctrl && global.mouse.buttons[1]) {
               this.selectedForGroupAction = true;
-            }
-            else if(global.mouse.buttons[1]) {
+            } else if (global.mouse.buttons[1]) {
               rootBlock.unselectAll();
             }
 
@@ -1076,42 +1113,44 @@ class Block {
     }
 
     // Render links
-    this.children.forEach((child, i) => {
-      // We don't want to draw the connection from the hidden root to its children, except for the first element
-      if (!this.isRoot || i == 0) {
-        const dashInterval = getLinkStyleProperty(child.linkToParentType, "dashInterval");
-        const baseLinkLength = getLinkStyleProperty(child.linkToParentType, "baseLength");
+    if (!this.minimized) {
+      this.children.forEach((child, i) => {
+        // We don't want to draw the connection from the hidden root to its children, except for the first element
+        if (!this.isRoot || i == 0) {
+          const dashInterval = getLinkStyleProperty(child.linkToParentType, "dashInterval");
+          const baseLinkLength = getLinkStyleProperty(child.linkToParentType, "baseLength");
 
-        ctx.strokeStyle = getLinkStyleProperty(child.linkToParentType, "color");
-        ctx.lineWidth = getLinkStyleProperty(child.linkToParentType, "lineWidth");
+          ctx.strokeStyle = getLinkStyleProperty(child.linkToParentType, "color");
+          ctx.lineWidth = getLinkStyleProperty(child.linkToParentType, "lineWidth");
 
-        if (dashInterval == 0) {
-          ctx.setLineDash([]);
-        } else {
-          ctx.setLineDash([dashInterval]);
+          if (dashInterval == 0) {
+            ctx.setLineDash([]);
+          } else {
+            ctx.setLineDash([dashInterval]);
+          }
+
+          ctx.beginPath();
+          // Blocks displayed below their parent are styled in another manner
+          if (!getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
+            camera.drawSegment(ctx, this.position.x + this.size.width, this.getYPosition() + this.size.height * 0.5,
+              this.position.x + this.size.width + baseLinkLength, this.getYPosition() + this.size.height * 0.5);
+            camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, this.getYPosition() + this.size.height * 0.5,
+              this.position.x + this.size.width + baseLinkLength, child.getYPosition() + child.size.height * 0.5);
+            camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, child.getYPosition() + child.size.height * 0.5,
+              child.position.x, child.getYPosition() + child.size.height * 0.5);
+          } else {
+            camera.drawSegment(ctx, this.position.x, this.getYPosition() + this.size.height,
+              this.position.x, child.getYPosition() + child.size.height * 0.5);
+            camera.drawSegment(ctx, this.position.x, child.getYPosition() + child.size.height * 0.5,
+              child.position.x, child.getYPosition() + child.size.height * 0.5);
+          }
+
+          ctx.stroke();
         }
 
-        ctx.beginPath();
-        // Blocks displayed below their parent are styled in another manner
-        if (!getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
-          camera.drawSegment(ctx, this.position.x + this.size.width, this.getYPosition() + this.size.height * 0.5,
-            this.position.x + this.size.width + baseLinkLength, this.getYPosition() + this.size.height * 0.5);
-          camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, this.getYPosition() + this.size.height * 0.5,
-            this.position.x + this.size.width + baseLinkLength, child.getYPosition() + child.size.height * 0.5);
-          camera.drawSegment(ctx, this.position.x + this.size.width + baseLinkLength, child.getYPosition() + child.size.height * 0.5,
-            child.position.x, child.getYPosition() + child.size.height * 0.5);
-        } else {
-          camera.drawSegment(ctx, this.position.x, this.getYPosition() + this.size.height,
-            this.position.x, child.getYPosition() + child.size.height * 0.5);
-          camera.drawSegment(ctx, this.position.x, child.getYPosition() + child.size.height * 0.5,
-            child.position.x, child.getYPosition() + child.size.height * 0.5);
-        }
-
-        ctx.stroke();
-      }
-
-      child.renderConnections(ctx);
-    });
+        child.renderConnections(ctx);
+      });
+    }
   }
 
   // TODO: Only call this when comment is changed to improve render speed
@@ -1207,8 +1246,7 @@ class Block {
         // Selected color
         ctx.fillStyle = this.style.copySelectionColor;
         ctx.strokeStyle = this.style.copySelectionColor;
-      }
-      else {
+      } else {
         // Normal block color
         ctx.fillStyle = this.style.color;
         ctx.strokeStyle = this.style.color;
@@ -1236,6 +1274,23 @@ class Block {
           parseInt(ctx.fillStyle.slice(5, 7), 16)) /
         3) <= 128 ? "white" : "black";
 
+      if (this.children.length > 0 && this.minimized) {
+        // Draw an indicator that this block is minimized
+        ctx.fillStyle = this.style.collapseCross.color;
+        // -
+        ctx.fillRect(
+          this.position.x + this.size.width + this.style.collapseCross.padding / 2,
+          this.getYPosition() + (this.size.height - this.style.collapseCross.width) / 2,
+          this.style.collapseCross.size, this.style.collapseCross.width
+        );
+        // |
+        ctx.fillRect(
+          this.position.x + this.size.width + (this.style.collapseCross.padding - this.style.collapseCross.width + this.style.collapseCross.size) / 2 ,
+          this.getYPosition() + (this.size.height - (this.style.collapseCross.size)) / 2,
+          this.style.collapseCross.width, this.style.collapseCross.size
+        );
+      }
+
       // Mouse over color
       if (this.mouseOver) {
         ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
@@ -1250,18 +1305,22 @@ class Block {
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
 
-        ctx.fillText(this.name/* + " - " + this.parent.children.indexOf(this) *//* + " - " + selectedBlock.isRecursiveChild(this)  + " - " + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")"*/ , this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
+        if (!global.debugEnabled) {
+          ctx.fillText(this.name, this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
+        } else {
+          ctx.fillText("[" + this.parent.children.indexOf(this) + "] " + this.name + " / " /*+ selectedBlock.isRecursiveChild(this)  + " - "*/ + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")", this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
+        }
       }
 
-
       // DEBUG: Display blocks real height
-      /*ctx.setLineDash([]);
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "red";
-      ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getFullHeight());
-      ctx.strokeStyle = "blue";
-      ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getMaxRecursiveHeight());*/
-
+      if (global.debugEnabled) {
+        ctx.setLineDash([]);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "rgba(255, 0, 0, 0.4)";
+        ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getFullHeight());
+        ctx.strokeStyle = "rgba(50, 100, 250, 0.4)";
+        ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getMaxRecursiveHeight());
+      }
 
       ctx.textAlign = "left";
       ctx.fillStyle = this.style.attributeColor;
@@ -1271,7 +1330,6 @@ class Block {
       // Render attributes
       for (let type in this.attributes) {
         for (let i in this.attributes[type]) {
-          // Skip comment (TODO: Skip IsMinimized)
           if (this.attributes[type][i].name !== config.commentAttributeName) {
             // Draw rect instead of text when zoomed out too much to increase performances
             if (camera.getScaling() < 0.4) {
@@ -1286,9 +1344,11 @@ class Block {
       }
     }
 
-    this.children.forEach((child) => {
-      child.render(ctx);
-    });
+    if (!this.minimized) {
+      this.children.forEach((child) => {
+        child.render(ctx);
+      });
+    }
 
     if (this.isRoot) {
       // Render block selection
@@ -1299,20 +1359,6 @@ class Block {
     }
   }
 }
-/*
-
-  getNearest(position, smallestDist = Infinity) {
-    let dist = Math.sqrt((this.position.x - position.x)**2 + (this.position.y - position.y)**2);
-    let closestChild = this; // i don't really want to select rootBlock though uh fk i'm tired
-    this.children.forEach((child) => {
-
-      /*if(child.getNearest(position, smallestDist) < smallestDist) {
-
-      }
-    });
-    return closestChild;
-  }
-  */
 
 Block.setSelectedCenterView = () => {
   let minDistance = Infinity; // guhguguu0
@@ -1325,7 +1371,7 @@ Block.setSelectedCenterView = () => {
   allBlocks.forEach((block) => {
     let dist = Math.sqrt((block.position.x - centerX) ** 2 + (block.position.y - centerY) ** 2);
 
-    if (dist < minDistance) {
+    if (dist < minDistance && block.isRecursiveParentMinimized() === false) {
       minDistance = dist;
       minDistanceBlock = block;
     }
