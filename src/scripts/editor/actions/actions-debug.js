@@ -1,5 +1,7 @@
 const DISPLAY_DEBUG_COMMANDS = true;
 
+global.debugEnabled = false;
+
 module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "debug: reload",
@@ -10,6 +12,28 @@ module.exports.registerActions = () => {
     preventTriggerWhenDialogOpen: false,
     preventTriggerWhenInputFocused: false
   });
+
+  actionHandler.addAction({
+    name: "debug: toggle dev tools",
+    action: () => {
+        require("electron").remote.getCurrentWindow().toggleDevTools();
+    },
+    displayable: DISPLAY_DEBUG_COMMANDS,
+    preventTriggerWhenDialogOpen: false,
+    preventTriggerWhenInputFocused: false
+  });
+
+  actionHandler.addAction({
+    name: "debug: toggle",
+    action: () => {
+      global.debugEnabled = !global.debugEnabled;
+    },
+    displayable: DISPLAY_DEBUG_COMMANDS,
+    preventTriggerWhenDialogOpen: false,
+    preventTriggerWhenInputFocused: false
+  });
+
+
   /*
     actionHandler.addAction({name:}"debug: log definitions", () => {
       console.log(blockLoader.getBlockDefinitions())

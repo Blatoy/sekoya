@@ -1,10 +1,11 @@
 const ctx = canvas.getContext("2d");
-global.tick = 0;
 
 let fps = 0, displayedFps = 0;
+global.tick = 0;
 
 function mainLoop() {
   global.tick++,
+
   rootBlock.update();
   camera.update();
 
@@ -16,19 +17,27 @@ function mainLoop() {
     rootBlock.render(ctx, camera);
     camera.resetTransforms(ctx);
 
-    /// DEBUG
+    if(global.debugEnabled) {
       fps++;
+
       let currentHistory = actionHandler.setHistory({undo: [], redo: []});
+      let lineCount = 1;
+
       ctx.fillStyle = "gray";
-      ctx.fillText("Sekoya - ALPHA 0.1", canvas.width - 100, 10)
-      /*ctx.fillText("FPS: " + displayedFps, canvas.width - 50, 10)
+      ctx.textAlign = "right";
+      ctx.fillText("Sekoya - ALPHA 0.1", canvas.width - 10, lineCount++ * 10);
+      ctx.fillText("FPS: " + displayedFps, canvas.width - 10, lineCount++ * 10);
+      lineCount++;
+      ctx.fillText("== HISTORY ==", canvas.width - 10, lineCount++ * 10);
+
       for(let i = 0; i < currentHistory.undo.length; ++i) {
         if(currentHistory.undo[i]) {
-          let s = ctx.measureText(" - " + (currentHistory.undo[i].actionName || currentHistory.undo[i][0].actionName));
-          ctx.fillText(" - " + (currentHistory.undo[i].actionName || currentHistory.undo[i][0].actionName), canvas.width - s.width - 10, 18 + i * 18)
+          ctx.fillText(" ("+i+") " + (currentHistory.undo[i].actionName || currentHistory.undo[i][0].actionName), canvas.width - 10, lineCount++ * 10)
         }
-      }*/
+      }
       actionHandler.setHistory(currentHistory);
+    }
+
     /// END DEBUG
 
   }
