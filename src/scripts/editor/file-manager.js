@@ -73,6 +73,11 @@ function getXMLRecursively(block, depth = 0) {
       for (let attribute in block.attributes[type]) {
         blockData += '<' + type + ' id="' + block.attributes[type][attribute].name + '">' + encodeXML(block.attributes[type][attribute].value) + '</' + type + '>';
       }
+      if(config.minimizedAttributeName !== "") {
+        if(block.minimized) {
+          blockData += '<string id="' + config.minimizedAttributeName + '">yes</string>';
+        }
+      }
     }
     if (block.children.length > 0) {
       let previousLinkToParentType = block.children[0].linkToParentType;
@@ -142,18 +147,25 @@ function createBlockRecursively(element, parentBlock, linkToParentType) {
           createBlockRecursively(childElement.elements[j], newBlock, childName);
         }
       } else {
-        // This is an attribute of newBlock
-        if (!newBlock.attributes[childElement.name]) {
-          newBlock.attributes[childElement.name] = {};
-        }
-
-        let value = childElement.elements ? childElement.elements[0].text : undefined;
-        if (value !== undefined) {
-          if(!newBlock.attributes[childElement.name][childElement.attributes.id]) {
-            newBlock.attributes[childElement.name][childElement.attributes.id] = {name: childName, value: value};
+        if(config.minimizedAttributeName !== "" && childName !== config.minimizedAttributeName) {
+          // This is an attribute of newBlock
+          if (!newBlock.attributes[childElement.name]) {
+            newBlock.attributes[childElement.name] = {};
           }
-          else {
-            newBlock.attributes[childElement.name][childElement.attributes.id].value = value;
+
+          let value = childElement.elements ? childElement.elements[0].text : undefined;
+          if (value !== undefined) {
+            if(!newBlock.attributes[childElement.name][childElement.attributes.id]) {
+              newBlock.attributes[childElement.name][childElement.attributes.id] = {name: childName, value: value};
+            }
+            else {
+              newBlock.attributes[childElement.name][childElement.attributes.id].value = value;
+            }
+          }
+        }
+        else {
+          if(childName === config.minimizedAttributeName) {
+            newBlock.minimized = true;
           }
         }
       }

@@ -31,5 +31,7 @@
     },
   "multiSelectSeparator": ";;",
   "//": "This allows to automatically add an attribute with a custom name that will be used for comments. Leave empty for none",
-    "commentAttributeName": "Comment"
+    "commentAttributeName": "Comment",
+  "//": "This allows saving children collapsed status. Leave empty if you don't want to save this",
+    "minimizedAttributeName": "Minimized"
 }
