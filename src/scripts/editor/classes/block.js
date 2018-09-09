@@ -348,39 +348,41 @@ class Block {
     }
   }
 
-  closePropertyWindow(save = true) {
-    if (save) {
-      this.commentHeightLoaded = false;
-      let propertyElementList = document.getElementsByClassName("__property-value");
-      for (let i = 0; i < propertyElementList.length; ++i) {
-        let propertyElement = propertyElementList[i];
-        this.attributes[propertyElement.dataset.attributeType][propertyElement.dataset.attributeName].value = propertyElement.value;
-      }
-
-      let propertyCheckboxList = document.getElementsByClassName("__property-value-checkbox");
-      let checkedValues = [];
-      let lastType = "",
-        lastName = "";
-
-      for (let i = 0; i < propertyCheckboxList.length; ++i) {
-        let checkbox = propertyCheckboxList[i];
-        if (lastName !== checkbox.dataset.attributeName) {
-          if (lastName !== "") {
-            this.attributes[lastType][lastName].value = checkedValues.join(config.multiSelectSeparator);
-            checkedValues = [];
-          }
-          lastName = checkbox.dataset.attributeName;
-          lastType = checkbox.dataset.attributeType;
+  getAttributesCopy() {
+    let attributes = {};
+    for(let type in this.attributes) {
+      for(let attributeName in this.attributes[type]) {
+        if(!attributes[type]) {
+          attributes[type] = {};
         }
-        if (checkbox.checked) {
-          checkedValues.push(checkbox.value);
-        }
-      }
-      if (lastName !== "") {
-        this.attributes[lastType][lastName].value = checkedValues.join(config.multiSelectSeparator);
+        attributes[type][attributeName] = this.attributes[type][attributeName].value;
       }
     }
+    return attributes;
+  }
 
+  setAttributes(attributes) {
+    for(let type in attributes) {
+      for(let attributeName in attributes[type]) {
+        if(!this.attributes[type]) {
+          this.attributes[type] = {};
+        }
+
+        if(!this.attributes[type][attributeName]) {
+          this.attributes[type][attributeName] = {
+            value: "",
+            defaultValue: "",
+            name: attributeName,
+            shortName: "",
+          };
+        }
+        this.attributes[type][attributeName].value = attributes[type][attributeName];
+      }
+    }
+  }
+
+  closePropertyWindow() {
+    this.commentHeightLoaded = false;
     this.propertyDialogDisplayed = false;
     global.dialogOpen = false;
     let divBackground = document.getElementById("block-properties-background");
@@ -525,7 +527,6 @@ class Block {
           copiedBlock.attributes[attributeType][attributeName][attributeAttributes] = this.attributes[attributeType][attributeName][attributeAttributes];
         }
       }
-      // console.log(this.attributes[attributeGroupedByType], attributeGroupedByType);
     }
 
     // TODO: Set all properties, position offset to keep stuff when pasted, ...

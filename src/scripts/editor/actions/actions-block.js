@@ -48,7 +48,7 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "blocks: toggle children collapse",
     action: (data, actionHandlerParameters) => {
-      if(data.block.isRoot || data.block.children.length <= 0) {
+      if (data.block.isRoot || data.block.children.length <= 0) {
         actionHandlerParameters.cancelUndo = true;
         return false;
       }
@@ -56,17 +56,21 @@ module.exports.registerActions = () => {
       data.block.parent.autoLayout();
     },
     setData: (data = {}) => {
-      let block = data.block, minimized = data.minimized;
+      let block = data.block,
+        minimized = data.minimized;
 
-      if(block === undefined) {
+      if (block === undefined) {
         block = Block.getSelectedBlock();
       }
 
-      if(minimized === undefined) {
+      if (minimized === undefined) {
         minimized = Block.getSelectedBlock().minimized;
       }
 
-      return {block: block, minimizedState: minimized};
+      return {
+        block: block,
+        minimizedState: minimized
+      };
     },
     undoAction: (data) => {
       data.block.minimized = data.minimizedState;
@@ -77,8 +81,63 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction({
     name: "blocks: close settings dialog",
-    action: () => {
-      Block.getSelectedBlock().closePropertyWindow();
+    action: (data) => {
+      data.block.setAttributes(data.newAttributes);
+      data.block.closePropertyWindow();
+      tabManager.setFileModified();
+    },
+    setData: () => {
+      // Retrieve all the data
+      let attributes = {};
+      let propertyElementList = document.getElementsByClassName("__property-value");
+      for (let i = 0; i < propertyElementList.length; ++i) {
+        let propertyElement = propertyElementList[i];
+        // I think it would make it way cleaner to store the type into the object itself instead of doing that...
+        if (!attributes[propertyElement.dataset.attributeType]) {
+          attributes[propertyElement.dataset.attributeType] = {};
+        }
+        attributes[propertyElement.dataset.attributeType][propertyElement.dataset.attributeName] = propertyElement.value;
+      }
+
+      let propertyCheckboxList = document.getElementsByClassName("__property-value-checkbox");
+      let checkedValues = [];
+      let lastType = "",
+        lastName = "";
+
+      for (let i = 0; i < propertyCheckboxList.length; ++i) {
+        let checkbox = propertyCheckboxList[i];
+        if (lastName !== checkbox.dataset.attributeName) {
+          if (lastName !== "") {
+            if (!attributes[lastType]) {
+              attributes[lastType] = {};
+            }
+            attributes[lastType][lastName] = checkedValues.join(config.multiSelectSeparator);
+            checkedValues = [];
+          }
+          lastName = checkbox.dataset.attributeName;
+          lastType = checkbox.dataset.attributeType;
+        }
+        if (checkbox.checked) {
+          checkedValues.push(checkbox.value);
+        }
+      }
+
+      if (lastName !== "") {
+        if (!attributes[lastType]) {
+          attributes[lastType] = {};
+        }
+        attributes[lastType][lastName] = checkedValues.join(config.multiSelectSeparator);
+      }
+
+      return {
+        newAttributes: attributes,
+        block: Block.getSelectedBlock(),
+        oldAttributes: Block.getSelectedBlock().getAttributesCopy()
+      };
+    },
+    undoAction: (data) => {
+      data.block.setAttributes(data.oldAttributes);
+      //data.block.closePropertyWindow();
       tabManager.setFileModified();
     },
     displayable: false,
@@ -91,8 +150,7 @@ module.exports.registerActions = () => {
     action: (data, actionHandlerParameters) => {
       if (data.newPosition.x === data.oldPosition.x && data.newPosition.y === data.oldPosition.y) {
         actionHandlerParameters.cancelUndo = true;
-      }
-      else {
+      } else {
         tabManager.setFileModified();
       }
 
@@ -320,14 +378,17 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "blocks: paste selection",
     action: (data) => {
-      if(copiedBlocks.length < 1) return false;
+      if (copiedBlocks.length < 1) return false;
       rootBlock.unselectAll();
 
-      let leftestPosition = {x: copiedBlocks[0].position.x, y: copiedBlocks[0].position.y};
+      let leftestPosition = {
+        x: copiedBlocks[0].position.x,
+        y: copiedBlocks[0].position.y
+      };
       for (let i = 0; i < copiedBlocks.length; ++i) {
-        if(leftestPosition.x > copiedBlocks[i].position.x) {
-           leftestPosition.x = copiedBlocks[i].position.x;
-           leftestPosition.y = copiedBlocks[i].position.y;
+        if (leftestPosition.x > copiedBlocks[i].position.x) {
+          leftestPosition.x = copiedBlocks[i].position.x;
+          leftestPosition.y = copiedBlocks[i].position.y;
         }
       }
 
