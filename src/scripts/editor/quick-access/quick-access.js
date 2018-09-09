@@ -114,12 +114,6 @@ function getSearchScoreAndCharactersMatchIndexes(search, text) {
     if (!found) {
       score--;
     }
-    /*if (!found) {
-      return {
-        score: 0,
-        characterMatchIndexes: characterMatchIndexes
-      };
-    }*/
   }
 
   return {
