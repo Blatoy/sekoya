@@ -397,7 +397,9 @@ module.exports.registerActions = () => {
         let newBlock = copiedBlocks[i].getCopy()
         newBlock.position.x += global.mouse.cameraX - leftestPosition.x;
         newBlock.position.y += global.mouse.cameraY - leftestPosition.y;
-        newBlock.selectedForGroupAction = true;
+        if (copiedBlocks.length > 1) {
+          newBlock.selectedForGroupAction = true;
+        }
         newBlock.preventCameraCentering = true;
         // TODO: Merge with previous or something like this
         actionHandler.trigger("blocks: add block", {
