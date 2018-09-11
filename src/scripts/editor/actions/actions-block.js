@@ -117,6 +117,10 @@ module.exports.registerActions = () => {
       tabManager.setFileModified();
     },
     setData: () => {
+      if(document.getElementById("block-properties-background").style.display === "none") {
+        return false;
+      }
+
       // Retrieve all the data
       let attributes = {};
       let propertyElementList = document.getElementsByClassName("__property-value");
