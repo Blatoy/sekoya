@@ -6,6 +6,8 @@ global.mouse = {
   y: 0,
   canvasX: 0,
   canvasY: 0,
+  cameraX: 0,
+  cameraY: 0,
   buttons: {}
 };
 
@@ -51,7 +53,9 @@ module.exports.addEditorEvents = () => {
   });
 
   window.addEventListener("dblclick", (e) => {
-    actionHandler.trigger("blocks: display settings for selected block")
+    if(Block.getSelectedBlock().isPositionOver(global.mouse.cameraX, global.mouse.cameraY)) {
+      actionHandler.trigger("blocks: display settings for selected block")
+    }
   });
 
   window.addEventListener("keydown", (e) => {
