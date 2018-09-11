@@ -76,8 +76,8 @@ module.exports = [{
     action: "tabs: create new tab"
   },
   {
-    key: 'h',
-    ctrl: true,
+    key: 'F1',
+    ctrl: false,
     alt: false,
     shift: false,
     action: "core: display about"
