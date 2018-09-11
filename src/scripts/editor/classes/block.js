@@ -1020,9 +1020,11 @@ class Block {
       }
     }
 
-    this.children.forEach((child) => {
-      child.handleMouseInteraction();
-    });
+    if(!this.minimized) {
+      this.children.forEach((child) => {
+        child.handleMouseInteraction();
+      });  
+    }
   }
 
   unselectAll() {
