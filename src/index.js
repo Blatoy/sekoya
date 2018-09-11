@@ -10,18 +10,24 @@ function createWindow() {
   win = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: 'src/images/icon.png'
+    icon: 'src/images/icon.png',
+    show: false
   });
+
+  win.maximize();
 
   // Load the index.html of the app
   win.loadFile('src/html/editor.html');
 
   // Open DevTools
   // win.webContents.openDevTools();
-
   win.on('closed', () => {
     win = null
   });
+
+  win.once('ready-to-show', () => {
+    win.show();
+  })
 }
 
 // Called when Electron has finished initialization
