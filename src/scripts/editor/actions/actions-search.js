@@ -33,7 +33,7 @@ module.exports.registerActions = () => {
                 break;
               }
             }
-            if (allBlocks[i].name.toLowerCase().includes(inputSearch.value) || foundInAttributes) {
+            if (allBlocks[i].name.toLowerCase().includes(searchedValue) || foundInAttributes) {
               searchResults.push(allBlocks[i]);
               allBlocks[i].searchSelected = true;
             } else {
