@@ -1,5 +1,7 @@
 {
   "all": {
+    "selectAreaColor": "rgba(168, 202, 237, 0.5)",
+    "selectedColor": "rgb(198, 232, 255)",
     "attributeColor": "black",
     "rootPosition": {
       "x": 15,

@@ -97,7 +97,8 @@ class Block {
       blockBelowParentMargin: getBlockStyleProperty(this.type, "blockBelowParentMargin"),
       border: getBlockStyleProperty(this.type, "border"),
       comment: getBlockStyleProperty(this.type, "comment"),
-      copySelectionColor: getBlockStyleProperty(this.type, "copySelectionColor"),
+      selectAreaColor: getBlockStyleProperty(this.type, "selectAreaColor"),
+      selectedColor: getBlockStyleProperty(this.type, "selectedColor"),
       collapseCross: getBlockStyleProperty(this.type, "collapseCross")
     };
 
@@ -1023,7 +1024,7 @@ class Block {
     if(!this.minimized) {
       this.children.forEach((child) => {
         child.handleMouseInteraction();
-      });  
+      });
     }
   }
 
@@ -1249,8 +1250,8 @@ class Block {
 
       if (this.selectedForGroupAction) {
         // Selected color
-        ctx.fillStyle = this.style.copySelectionColor;
-        ctx.strokeStyle = this.style.copySelectionColor;
+        ctx.fillStyle = this.style.selectedColor;
+        ctx.strokeStyle = this.style.selectedColor;
       } else {
         // Normal block color
         ctx.fillStyle = this.style.color;
@@ -1259,6 +1260,14 @@ class Block {
 
       ctx.fillRect(this.position.x, this.getYPosition() /** this.style.font.size*/ , this.size.width, this.size.height);
 
+
+      // Text is white or black depending on the colour of the block
+      const hexColor = ctx.fillStyle;
+      const red =  parseInt(hexColor.slice(1, 3), 16);
+      const green =  parseInt(hexColor.slice(3, 5), 16);
+      const blue =  parseInt(hexColor.slice(5, 7), 16);
+      const gray = red * 0.299 + green * 0.587 + blue * 0.114;
+      const textColour = gray < 140 ? "white" : "black";
 
       // Selection border
       if (this.selected) {
@@ -1274,12 +1283,6 @@ class Block {
         ctx.lineDashOffset = 0;
       }
 
-      // Text is white or black depending on the colour of the block
-      const textColour = ((
-          parseInt(ctx.fillStyle.slice(1, 3), 16) +
-          parseInt(ctx.fillStyle.slice(3, 5), 16) +
-          parseInt(ctx.fillStyle.slice(5, 7), 16)) /
-        3) <= 128 ? "white" : "black";
 
       if (this.searchSelected) {
         ctx.fillStyle = "rgba(255, 255, 255, " + Math.abs(Math.sin(tick * 0.05) * 0.8 + 0.1) + ")";
@@ -1366,7 +1369,7 @@ class Block {
     if (this.isRoot) {
       // Render block selection
       if (selectingBlocks && !global.dialogOpen) {
-        ctx.fillStyle = this.style.copySelectionColor;
+        ctx.fillStyle = this.style.selectAreaColor;
         ctx.fillRect(mouseClickPosition.x, mouseClickPosition.y, -mouseClickPosition.x + global.mouse.cameraX, -mouseClickPosition.y + global.mouse.cameraY);
       }
     }
