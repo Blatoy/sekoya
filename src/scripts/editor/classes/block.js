@@ -898,7 +898,7 @@ class Block {
 
             if (global.metaKeys.ctrl && global.mouse.buttons[1]) {
               this.selectedForGroupAction = true;
-            } else if (global.mouse.buttons[1]) {
+            } else if (global.mouse.buttons[1] && !this.selectedForGroupAction) {
               rootBlock.unselectAll();
             }
 
