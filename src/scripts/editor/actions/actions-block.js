@@ -2,7 +2,6 @@ module.exports.registerActions = () => {
   actionHandler.addAction("blocks: auto layout", () => {
     rootBlock.sortChildrenByYPosition();
     rootBlock.autoLayout();
-    tabManager.setFileModified();
   });
 
   actionHandler.addAction("blocks: change current linking type", () => {
@@ -111,7 +110,12 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction({
     name: "blocks: close settings dialog",
-    action: (data) => {
+    action: (data, actionHandlerParameters) => {
+      if (data === false) {
+        actionHandlerParameters.cancelUndo = true;
+        return false;
+      }
+
       data.block.setAttributes(data.newAttributes);
       data.block.closePropertyWindow();
       tabManager.setFileModified();
