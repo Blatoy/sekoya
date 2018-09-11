@@ -13,7 +13,7 @@ global.metaKeys = {
   ctrl: false,
   alt: false,
   shift: false
-}
+};
 
 global.camera = {
   bounds: {
@@ -83,6 +83,14 @@ module.exports.addEditorEvents = () => {
 
   window.addEventListener("resize", (e) => {
     setCanvasSize();
+  });
+
+  window.addEventListener("blur", (e) => {
+    global.metaKeys = {
+      ctrl: false,
+      alt: false,
+      shift: false
+    };
   });
 
   window.addEventListener("mousemove", (e) => {
