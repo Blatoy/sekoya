@@ -4,11 +4,12 @@ const {
 const fs = require("fs");
 const xmlConverter = require("xml-js");
 const path = require("path");
+const remote = require('electron').remote;
 
 let canOpenDialog = true;
 
 function saveAs(tab, callback = () => {}) {
-  dialog.showSaveDialog({
+  dialog.showSaveDialog(remote.getCurrentWindow(), {
     title: "Save as...",
     defaultPath: tab.getFileLocation(),
     filters: [{
@@ -215,7 +216,7 @@ module.exports.openWithDialog = () => {
     defaultPath = config.defaultOpenFileLocation;
   }
 
-  dialog.showOpenDialog({
+  dialog.showOpenDialog(remote.getCurrentWindow(), {
     defaultPath: defaultPath,
     properties: ['openFile', 'multiSelections'],
     filters: [{
