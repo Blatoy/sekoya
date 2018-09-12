@@ -675,9 +675,8 @@ class Block {
 
       if (this.isRecursiveParentMinimized() !== false) {
         actionHandler.trigger("blocks: toggle children collapse", {
-          block: this.isRecursiveParentMinimized(),
-          minimized: true
-        });
+          block: this.isRecursiveParentMinimized()
+        }, false, true);
       }
 
       this.selected = true;

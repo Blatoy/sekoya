@@ -17,14 +17,13 @@ module.exports.registerActions = () => {
         let searchedValue = inputSearch.value.toLowerCase();
         searchResults = [];
 
-        // I'm open for cool search, but searching for nothing is useless
         if (searchedValue.length > 0) {
           for (let i = 0; i < allBlocks.length; ++i) {
             // TODO: Cool search maybe?
             let foundInAttributes = false;
             for (let type in allBlocks[i].attributes) {
               for (let attributeName in allBlocks[i].attributes[type]) {
-                if (allBlocks[i].attributes[type][attributeName].value.toLowerCase().includes(searchedValue)) {
+                if (allBlocks[i].attributes[type][attributeName].value.toString().toLowerCase().includes(searchedValue)) {
                   foundInAttributes = true;
                   break;
                 }

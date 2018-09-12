@@ -51,8 +51,7 @@ module.exports.registerActions = () => {
       for(let i = 0; i < allBlocks.length; ++i) {
         if(!allBlocks[i].minimized) {
           actionHandler.trigger("blocks: toggle children collapse", {
-            block: allBlocks[i],
-            minimized: false
+            block: allBlocks[i]
           }, false, true, true);
         }
       }
@@ -67,8 +66,7 @@ module.exports.registerActions = () => {
       for(let i = 0; i < allBlocks.length; ++i) {
         if(allBlocks[i].minimized) {
           actionHandler.trigger("blocks: toggle children collapse", {
-            block: allBlocks[i],
-            minimized: true
+            block: allBlocks[i]
           }, false, true, true);
         }
       }
@@ -78,28 +76,26 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "blocks: toggle children collapse",
     action: (data, actionHandlerParameters) => {
+
       if (data.block.isRoot || data.block.children.length <= 0) {
         actionHandlerParameters.cancelUndo = true;
         return false;
       }
+
       data.block.minimized = !data.minimizedState;
       data.block.parent.autoLayout(true);
     },
     setData: (data = {}) => {
-      let block = data.block,
-        minimized = data.minimized;
+      let block = data.block;
 
       if (block === undefined) {
         block = Block.getSelectedBlock();
       }
 
-      if (minimized === undefined) {
-        minimized = Block.getSelectedBlock().minimized;
-      }
 
       return {
         block: block,
-        minimizedState: minimized
+        minimizedState: block.minimized
       };
     },
     undoAction: (data) => {
