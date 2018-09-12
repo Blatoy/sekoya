@@ -55,7 +55,7 @@ if(!localStorage.firstLaunchDone) {
 }
 
 window.onerror = (msg, script, line) => {
-  let errorMessage = "[" + script + ":" + line +"] " + msg + "\n";
+  let errorMessage = (new Date()) + " " + script + ":" + line + " --- " + msg + "\n";
 
   fs.appendFile('sekoya-errors.log', errorMessage, function (err) {
     if (err) throw err;
