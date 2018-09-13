@@ -189,6 +189,7 @@ function selectTab(index) {
     let selectedBlock = Block.getSelectedBlock();
     if (selectedBlock && selectedBlock.parent) {
       previousSelectedTab.selectedBlock = selectedBlock;
+      selectedBlock.dragged = false;
     }
   }
 
