@@ -89,7 +89,6 @@ module.exports.registerActions = () => {
         document.getElementById("search-result-current").textContent = searchIndex + 1;
       }
     },
-    preventTriggerWhenDialogOpen: false,
     preventTriggerWhenInputFocused: false
   });
 
@@ -106,7 +105,6 @@ module.exports.registerActions = () => {
         document.getElementById("search-result-current").textContent = searchIndex + 1;
       }
     },
-    preventTriggerWhenDialogOpen: false,
     preventTriggerWhenInputFocused: false
   });
 };

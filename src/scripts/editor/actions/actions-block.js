@@ -390,7 +390,8 @@ module.exports.registerActions = () => {
     },
     displayable: false,
     preventTriggerWhenInputFocused: false,
-    preventTriggerWhenDialogOpen: false
+    preventTriggerWhenDialogOpen: false,
+    priority: 1000
   });
 
   actionHandler.addAction({
