@@ -547,13 +547,7 @@ class Block {
         let nextSibling = this.getSibling(1);
         let previousSibling = this.getSibling(-1);
 
-        if (nextSibling !== false) {
-          nextSibling.setSelected(true);
-        } else if (previousSibling !== false) {
-          previousSibling.setSelected(true);
-        } else {
-          this.parent.setSelected(true);
-        }
+        this.getNearestBlock(0, "all").closestBlock.setSelected();
       }
 
       return this.parent.children.splice(this.parent.children.indexOf(this), 1);
@@ -735,7 +729,7 @@ class Block {
   // ooof it's way too late i'm probaly doing zork
   getNearestBlock(direction, axis, targetBlock = false, initialBlock = false, results = {
     bestDistance: Infinity,
-    bestBlock: false
+    closestBlock: false
   }) {
     if (!initialBlock) {
       initialBlock = rootBlock;
@@ -745,7 +739,7 @@ class Block {
       targetBlock = this;
     }
 
-    let bestBlock = this;
+    let closestBlock = this;
 
     initialBlock.children.forEach((child) => {
       let vx = child.position.x - targetBlock.position.x;
@@ -755,11 +749,15 @@ class Block {
       if (vy === 0 || vx === 0) {
         dist /= 100;
       }
-      if (axis === "y" && (direction * child.position.y > direction * targetBlock.position.y) ||
-        axis === "x" && (direction * child.position.x > direction * targetBlock.position.x)) {
+
+      if (
+        axis === "y" && (direction * child.position.y > direction * targetBlock.position.y) ||
+        axis === "x" && (direction * child.position.x > direction * targetBlock.position.x) ||
+        axis === "all"
+      ) {
         if (dist < results.bestDistance && child !== targetBlock) {
           results.bestDistance = dist;
-          results.bestBlock = child;
+          results.closestBlock = child;
         }
       }
       child.getNearestBlock(direction, axis, targetBlock, child, results);
@@ -770,7 +768,7 @@ class Block {
 
   // Move to the closest block
   moveSelectedUpDown(direction) {
-    let closestBlock = this.getNearestBlock(direction, "y").bestBlock;
+    let closestBlock = this.getNearestBlock(direction, "y").closestBlock;
     if (closestBlock && closestBlock.isRecursiveParentMinimized() === false) {
       closestBlock.setSelected(true);
     }
@@ -778,7 +776,7 @@ class Block {
 
   // Move to the closest block
   moveSelectedLeftRight(direction) {
-    let closestBlock = this.getNearestBlock(direction, "x").bestBlock;
+    let closestBlock = this.getNearestBlock(direction, "x").closestBlock;
     if (closestBlock && closestBlock.isRecursiveParentMinimized() === false) {
       closestBlock.setSelected(true);
     }
@@ -1020,7 +1018,7 @@ class Block {
       }
     }
 
-    if(!this.minimized) {
+    if (!this.minimized) {
       this.children.forEach((child) => {
         child.handleMouseInteraction();
       });
@@ -1262,9 +1260,9 @@ class Block {
 
       // Text is white or black depending on the colour of the block
       const hexColor = ctx.fillStyle;
-      const red =  parseInt(hexColor.slice(1, 3), 16);
-      const green =  parseInt(hexColor.slice(3, 5), 16);
-      const blue =  parseInt(hexColor.slice(5, 7), 16);
+      const red = parseInt(hexColor.slice(1, 3), 16);
+      const green = parseInt(hexColor.slice(3, 5), 16);
+      const blue = parseInt(hexColor.slice(5, 7), 16);
       const gray = red * 0.299 + green * 0.587 + blue * 0.114;
       const textColour = gray < 140 ? "white" : "black";
 
