@@ -1,4 +1,4 @@
-const keybinds = require(basePath + "/config/keybinds.js");
+const keybinds = require(basePath + "/config/keybinds.json");
 const accelerators = require(basePath + "/config/menu.json").topMenu;
 
 let actions = {};
