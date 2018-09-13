@@ -570,6 +570,11 @@ class Block {
   }
 
   sortChildrenByYPosition() {
+    let previousOrder = [];
+    this.children.forEach((child) => {
+      previousOrder.push(child);
+    });
+
     this.children.sort((a, b) => {
       let sortOrderA = parseInt(a.linkToParentProperties.sortOrder);
       let sortOrderB = parseInt(b.linkToParentProperties.sortOrder);
@@ -580,6 +585,14 @@ class Block {
         return compare(sortOrderA, sortOrderB);
       }
     });
+
+    for(let i = 0; i < previousOrder.length; ++i) {
+      if(previousOrder[i].position.y !== this.children[i].position.y) {
+        return true;
+      }
+    }
+
+    return false;
     /*  this.children.sort(positionYComparator);
       this.children = stable(this.children, linkToParentComparator);*/
   }
@@ -671,7 +684,7 @@ class Block {
       }
 
       if (this.isRecursiveParentMinimized() !== false) {
-        actionHandler.trigger("blocks: toggle children collapse", {
+        actionHandler.trigger("blocks: toggle folding", {
           block: this.isRecursiveParentMinimized()
         }, false, true);
       }
@@ -885,7 +898,7 @@ class Block {
         if (this.children.length > 0 && this.isPositionOverMinimizeButton(global.mouse.cameraX, global.mouse.cameraY)) {
           mouseOverAnyBlock = true;
           if (global.mouse.buttons[1]) {
-            actionHandler.trigger("blocks: toggle children collapse", {
+            actionHandler.trigger("blocks: toggle folding", {
               block: this,
               minimized: this.minimized
             });
