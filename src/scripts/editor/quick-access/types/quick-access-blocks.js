@@ -23,7 +23,7 @@ function getSourceArray() {
 function displayLinked(index) {
   lastLinkedIndex = index;
   linkType = config.connectionsTypes[index].name;
-  if(!Block.getSelectedBlock().linkableTo(linkType)) {
+  if(!Block.getSelectedBlock().linkableTo(linkType) || Block.getSelectedBlock().isTerminalNode()) {
     return false;
   }
   quickAccess.attachType("Add \"" + linkType + "\" block", getSourceArray(), onResultSelected);
