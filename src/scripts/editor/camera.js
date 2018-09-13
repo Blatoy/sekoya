@@ -181,6 +181,9 @@ module.exports.update = () => {
 
   position.x += (targetPosition.x - position.x) * speed;
   position.y += (targetPosition.y - position.y) * speed;
+  
+  position.x = Math.max(position.x, 0);
+  position.y = Math.max(position.y, 0);
 
   global.mouse.cameraX = (global.mouse.canvasX + position.x) / scaling;
   global.mouse.cameraY = (global.mouse.canvasY + position.y) / scaling;
@@ -188,14 +191,6 @@ module.exports.update = () => {
 
 module.exports.applyTransforms = (ctx) => {
   renderedSegments ={};
-  /*  if(position.x < 0) {
-      targetPosition.x = 0;
-    }
-    if(position.y < 0) {
-      targetPosition.y = 0;
-    }*/
-  position.x = Math.max(position.x, 0);
-  position.y = Math.max(position.y, 0);
 
   global.camera.scaling = scaling;
   global.camera.bounds = getBounds();
