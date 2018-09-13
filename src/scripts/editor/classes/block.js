@@ -547,7 +547,10 @@ class Block {
         let nextSibling = this.getSibling(1);
         let previousSibling = this.getSibling(-1);
 
-        this.getNearestBlock(0, "all").closestBlock.setSelected();
+        let closestBlock = this.getNearestBlock(0, "all").closestBlock;
+        if(closestBlock) {
+          closestBlock.setSelected();
+        }
       }
 
       return this.parent.children.splice(this.parent.children.indexOf(this), 1);
