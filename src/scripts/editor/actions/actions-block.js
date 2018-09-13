@@ -226,6 +226,10 @@ module.exports.registerActions = () => {
       return false;
     }
 
+    actionHandler.trigger("blocks: sort children using position - no undo", {
+      parentBlock: data.parentBlock
+    });
+
     tabManager.setFileModified();
     return true;
   }, (data) => {
