@@ -1251,6 +1251,7 @@ class Block {
         }
         ctx.font = this.style.font.size + "px " + this.style.font.family;
         ctx.textBaseline = "top";
+        ctx.textAlign = "left";
         ctx.fillStyle = this.style.comment.backgroundColor;
         ctx.fillRect(this.position.x, this.position.y, this.size.width * this.style.comment.width, this.commentHeight);
         ctx.fillStyle = this.style.comment.textColor;
