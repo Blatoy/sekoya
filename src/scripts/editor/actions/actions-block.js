@@ -1,56 +1,22 @@
 module.exports.registerActions = () => {
-  actionHandler.addAction("blocks: auto layout", () => {
-    rootBlock.sortChildrenByYPosition();
-    rootBlock.autoLayout();
-  });
-
-  actionHandler.addAction("blocks: change current linking type", () => {
-    if (Block.getSelectedBlock().linkingInProgress) {
-      Block.getSelectedBlock().switchLinkingLinkType();
-      return true;
-    } else {
-      return false;
-    }
-    tabManager.setFileModified();
-  });
-
-  actionHandler.addAction("blocks: cancel block linking", () => {
-    if (Block.getSelectedBlock().linkingInProgress) {
-      Block.getSelectedBlock().cancelBlockLinking();
-      return true;
-    } else {
-      return false;
-    }
-  });
-
+  // Moving block / layout
   actionHandler.addAction({
-    name: "blocks: unselect all",
+    name: "blocks: auto layout",
     action: () => {
-      rootBlock.unselectAll();
-    },
-    preventTriggerWhenInputFocused: false,
-    preventTriggerWhenDialogOpen: false
-  });
-
-
-  actionHandler.addAction({
-    name: "blocks: close settings dialog and discard changes",
-    action: () => {
-      Block.getSelectedBlock().closePropertyWindow(false);
-    },
-    displayable: false,
-    preventTriggerWhenInputFocused: false,
-    preventTriggerWhenDialogOpen: false
+      rootBlock.sortChildrenByYPosition();
+      rootBlock.autoLayout();
+    }
   });
 
   actionHandler.addAction({
     name: "blocks: fold all",
     action: () => {
-      let allBlocks = rootBlock.getChildrenRecursively();
       actionHandler.separateMergeUndo();
-      for(let i = 0; i < allBlocks.length; ++i) {
-        if(!allBlocks[i].minimized) {
-          actionHandler.trigger("blocks: toggle children collapse", {
+
+      let allBlocks = rootBlock.getChildrenRecursively();
+      for (let i = 0; i < allBlocks.length; ++i) {
+        if (!allBlocks[i].minimized) {
+          actionHandler.trigger("blocks: toggle folding", {
             block: allBlocks[i]
           }, false, true, true);
         }
@@ -61,11 +27,12 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "blocks: unfold all",
     action: () => {
-      let allBlocks = rootBlock.getChildrenRecursively();
       actionHandler.separateMergeUndo();
-      for(let i = 0; i < allBlocks.length; ++i) {
-        if(allBlocks[i].minimized) {
-          actionHandler.trigger("blocks: toggle children collapse", {
+
+      let allBlocks = rootBlock.getChildrenRecursively();
+      for (let i = 0; i < allBlocks.length; ++i) {
+        if (allBlocks[i].minimized) {
+          actionHandler.trigger("blocks: toggle folding", {
             block: allBlocks[i]
           }, false, true, true);
         }
@@ -74,9 +41,8 @@ module.exports.registerActions = () => {
   });
 
   actionHandler.addAction({
-    name: "blocks: toggle children collapse",
+    name: "blocks: toggle folding",
     action: (data, actionHandlerParameters) => {
-
       if (data.block.isRoot || data.block.children.length <= 0) {
         actionHandlerParameters.cancelUndo = true;
         return false;
@@ -84,6 +50,7 @@ module.exports.registerActions = () => {
 
       data.block.minimized = !data.minimizedState;
       data.block.parent.autoLayout(true);
+      return true;
     },
     setData: (data = {}) => {
       let block = data.block;
@@ -91,7 +58,6 @@ module.exports.registerActions = () => {
       if (block === undefined) {
         block = Block.getSelectedBlock();
       }
-
 
       return {
         block: block,
@@ -104,80 +70,6 @@ module.exports.registerActions = () => {
     }
   });
 
-  actionHandler.addAction({
-    name: "blocks: close settings dialog",
-    action: (data, actionHandlerParameters) => {
-      if (data === false) {
-        actionHandlerParameters.cancelUndo = true;
-        return false;
-      }
-
-      data.block.setAttributes(data.newAttributes);
-      data.block.closePropertyWindow();
-      tabManager.setFileModified();
-    },
-    setData: () => {
-      if(document.getElementById("block-properties-background").style.display === "none") {
-        return false;
-      }
-
-      // Retrieve all the data
-      let attributes = {};
-      let propertyElementList = document.getElementsByClassName("__property-value");
-      for (let i = 0; i < propertyElementList.length; ++i) {
-        let propertyElement = propertyElementList[i];
-        // I think it would make it way cleaner to store the type into the object itself instead of doing that...
-        if (!attributes[propertyElement.dataset.attributeType]) {
-          attributes[propertyElement.dataset.attributeType] = {};
-        }
-        attributes[propertyElement.dataset.attributeType][propertyElement.dataset.attributeName] = propertyElement.value;
-      }
-
-      let propertyCheckboxList = document.getElementsByClassName("__property-value-checkbox");
-      let checkedValues = [];
-      let lastType = "",
-        lastName = "";
-
-      for (let i = 0; i < propertyCheckboxList.length; ++i) {
-        let checkbox = propertyCheckboxList[i];
-        if (lastName !== checkbox.dataset.attributeName) {
-          if (lastName !== "") {
-            if (!attributes[lastType]) {
-              attributes[lastType] = {};
-            }
-            attributes[lastType][lastName] = checkedValues.join(config.multiSelectSeparator);
-            checkedValues = [];
-          }
-          lastName = checkbox.dataset.attributeName;
-          lastType = checkbox.dataset.attributeType;
-        }
-        if (checkbox.checked) {
-          checkedValues.push(checkbox.value);
-        }
-      }
-
-      if (lastName !== "") {
-        if (!attributes[lastType]) {
-          attributes[lastType] = {};
-        }
-        attributes[lastType][lastName] = checkedValues.join(config.multiSelectSeparator);
-      }
-
-      return {
-        newAttributes: attributes,
-        block: Block.getSelectedBlock(),
-        oldAttributes: Block.getSelectedBlock().getAttributesCopy()
-      };
-    },
-    undoAction: (data) => {
-      data.block.setAttributes(data.oldAttributes);
-      //data.block.closePropertyWindow();
-      tabManager.setFileModified();
-    },
-    displayable: false,
-    preventTriggerWhenInputFocused: false,
-    preventTriggerWhenDialogOpen: false
-  });
 
   actionHandler.addAction({
     name: "blocks: move block",
@@ -204,129 +96,95 @@ module.exports.registerActions = () => {
     preventTriggerWhenDialogOpen: false
   });
 
-  actionHandler.addAction("blocks: display settings for selected block", () => {
-    if (!Block.getSelectedBlock().linkingInProgress && !global.dialogOpen) {
-      Block.getSelectedBlock().displayPropertyWindow();
-      return true;
-    } else {
-      return false;
-    }
-  });
+  // Add / remove blocks
+  actionHandler.addAction({
+    name: "blocks: delete selected",
+    action: (data) => {
+      for (let i = 0; i < data.length; ++i) {
+        data[i].block.delete();
+      }
 
-  actionHandler.addAction("blocks: unlink selected block", () => {
-    actionHandler.trigger("blocks: link block", {
-      parentBlock: rootBlock,
-      targetBlock: Block.getSelectedBlock()
-    });
-  });
+      tabManager.setFileModified();
+    },
+    setData: () => {
+      let selectedBlocks = rootBlock.getSelectedForGroupAction();
 
-  actionHandler.addAction("blocks: link block", (data, actionHandlerParameters) => {
-    if (!data.targetBlock.changeParent(data.parentBlock, data.linkType)) {
-      actionHandlerParameters.cancelUndo = true;
-      return false;
-    }
+      // We delete the selected block only if there was no selected block for group action
+      if (selectedBlocks.length === 0) {
+        selectedBlocks = [Block.getSelectedBlock()];
+      }
 
-    actionHandler.trigger("blocks: sort children using position - no undo", {
-      parentBlock: data.parentBlock
-    });
+      let deletedBlocks = [];
+      for (let i = 0; i < selectedBlocks.length; ++i) {
+        let children = [];
+        let selectedBlock = selectedBlocks[i];
+        // We have to restore it at the right position
+        let blockIndex = selectedBlock.parent.children.indexOf(selectedBlock);
+        selectedBlock.selectedForGroupAction = false;
 
-    tabManager.setFileModified();
-    return true;
-  }, (data) => {
-    let oldParent = data.targetBlock.parent;
-    let oldLinkingType = data.targetBlock.linkToParentType;
+        // We must keep a reference to all the children since they are manually deleted from the block
+        for (let j = 0; j < selectedBlock.children.length; ++j) {
+          let child = selectedBlock.children[j];
+          let childIndex = child.parent.children.indexOf(child);
+          selectedBlock.children[j].selectedForGroupAction = false;
+          children.push({
+            child: selectedBlock.children[j],
+            linkToParentType: selectedBlock.children[j].linkToParentType,
+            index: childIndex
+          });
+        }
 
-    tabManager.setFileModified();
-    return {
-      oldParent: data.targetBlock.parent,
-      oldLinkingType: oldLinkingType,
-      targetBlock: data.targetBlock,
-      parentBlock: data.parentBlock,
-      linkType: data.linkType
-    };
-  }, (data) => {
-    data.targetBlock.changeParent(data.oldParent, data.oldLinkingType);
-  });
-
-  actionHandler.addAction("blocks: delete selected", (data) => {
-    for (let i = 0; i < data.length; ++i) {
-      data[i].block.delete();
-    }
-
-    tabManager.setFileModified();
-    //  rootBlock.autoLayout();
-  }, () => {
-    let selectedBlocks = rootBlock.getSelectedForGroupAction();
-
-    // We delete the selected block only if there was no selected block for group action
-    if (selectedBlocks.length === 0) {
-      selectedBlocks = [Block.getSelectedBlock()];
-    }
-
-    let deletedBlocks = [];
-    for (let i = 0; i < selectedBlocks.length; ++i) {
-      let children = [];
-      let selectedBlock = selectedBlocks[i];
-      // We have to restore it at the right position
-      let blockIndex = selectedBlock.parent.children.indexOf(selectedBlock);
-      selectedBlock.selectedForGroupAction = false;
-
-      // We must keep a reference to all the children since they are manually deleted from the block
-      for (let j = 0; j < selectedBlock.children.length; ++j) {
-        let child = selectedBlock.children[j];
-        let childIndex = child.parent.children.indexOf(child);
-        selectedBlock.children[j].selectedForGroupAction = false;
-        children.push({
-          child: selectedBlock.children[j],
-          linkToParentType: selectedBlock.children[j].linkToParentType,
-          index: childIndex
+        deletedBlocks.push({
+          block: selectedBlock,
+          children: children,
+          index: blockIndex
         });
       }
 
-      deletedBlocks.push({
-        block: selectedBlock,
-        children: children,
-        index: blockIndex
-      });
-    }
+      tabManager.setFileModified();
+      return deletedBlocks;
+    },
+    undoAction: (data) => {
+      for (let i = 0; i < data.length; ++i) {
+        let blockInfo = data[i];
+        // Using addChild is fine here since the block is deleted
+        blockInfo.block.parent.addChild(blockInfo.block, blockInfo.block.linkToParentType, blockInfo.index);
 
-    tabManager.setFileModified();
-    return deletedBlocks;
-  }, (data) => {
-    for (let i = 0; i < data.length; ++i) {
-      let blockInfo = data[i];
-      // Using addChild is fine here since the block is deleted
-      blockInfo.block.parent.addChild(blockInfo.block, blockInfo.block.linkToParentType, blockInfo.index);
+        for (let j = 0; j < blockInfo.children.length; ++j) {
+          blockInfo.children[j].child.changeParent(blockInfo.block, blockInfo.children[j].linkToParentType, blockInfo.children[j].index);
+        }
 
-      for (let j = 0; j < blockInfo.children.length; ++j) {
-        blockInfo.children[j].child.changeParent(blockInfo.block, blockInfo.children[j].linkToParentType, blockInfo.children[j].index);
+        blockInfo.block.setSelected(true);
       }
-
-      //  rootBlock.autoLayout();
-      blockInfo.block.setSelected(true);
     }
   });
 
-  actionHandler.addAction("blocks: delete selected and children", (data) => {
-    data.block.deleteRecursive();
-    tabManager.setFileModified();
-    //rootBlock.autoLayout();
-  }, () => {
-    let selectedBlock = Block.getSelectedBlock();
+  actionHandler.addAction({
+    name: "blocks: delete selected and children",
+    action: (data) => {
+      data.block.deleteRecursive();
+      tabManager.setFileModified();
+      //rootBlock.autoLayout();
+    },
+    setData: () => {
+      let selectedBlock = Block.getSelectedBlock();
 
-    return {
-      block: selectedBlock,
-      index: selectedBlock.parent.children.indexOf(selectedBlock)
-    };
-  }, (data) => {
-    data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
-    //rootBlock.autoLayout();
-    data.block.setSelected(true);
-    tabManager.setFileModified();
+      return {
+        block: selectedBlock,
+        index: selectedBlock.parent.children.indexOf(selectedBlock)
+      };
+    },
+    undoAction: (data) => {
+      data.block.parent.addChild(data.block, data.block.linkToParentType, data.index);
+      //rootBlock.autoLayout();
+      data.block.setSelected(true);
+      tabManager.setFileModified();
+    }
   });
 
   actionHandler.addAction({
     name: "blocks: add block",
+    displayable: false,
     action: (data) => {
       if (data.block.isNewDraggedBlock) {
         rootBlock.unselectAll();
@@ -366,13 +224,202 @@ module.exports.registerActions = () => {
     }
   });
 
-  actionHandler.addAction("blocks: sort children using position - no undo", (data) => {
-    data.parentBlock.sortChildrenByYPosition();
+  // Block linking
+  actionHandler.addAction({
+    name: "blocks: change current linking type",
+    action: () => {
+      if (Block.getSelectedBlock().linkingInProgress) {
+        Block.getSelectedBlock().switchLinkingLinkType();
+        return true;
+      } else {
+        return false;
+      }
+      tabManager.setFileModified();
+    }
   });
 
-  actionHandler.addAction("blocks: sort children using position", (data) => {
-    data.parentBlock.sortChildrenByYPosition();
-    tabManager.setFileModified();
+  actionHandler.addAction({
+    name: "blocks: cancel block linking",
+    action: () => {
+      if (Block.getSelectedBlock().linkingInProgress) {
+        Block.getSelectedBlock().cancelBlockLinking();
+        return true;
+      } else {
+        return false;
+      }
+    }
+  });
+
+  actionHandler.addAction({
+    name: "blocks: unlink selected block",
+    action: () => {
+      actionHandler.trigger("blocks: link block", {
+        parentBlock: rootBlock,
+        targetBlock: Block.getSelectedBlock()
+      });
+    }
+  });
+
+
+  actionHandler.addAction({
+    name: "blocks: link block",
+    displayable: false,
+    action: (data, actionHandlerParameters) => {
+      if (!data.targetBlock.changeParent(data.parentBlock, data.linkType)) {
+        actionHandlerParameters.cancelUndo = true;
+        return false;
+      }
+
+      actionHandler.trigger("blocks: sort children using position - no undo", {
+        parentBlock: data.parentBlock
+      });
+
+      tabManager.setFileModified();
+      return true;
+    },
+    setData: (data) => {
+      let oldParent = data.targetBlock.parent;
+      let oldLinkingType = data.targetBlock.linkToParentType;
+
+      tabManager.setFileModified();
+      return {
+        oldParent: data.targetBlock.parent,
+        oldLinkingType: oldLinkingType,
+        targetBlock: data.targetBlock,
+        parentBlock: data.parentBlock,
+        linkType: data.linkType
+      };
+    },
+    undoAction: (data) => {
+      data.targetBlock.changeParent(data.oldParent, data.oldLinkingType);
+    }
+  });
+
+  // Block selection
+  actionHandler.addAction({
+    name: "blocks: unselect all",
+    action: () => {
+      rootBlock.unselectAll();
+    },
+    preventTriggerWhenInputFocused: false,
+    preventTriggerWhenDialogOpen: false
+  });
+
+  // Block settings
+  actionHandler.addAction({
+    name: "blocks: close settings dialog and discard changes",
+    action: () => {
+      Block.getSelectedBlock().closePropertyWindow(false);
+    },
+    displayable: false,
+    preventTriggerWhenInputFocused: false,
+    preventTriggerWhenDialogOpen: false
+  });
+
+  actionHandler.addAction({
+    name: "blocks: close settings dialog and save changes",
+    action: (data, actionHandlerParameters) => {
+      if (data === false) {
+        actionHandlerParameters.cancelUndo = true;
+        return false;
+      }
+
+      data.block.setAttributes(data.newAttributes);
+      data.block.closePropertyWindow();
+      tabManager.setFileModified();
+      return true;
+    },
+    setData: () => {
+      if (document.getElementById("block-properties-background").style.display === "none") {
+        return false;
+      }
+
+      let attributes = {};
+      // Get all "normal" attributes
+      let propertyElementList = document.getElementsByClassName("__property-value");
+
+      for (let i = 0; i < propertyElementList.length; ++i) {
+        let propertyElement = propertyElementList[i];
+        // I think it would make it way cleaner to store the type into the object itself instead of doing that...
+        if (!attributes[propertyElement.dataset.attributeType]) {
+          attributes[propertyElement.dataset.attributeType] = {};
+        }
+        attributes[propertyElement.dataset.attributeType][propertyElement.dataset.attributeName] = propertyElement.value;
+      }
+
+      // Get all "checkboxes" attributes
+      let propertyCheckboxList = document.getElementsByClassName("__property-value-checkbox");
+      let checkedValues = [];
+      let lastType = "",
+        lastName = "";
+
+      for (let i = 0; i < propertyCheckboxList.length; ++i) {
+        let checkbox = propertyCheckboxList[i];
+        if (lastName !== checkbox.dataset.attributeName) {
+          if (lastName !== "") {
+            if (!attributes[lastType]) {
+              attributes[lastType] = {};
+            }
+            attributes[lastType][lastName] = checkedValues.join(config.multiSelectSeparator);
+            checkedValues = [];
+          }
+          lastName = checkbox.dataset.attributeName;
+          lastType = checkbox.dataset.attributeType;
+        }
+        if (checkbox.checked) {
+          checkedValues.push(checkbox.value);
+        }
+      }
+
+      if (lastName !== "") {
+        if (!attributes[lastType]) {
+          attributes[lastType] = {};
+        }
+        attributes[lastType][lastName] = checkedValues.join(config.multiSelectSeparator);
+      }
+
+      return {
+        newAttributes: attributes,
+        block: Block.getSelectedBlock(),
+        oldAttributes: Block.getSelectedBlock().getAttributesCopy()
+      };
+    },
+    undoAction: (data) => {
+      data.block.setAttributes(data.oldAttributes);
+      tabManager.setFileModified();
+    },
+    displayable: false,
+    preventTriggerWhenInputFocused: false,
+    preventTriggerWhenDialogOpen: false
+  });
+
+  actionHandler.addAction({
+    name: "blocks: display settings for selected block",
+    action: () => {
+      if (!Block.getSelectedBlock().linkingInProgress && !global.dialogOpen) {
+        Block.getSelectedBlock().displayPropertyWindow();
+        return true;
+      } else {
+        return false;
+      }
+    }
+  });
+
+  actionHandler.addAction({
+    name: "blocks: sort children using position - no undo",
+    displayable: false,
+    action: (data) => {
+      data.parentBlock.sortChildrenByYPosition();
+    }
+  });
+
+  actionHandler.addAction({
+    name: "blocks: sort children using position",
+    action: (data) => {
+      if (data.parentBlock.sortChildrenByYPosition()) {
+        tabManager.setFileModified();
+      }
+    }
   });
 
   let copiedBlocks = [];
@@ -383,7 +430,6 @@ module.exports.registerActions = () => {
       let selectedBlocks = rootBlock.getSelectedForGroupAction();
 
       copiedBlocks = [];
-
       // We delete the selected block only if there was no selected block for group action
       if (selectedBlocks.length === 0) {
         selectedBlocks = [Block.getSelectedBlock()];
@@ -441,99 +487,101 @@ module.exports.registerActions = () => {
     }
   });
 
-  // This is currently not in used as we now undo the position as well
-  // This still may be useful in the future and since it's work
-  // the code will only be deleted if it's reall proven useless
-  /*actionHandler.addAction("blocks: sort children using position", (data) => {
-    data.parentBlock.children = data.newChildOrder;
-    // data.parentBlock.autoLayout();
-  }, (data, actionHandlerParameters) => {
-    let originalChildOrder = [];
-    let newChildOrder = [];
-
-    for (let i = 0; i < data.parentBlock.children.length; ++i) {
-      originalChildOrder.push(data.parentBlock.children[i]);
-    }
-
-    data.parentBlock.sortChildrenByYPosition();
-
-    actionHandlerParameters.cancelUndo = true;
-
-    for (let i = 0; i < data.parentBlock.children.length; ++i) {
-      newChildOrder.push(data.parentBlock.children[i]);
-      // Add action to undo stack only if any changes occured
-      if (actionHandlerParameters.cancelUndo && newChildOrder[i] !== originalChildOrder[i]) {
-        actionHandlerParameters.cancelUndo = false;
-      }
-    }
-
-    return {
-      parentBlock: data.parentBlock,
-      newChildOrder: newChildOrder,
-      originalChildOrder: originalChildOrder
-    };
-  }, (data) => {
-    data.parentBlock.children = data.originalChildOrder;
-    //data.parentBlock.autoLayout();
-  });*/
-
   // Block moving: closest one
-  actionHandler.addAction("blocks: select block below", () => {
-    Block.getSelectedBlock().moveSelectedUpDown(1);
+  actionHandler.addAction({
+    name: "blocks: select block below",
+    action: () => {
+      Block.getSelectedBlock().moveSelectedUpDown(1);
+    }
   });
 
-  actionHandler.addAction("blocks: select block above", () => {
-    Block.getSelectedBlock().moveSelectedUpDown(-1);
+  actionHandler.addAction({
+    name: "blocks: select block above",
+    action: () => {
+      Block.getSelectedBlock().moveSelectedUpDown(-1);
+    }
   });
 
-
-  actionHandler.addAction("blocks: select left block", () => {
-    Block.getSelectedBlock().moveSelectedLeftRight(-1);
+  actionHandler.addAction({
+    name: "blocks: select left block",
+    action: () => {
+      Block.getSelectedBlock().moveSelectedLeftRight(-1);
+    }
   });
 
-  actionHandler.addAction("blocks: select right block", () => {
-    Block.getSelectedBlock().moveSelectedLeftRight(1);
+  actionHandler.addAction({
+    name: "blocks: select right block",
+    action: () => {
+      Block.getSelectedBlock().moveSelectedLeftRight(1);
+    }
   });
 
-  actionHandler.addAction("blocks: select nearest to screen center", () => {
-    Block.setSelectedCenterView();
+  actionHandler.addAction({
+    name: "blocks: select nearest to screen center",
+    action: () => {
+      Block.setSelectedCenterView();
+    }
   });
 
   // Block moving: using tree
-  actionHandler.addAction("blocks: select first sibling", () => {
-    Block.getSelectedBlock().setSelectedFirstSibling();
-  });
-
-  actionHandler.addAction("blocks: select last sibling", () => {
-    Block.getSelectedBlock().setSelectedLastSibling();
-  });
-
-  actionHandler.addAction("blocks: tab next", () => {
-    if (!Block.getSelectedBlock().setSelectedChild()) {
-      Block.getSelectedBlock().setSelectedNextSibling();
+  actionHandler.addAction({
+    name: "blocks: select first sibling",
+    action: () => {
+      Block.getSelectedBlock().setSelectedFirstSibling();
     }
   });
 
-  actionHandler.addAction("blocks: tab previous", () => {
-    if (!Block.getSelectedBlock().setSelectedPreviousSibling()) {
+  actionHandler.addAction({
+    name: "blocks: select last sibling",
+    action: () => {
+      Block.getSelectedBlock().setSelectedLastSibling();
+    }
+  });
+
+  actionHandler.addAction({
+    name: "blocks: tab next",
+    action: () => {
+      if (!Block.getSelectedBlock().setSelectedChild()) {
+        Block.getSelectedBlock().setSelectedNextSibling();
+      }
+    }
+  });
+
+  actionHandler.addAction({
+    name: "blocks: tab previous",
+    action: () => {
+      if (!Block.getSelectedBlock().setSelectedPreviousSibling()) {
+        Block.getSelectedBlock().setSelectedParent();
+      }
+    }
+  });
+
+  actionHandler.addAction({
+    name: "blocks: select parent",
+    action: () => {
       Block.getSelectedBlock().setSelectedParent();
     }
   });
 
-  actionHandler.addAction("blocks: select parent", () => {
-    Block.getSelectedBlock().setSelectedParent();
-  });
-
-  actionHandler.addAction("blocks: select child", () => {
-    Block.getSelectedBlock().setSelectedChild();
+  actionHandler.addAction({
+    name: "blocks: select child",
+    action: () => {
+      Block.getSelectedBlock().setSelectedChild();
+    }
   });
 
   // Quick sibling move
-  actionHandler.addAction("blocks: select previous sibling", () => {
-    Block.getSelectedBlock().setSelectedPreviousSibling();
+  actionHandler.addAction({
+    name: "blocks: select previous sibling",
+    action: () => {
+      Block.getSelectedBlock().setSelectedPreviousSibling();
+    }
   });
 
-  actionHandler.addAction("blocks: select next sibling", () => {
-    Block.getSelectedBlock().setSelectedNextSibling();
+  actionHandler.addAction({
+    name: "blocks: select next sibling",
+    action: () => {
+      Block.getSelectedBlock().setSelectedNextSibling();
+    }
   });
 };

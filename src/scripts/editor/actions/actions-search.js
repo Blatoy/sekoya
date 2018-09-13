@@ -55,7 +55,6 @@ module.exports.registerActions = () => {
         }
       };
     },
-    preventTriggerWhenDialogOpen: false,
     preventTriggerWhenInputFocused: false
   });
 

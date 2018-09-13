@@ -1,37 +1,32 @@
-/*
-actionHandler.addAction("open new tab", () => {
-  addTab("untitled" + tabs.length + ".xml", [], true);
-});
-
-actionHandler.addAction("close current tab", () => {
-  closeTab(tabs.indexOf(getCurrentTab()));
-});
-
-actionHandler.addAction("switch to next tab", () => {
-  switchTab();
-});
-
-actionHandler.addAction("switch to previous tab", () => {
-  switchTab(true);
-});
-*/
 module.exports.registerActions = () => {
-  actionHandler.addAction("core: display about", () => {
-    document.getElementById("about-background").style.display = "block";
-  });
-
-  actionHandler.addAction("core: hide about", () => {
-    if(document.getElementById("about-background").style.display === "block") {
-      document.getElementById("about-background").style.display = "none";
-      localStorage.firstLaunchDone = true;
+  actionHandler.addAction({
+    name: "core: display about",
+    action: () => {
+      document.getElementById("about-background").style.display = "block";
     }
   });
 
-  actionHandler.addAction("core: undo", () => {
-    actionHandler.undo();
+  actionHandler.addAction({
+    name: "core: hide about",
+    action: () => {
+      if (document.getElementById("about-background").style.display === "block") {
+        document.getElementById("about-background").style.display = "none";
+        localStorage.firstLaunchDone = true;
+      }
+    }
   });
 
-  actionHandler.addAction("core: redo", () => {
-    actionHandler.redo();
+  actionHandler.addAction({
+    name: "core: undo",
+    action: () => {
+      actionHandler.undo();
+    }
+  });
+
+  actionHandler.addAction({
+    name: "core: redo",
+    action: () => {
+      actionHandler.redo();
+    }
   });
 };
