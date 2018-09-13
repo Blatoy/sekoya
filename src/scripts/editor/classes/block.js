@@ -63,6 +63,7 @@ class Block {
 
     this.children = children;
     this.parent = parent;
+    this.preventInteraction = blockDefinition.preventInteraction || false;
     this.isRoot = blockDefinition.isRoot || false;
 
     this.isNewDraggedBlock = false;
@@ -467,7 +468,7 @@ class Block {
   }
 
   changeParent(newParent, linkToParentType = false, insertionIndex = -1) {
-    if (newParent === this || (newParent === this.parent && this.linkToParentType === linkToParentType) || !newParent) {
+    if (newParent === this || this.preventInteraction || (newParent === this.parent && this.linkToParentType === linkToParentType) || !newParent) {
       return false;
     }
 
@@ -559,7 +560,7 @@ class Block {
 
   // Delete the block and attach the orphan to root
   delete() {
-    if (this.isRoot) return false; // no
+    if (this.isRoot || this.preventInteraction) return false; // no
 
     while (this.children.length > 0) {
       this.children[0].changeParent(rootBlock);
@@ -578,6 +579,12 @@ class Block {
     this.children.sort((a, b) => {
       let sortOrderA = parseInt(a.linkToParentProperties.sortOrder);
       let sortOrderB = parseInt(b.linkToParentProperties.sortOrder);
+
+      // We want blocks that cannot be interacted with at the top
+      // This could probably be in the config
+      if(a.preventInteraction) {
+        return -1;
+      }
 
       if (sortOrderA === sortOrderB) {
         return compare(a.position.y, b.position.y);
@@ -915,7 +922,7 @@ class Block {
               rootBlock.unselectAll();
             }
 
-            if (!this.dragged && global.mouse.buttons[1]) {
+            if (!this.dragged && global.mouse.buttons[1] && !this.preventInteraction) {
               this.dragged = true;
 
               rootBlock.getSelectedForGroupAction().forEach((block) => {
