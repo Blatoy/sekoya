@@ -197,7 +197,7 @@ function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false,
       ) {
         let previousUndo = undoStack[undoStack.length - 1];
         if (
-          mergeUndo &&
+          (mergeUndo || action.mergeUndoByDefault) &&
           previousUndo !== undefined &&
           (
             Array.isArray(previousUndo) &&
@@ -210,7 +210,7 @@ function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false,
             parameters: parameters
           });
         } else {
-          if (mergeUndo) {
+          if (mergeUndo || action.mergeUndoByDefault) {
             undoStack.push([{
               actionName: name,
               parameters: parameters
@@ -252,6 +252,7 @@ function addAction(name, action, setData = () => {}, undoAction = false, priorit
       setData: name.setData === undefined ? false : name.setData,
       undoAction: name.undoAction === undefined ? false : name.undoAction,
       priority: name.priority || 0,
+      mergeUndoByDefault: name.mergeUndoByDefault === undefined ? false: name.mergeUndoByDefault,
       displayable: name.displayable === undefined ? true : name.displayable,
       onShortcutRelease: name.onShortcutRelease || (() => {}),
       preventTriggerWhenInputFocused: name.preventTriggerWhenInputFocused === undefined ? true : name.preventTriggerWhenInputFocused,
