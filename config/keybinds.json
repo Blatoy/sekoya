@@ -48,6 +48,13 @@
     "action": "blocks: toggle folding"
   },
   {
+    "key": "k",
+    "ctrl": false,
+    "alt": false,
+    "shift": false,
+    "action": "blocks: toggle commented"
+  },
+  {
     "key": "Space",
     "ctrl": false,
     "alt": false,

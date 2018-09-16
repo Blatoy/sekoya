@@ -63,6 +63,9 @@ function getXMLRecursively(block, depth = 0) {
       blockData += "<" + config.topLevelBlocksContainer[depth + 1] + ">";
     }
 
+    if(block.commented) {
+      blockData += "<!--";
+    }
 
     if (blockLoader.getDefinitionByName(block.name).useNameAttributeAsTagName) {
       blockData += "<" + block.name + ' id="' + block.name + '">';
@@ -74,8 +77,8 @@ function getXMLRecursively(block, depth = 0) {
       for (let attribute in block.attributes[type]) {
         blockData += '<' + type + ' id="' + block.attributes[type][attribute].name + '">' + encodeXML(block.attributes[type][attribute].value) + '</' + type + '>';
       }
-      if(config.minimizedAttributeName !== "") {
-        if(block.minimized) {
+      if (config.minimizedAttributeName !== "") {
+        if (block.minimized) {
           blockData += '<string id="' + config.minimizedAttributeName + '">yes</string>';
         }
       }
@@ -101,6 +104,10 @@ function getXMLRecursively(block, depth = 0) {
       blockData += "</" + block.name + '>';
     } else {
       blockData += "</" + block.type + '>';
+    }
+
+    if(block.commented) {
+      blockData += "-->";
     }
 
     if (depth + 1 < config.topLevelBlocksContainer.length) {
@@ -134,8 +141,26 @@ for (let i = 0; i < config.connectionsTypes.length; ++i) {
 }
 
 function createBlockRecursively(element, parentBlock, linkToParentType) {
+  let isCommented = false;
+  if (element.type === "comment") {
+    try {
+      let JSONData = xmlConverter.xml2js(element.comment, {
+        compact: false
+      });
+      // Assume that's it's one of our comment. TODO: Better check to prevent loading invalid stuff
+      // This also only one block and its children to be commented
+      element = JSONData.elements[0];
+      isCommented = true;
+    } catch (e) {
+      // There's not much we can do if we can't parse it
+      return false;
+    }
+  }
+
   let blockName = element.attributes ? (element.attributes.id || element.name) : element.name;
   let newBlock = new Block(blockLoader.getDefinitionByName(blockName), parentBlock, linkToParentType);
+
+  newBlock.commented = isCommented;
 
   if (element.elements) {
     for (let i = 0; i < element.elements.length; ++i) {
@@ -148,7 +173,7 @@ function createBlockRecursively(element, parentBlock, linkToParentType) {
           createBlockRecursively(childElement.elements[j], newBlock, childName);
         }
       } else {
-        if(config.minimizedAttributeName !== "" && childName !== config.minimizedAttributeName) {
+        if (config.minimizedAttributeName !== "" && childName !== config.minimizedAttributeName) {
           // This is an attribute of newBlock
           if (!newBlock.attributes[childElement.name]) {
             newBlock.attributes[childElement.name] = {};
@@ -156,16 +181,17 @@ function createBlockRecursively(element, parentBlock, linkToParentType) {
 
           let value = childElement.elements ? childElement.elements[0].text : undefined;
           if (value !== undefined) {
-            if(!newBlock.attributes[childElement.name][childElement.attributes.id]) {
-              newBlock.attributes[childElement.name][childElement.attributes.id] = {name: childName, value: value};
-            }
-            else {
+            if (!newBlock.attributes[childElement.name][childElement.attributes.id]) {
+              newBlock.attributes[childElement.name][childElement.attributes.id] = {
+                name: childName,
+                value: value
+              };
+            } else {
               newBlock.attributes[childElement.name][childElement.attributes.id].value = value;
             }
           }
-        }
-        else {
-          if(childName === config.minimizedAttributeName) {
+        } else {
+          if (childName === config.minimizedAttributeName) {
             newBlock.minimized = true;
           }
         }

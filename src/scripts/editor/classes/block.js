@@ -73,6 +73,7 @@ class Block {
     this.searchSelected = false;
     this.dragged = false;
     this.commentHeightLoaded = false;
+    this.commented = false;
 
     this.linkingInProgress = false;
     this.linkingLinkTypeIndex = 0;
@@ -701,6 +702,25 @@ class Block {
     }
   }
 
+  uncommentAllChildren() {
+    this.children.forEach((child) => {
+      if(child.commented) {
+        actionHandler.trigger("blocks: toggle commented", {block: child, noUndoMerge: true}, false, false, true);
+      }
+      child.uncommentAllChildren();
+    });
+  }
+
+  isRecursiveParentCommented() {
+    if (this.isRoot) {
+      return false;
+    } else if (this.parent.commented) {
+      return this.parent;
+    } else {
+      return this.parent.isRecursiveParentCommented();
+    }
+  }
+
   isRecursiveParentMinimized() {
     if (this.isRoot) {
       return false;
@@ -1241,9 +1261,12 @@ class Block {
       this.loadCommentHeight(ctx);
     }
 
+    if(this.commented) {
+      ctx.globalAlpha = 0.4;
+    }
+
     if (!this.isRoot && this.isInView(camera)) {
       if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName] && this.attributes["string"][config.commentAttributeName].value) {
-
         if (this.style.comment.border.thickness > 0) {
           ctx.fillStyle = this.style.comment.border.color;
           ctx.fillRect(this.position.x - this.style.comment.border.thickness, this.position.y - this.style.comment.border.thickness,
@@ -1280,7 +1303,6 @@ class Block {
       }
 
       ctx.fillRect(this.position.x, this.getYPosition() /** this.style.font.size*/ , this.size.width, this.size.height);
-
 
       // Text is white or black depending on the colour of the block
       const hexColor = ctx.fillStyle;
@@ -1385,6 +1407,10 @@ class Block {
       this.children.forEach((child) => {
         child.render(ctx);
       });
+    }
+
+    if(this.commented) {
+      ctx.globalAlpha = 1;
     }
 
     if (this.isRoot) {

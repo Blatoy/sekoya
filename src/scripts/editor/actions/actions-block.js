@@ -295,6 +295,33 @@ module.exports.registerActions = () => {
     }
   });
 
+  actionHandler.addAction({
+    name: "blocks: toggle commented",
+    mergeUndoByDefault: true,
+    action: (data, actionHandlerParameter) => {
+      if(!data.noUndoMerge) {
+        actionHandler.separateMergeUndo();
+      }
+      if(data.block && !data.block.isRoot && !data.block.isRecursiveParentCommented()) {
+        data.block.uncommentAllChildren();
+        data.block.commented = !data.block.commented;
+        return true;
+      }
+
+      actionHandlerParameter.cancelUndo = true;
+      return false;
+    },
+    setData: (data = {noUndoMerge: false}) => {
+      if(data.block === undefined) {
+        data.block = Block.getSelectedBlock();
+      }
+      return {block: data.block, noUndoMerge: data.noUndoMerge};
+    },
+    undoAction: (data) => {
+      data.block.commented = !data.block.commented;
+    }
+  });
+
   // Block selection
   actionHandler.addAction({
     name: "blocks: unselect all",
