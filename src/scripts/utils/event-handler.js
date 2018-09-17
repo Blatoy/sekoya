@@ -107,6 +107,9 @@ module.exports.addEditorEvents = () => {
 
   let closeAllowed = false;
   window.addEventListener('beforeunload', function(event) {
+
+    tabManager.savePathsInLocalStorage();
+
     if(global.forceAppReload) {
       return true;
     }

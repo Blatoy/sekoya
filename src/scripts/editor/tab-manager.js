@@ -13,6 +13,15 @@ let selectedTabIndex = 0;
 
 function init() {
   newTab();
+  try {
+    let savedTabs = JSON.parse(localStorage.openedTabPaths);
+    if(savedTabs.length > 0) {
+      savedTabs.forEach((tabPath) => {
+        fileManager.open(tabPath);
+      });
+    }
+  }
+  catch(e) {}
 }
 
 function switchTab(direction = 0) {
@@ -102,6 +111,16 @@ function closeTab(index = 0, callback = () => {}, saveAndCloseCallback = () => {
   callback();
   return "closed";
 }
+
+module.exports.savePathsInLocalStorage = () => {
+  let openedTabPaths = [];
+  for(let i = 0; i < tabs.length; ++i) {
+    if(tabs[i].fileLocation) {
+      openedTabPaths.push(tabs[i].getFileLocation());
+    }
+  }
+  localStorage.openedTabPaths = JSON.stringify(openedTabPaths);
+};
 
 module.exports.anyUnsavedFiles = () => {
   for (let i = 0; i < tabs.length; ++i) {
