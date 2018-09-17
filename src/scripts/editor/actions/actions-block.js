@@ -301,6 +301,7 @@ module.exports.registerActions = () => {
     action: (data, actionHandlerParameter) => {
       if(!data.noUndoMerge) {
         actionHandler.separateMergeUndo();
+        tabManager.setFileModified();
       }
       if(data.block && !data.block.isRoot && !data.block.isRecursiveParentCommented()) {
         data.block.uncommentAllChildren();
