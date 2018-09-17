@@ -423,8 +423,13 @@ class Block {
 
     // Everything displayed below the parents count as the block's height
     if (!this.minimized) {
+      let blockBelowParentFound = false;
       this.children.forEach((child) => {
         if (getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
+          if(!blockBelowParentFound) {
+            extraHeight += this.style.blockBelowParentMargin.y;
+            blockBelowParentFound = true;
+          }
           extraHeight += child.getFullHeight();
         }
       });
