@@ -25,7 +25,7 @@ function mainLoop() {
 
       ctx.fillStyle = "gray";
       ctx.textAlign = "right";
-      ctx.fillText("Sekoya - ALPHA 0.1", canvas.width - 10, lineCount++ * 10);
+      ctx.fillText("Sekoya - Alpha 0.0.2", canvas.width - 10, lineCount++ * 10);
       ctx.fillText("FPS: " + displayedFps, canvas.width - 10, lineCount++ * 10);
       lineCount++;
       ctx.fillText("== HISTORY ==", canvas.width - 10, lineCount++ * 10);
