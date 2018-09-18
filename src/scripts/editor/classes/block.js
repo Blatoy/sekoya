@@ -796,12 +796,12 @@ class Block {
         let dist = Math.sqrt(vx ** 2 + vy ** 2);
         // crappy workaround for or blocks (and now also for other stuff)
         if (vy === 0 || vx === 0) {
-          dist /= 100;
+          dist /= 8;
         }
 
         if (
-          axis === "y" && (direction * child.position.y > direction * targetBlock.position.y) ||
-          axis === "x" && (direction * child.position.x > direction * targetBlock.position.x) ||
+          axis === "y" && (direction < 0 ? child.position.y + child.size.height < targetBlock.position.y : child.position.y > targetBlock.position.y + targetBlock.size.height) ||
+          axis === "x" && (direction < 0 ? child.position.x + child.size.width < targetBlock.position.x : child.position.x > targetBlock.position.x + targetBlock.size.width) ||
           axis === "all"
         ) {
           if (dist < results.bestDistance && child !== targetBlock) {
