@@ -790,7 +790,7 @@ class Block {
     let closestBlock = this;
 
     initialBlock.children.forEach((child) => {
-      if(!child.isRecursiveParentMinimized() && !child.minimized) {
+      if(!child.isRecursiveParentMinimized()) {
         let vx = child.position.x - targetBlock.position.x;
         let vy = child.position.y - targetBlock.position.y;
         let dist = Math.sqrt(vx ** 2 + vy ** 2);
