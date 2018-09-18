@@ -790,25 +790,27 @@ class Block {
     let closestBlock = this;
 
     initialBlock.children.forEach((child) => {
-      let vx = child.position.x - targetBlock.position.x;
-      let vy = child.position.y - targetBlock.position.y;
-      let dist = Math.sqrt(vx ** 2 + vy ** 2);
-      // crappy workaround for or blocks (and now also for other stuff)
-      if (vy === 0 || vx === 0) {
-        dist /= 100;
-      }
-
-      if (
-        axis === "y" && (direction * child.position.y > direction * targetBlock.position.y) ||
-        axis === "x" && (direction * child.position.x > direction * targetBlock.position.x) ||
-        axis === "all"
-      ) {
-        if (dist < results.bestDistance && child !== targetBlock) {
-          results.bestDistance = dist;
-          results.closestBlock = child;
+      if(!child.isRecursiveParentMinimized() && !child.minimized) {
+        let vx = child.position.x - targetBlock.position.x;
+        let vy = child.position.y - targetBlock.position.y;
+        let dist = Math.sqrt(vx ** 2 + vy ** 2);
+        // crappy workaround for or blocks (and now also for other stuff)
+        if (vy === 0 || vx === 0) {
+          dist /= 100;
         }
+
+        if (
+          axis === "y" && (direction * child.position.y > direction * targetBlock.position.y) ||
+          axis === "x" && (direction * child.position.x > direction * targetBlock.position.x) ||
+          axis === "all"
+        ) {
+          if (dist < results.bestDistance && child !== targetBlock) {
+            results.bestDistance = dist;
+            results.closestBlock = child;
+          }
+        }
+        child.getNearestBlock(direction, axis, targetBlock, child, results);
       }
-      child.getNearestBlock(direction, axis, targetBlock, child, results);
     });
 
     return results;
