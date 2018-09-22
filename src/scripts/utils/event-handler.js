@@ -118,11 +118,13 @@ module.exports.addEditorEvents = () => {
       event.returnValue = true;
     }
 
-    tabManager.closeAll(() => {
-      closeAllowed = true;
-      let mainWindow = remote.getCurrentWindow()
-      mainWindow.removeAllListeners('close');
-      mainWindow.destroy();
+    setTimeout(() => {
+      tabManager.closeAll(() => {
+        closeAllowed = true;
+        let mainWindow = remote.getCurrentWindow()
+        mainWindow.removeAllListeners('close');
+        mainWindow.destroy();
+      });
     });
   });
 };
