@@ -14,6 +14,7 @@ const blockLoader = require(editorFolderPath + "block-loader.js");
 const tabManager = require(editorFolderPath + "tab-manager.js");
 const fileManager = require(editorFolderPath + "file-manager.js");
 const camera = require(editorFolderPath + "camera.js");
+const scrollBars = require(editorFolderPath + "scroll-bars.js");
 
 const fs = require('fs');
 

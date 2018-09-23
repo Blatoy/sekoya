@@ -8,14 +8,18 @@ function mainLoop() {
 
   rootBlock.update();
   camera.update();
+  scrollBars.update();
 
   if(document.hasFocus() || global.tick % 10 === 0 || global.tabDown) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     camera.applyTransforms(ctx);
+
     rootBlock.renderConnections(ctx, camera);
     rootBlock.render(ctx, camera);
+
     camera.resetTransforms(ctx);
+    scrollBars.render(ctx);
 
     if(global.debugEnabled) {
       fps++;

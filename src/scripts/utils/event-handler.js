@@ -45,11 +45,13 @@ function setCanvasSize() {
 module.exports.addEditorEvents = () => {
   window.addEventListener("mousedown", (e) => {
     camera.onMouseDown(e.which);
+    scrollBars.onMouseDown();
     global.mouse.buttons[e.which] = true;
   });
 
   window.addEventListener("mouseup", (e) => {
     global.mouse.buttons[e.which] = false;
+    scrollBars.onMouseUp();
   });
 
   window.addEventListener("dblclick", (e) => {

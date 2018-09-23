@@ -426,7 +426,7 @@ class Block {
       let blockBelowParentFound = false;
       this.children.forEach((child) => {
         if (getLinkStyleProperty(child.linkToParentType, "displayBelowParent")) {
-          if(!blockBelowParentFound) {
+          if (!blockBelowParentFound) {
             extraHeight += this.style.blockBelowParentMargin.y;
             blockBelowParentFound = true;
           }
@@ -555,7 +555,7 @@ class Block {
         let previousSibling = this.getSibling(-1);
 
         let closestBlock = this.getNearestBlock(0, "all").closestBlock;
-        if(closestBlock) {
+        if (closestBlock) {
           closestBlock.setSelected();
         }
       }
@@ -588,7 +588,7 @@ class Block {
 
       // We want blocks that cannot be interacted with at the top
       // This could probably be in the config
-      if(a.preventInteraction) {
+      if (a.preventInteraction) {
         return -1;
       }
 
@@ -599,8 +599,8 @@ class Block {
       }
     });
 
-    for(let i = 0; i < previousOrder.length; ++i) {
-      if(previousOrder[i].position.y !== this.children[i].position.y) {
+    for (let i = 0; i < previousOrder.length; ++i) {
+      if (previousOrder[i].position.y !== this.children[i].position.y) {
         return true;
       }
     }
@@ -709,8 +709,11 @@ class Block {
 
   uncommentAllChildren() {
     this.children.forEach((child) => {
-      if(child.commented) {
-        actionHandler.trigger("blocks: toggle commented", {block: child, noUndoMerge: true}, false, false, true);
+      if (child.commented) {
+        actionHandler.trigger("blocks: toggle commented", {
+          block: child,
+          noUndoMerge: true
+        }, false, false, true);
       }
       child.uncommentAllChildren();
     });
@@ -790,7 +793,7 @@ class Block {
     let closestBlock = this;
 
     initialBlock.children.forEach((child) => {
-      if(!child.isRecursiveParentMinimized()) {
+      if (!child.isRecursiveParentMinimized()) {
         let vx = child.position.x - targetBlock.position.x;
         let vy = child.position.y - targetBlock.position.y;
         let dist = Math.sqrt(vx ** 2 + vy ** 2);
@@ -1089,45 +1092,48 @@ class Block {
 
   update() {
     mouseOverAnyBlock = false;
-    this.handleMouseInteraction();
+    if (scrollBars.getScrollState() === scrollBars.SCROLL_STATES.NONE_SELECTED) {
+      this.handleMouseInteraction();
 
-    if (!global.mouse.buttons["1"]) {
-      leftClickReleased = true;
-    } else {
-      if (leftClickReleased) {
-        leftClickReleased = false;
-        mouseClickPosition.x = global.mouse.cameraX;
-        mouseClickPosition.y = global.mouse.cameraY;
-      }
-    }
 
-    if (selectedBlock.dragged) {
-      selectedBlock.position.x = mouseClickPositionRelativeToBlock.x + global.mouse.cameraX;
-      selectedBlock.position.y = mouseClickPositionRelativeToBlock.y + global.mouse.cameraY;
-      rootBlock.getSelectedForGroupAction().forEach((block) => {
-        if (!block.dragged) {
-          block.position.x = block.mouseClickPositionRelativeToBlock.x + global.mouse.cameraX;
-          block.position.y = block.mouseClickPositionRelativeToBlock.y + global.mouse.cameraY;
-        }
-      });
-    } else if (global.mouse.buttons["1"]) {
-      //  if (global.mouse.cameraX != mouseClickPosition.x && global.mouse.cameraY != mouseClickPosition.y) {
-      if (!global.metaKeys.ctrl) {
-        selectingBlocks = true;
-      }
-      //  }
-    } else {
-      if (selectingBlocks) {
-        selectingBlocks = false;
-      }
-    }
-
-    // Prevent changing the moving canvas cursor
-    if (!global.mouse.buttons["2"]) {
-      if (mouseOverAnyBlock) {
-        document.getElementById("main-canvas").style.cursor = "pointer";
+      if (!global.mouse.buttons["1"]) {
+        leftClickReleased = true;
       } else {
-        document.getElementById("main-canvas").style.cursor = "default";
+        if (leftClickReleased) {
+          leftClickReleased = false;
+          mouseClickPosition.x = global.mouse.cameraX;
+          mouseClickPosition.y = global.mouse.cameraY;
+        }
+      }
+
+      if (selectedBlock.dragged) {
+        selectedBlock.position.x = mouseClickPositionRelativeToBlock.x + global.mouse.cameraX;
+        selectedBlock.position.y = mouseClickPositionRelativeToBlock.y + global.mouse.cameraY;
+        rootBlock.getSelectedForGroupAction().forEach((block) => {
+          if (!block.dragged) {
+            block.position.x = block.mouseClickPositionRelativeToBlock.x + global.mouse.cameraX;
+            block.position.y = block.mouseClickPositionRelativeToBlock.y + global.mouse.cameraY;
+          }
+        });
+      } else if (global.mouse.buttons["1"]) {
+        //  if (global.mouse.cameraX != mouseClickPosition.x && global.mouse.cameraY != mouseClickPosition.y) {
+        if (!global.metaKeys.ctrl) {
+          selectingBlocks = true;
+        }
+        //  }
+      } else {
+        if (selectingBlocks) {
+          selectingBlocks = false;
+        }
+      }
+
+      // Prevent changing the moving canvas cursor
+      if (!global.mouse.buttons["2"]) {
+        if (mouseOverAnyBlock) {
+          document.getElementById("main-canvas").style.cursor = "pointer";
+        } else {
+          document.getElementById("main-canvas").style.cursor = "default";
+        }
       }
     }
   }
@@ -1268,7 +1274,7 @@ class Block {
       this.loadCommentHeight(ctx);
     }
 
-    if(this.commented) {
+    if (this.commented) {
       ctx.globalAlpha = 0.4;
     }
 
@@ -1416,7 +1422,7 @@ class Block {
       });
     }
 
-    if(this.commented) {
+    if (this.commented) {
       ctx.globalAlpha = 1;
     }
 
