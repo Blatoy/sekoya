@@ -89,6 +89,11 @@ module.exports.registerActions = () => {
     undoAction: (data) => {
       data.block.position.x = data.oldPosition.x;
       data.block.position.y = data.oldPosition.y;
+
+      actionHandler.trigger("blocks: sort children using position", {
+        parentBlock: data.block.parent
+      });
+
       tabManager.setFileModified();
     },
     displayable: false,
