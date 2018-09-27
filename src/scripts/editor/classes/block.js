@@ -525,6 +525,9 @@ class Block {
   }
 
   getCopy() {
+    if(this.preventInteraction) {
+      return false;
+    }
     let copiedBlock = new Block(blockLoader.getDefinitionByName(this.name));
 
     for (let attributeType in this.attributes) {
@@ -946,7 +949,7 @@ class Block {
             this.mouseOver = true;
             mouseOverAnyBlock = true;
 
-            if (global.metaKeys.ctrl && global.mouse.buttons[1]) {
+            if (global.metaKeys.ctrl && global.mouse.buttons[1] && this.preventInteraction === false) {
               this.selectedForGroupAction = true;
             } else if (global.mouse.buttons[1] && !this.selectedForGroupAction) {
               rootBlock.unselectAll();
@@ -1065,7 +1068,9 @@ class Block {
         this.getYPosition() < y2 &&
         !global.dialogOpen
       ) {
-        this.selectedForGroupAction = true;
+        if(this.preventInteraction === false) {
+          this.selectedForGroupAction = true;
+        }
       } else {
         this.selectedForGroupAction = false;
       }

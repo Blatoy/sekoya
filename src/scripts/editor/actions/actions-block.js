@@ -104,7 +104,7 @@ module.exports.registerActions = () => {
   // Add / remove blocks
   actionHandler.addAction({
     name: "blocks: delete selected",
-    action: (data) => {
+    action: (data, actionHandlerParameters) => {
       for (let i = 0; i < data.length; ++i) {
         data[i].block.delete();
       }
@@ -123,6 +123,11 @@ module.exports.registerActions = () => {
       for (let i = 0; i < selectedBlocks.length; ++i) {
         let children = [];
         let selectedBlock = selectedBlocks[i];
+
+        if(selectedBlock.preventInteraction) {
+          continue;
+        }
+        
         // We have to restore it at the right position
         let blockIndex = selectedBlock.parent.children.indexOf(selectedBlock);
         selectedBlock.selectedForGroupAction = false;
@@ -471,7 +476,10 @@ module.exports.registerActions = () => {
 
       copiedBlocks = [];
       for (let i = 0; i < selectedBlocks.length; ++i) {
-        copiedBlocks.push(selectedBlocks[i].getCopy());
+        let copiedBlock = selectedBlocks[i].getCopy();
+        if(copiedBlock !== false) {
+          copiedBlocks.push(copiedBlock);
+        }
       }
     }
   });
