@@ -65,7 +65,7 @@ function renameTab(index, name) {
 
 function closeTab(index = 0, callback = () => {}, saveAndCloseCallback = () => {}) {
   if (!tabs[index].saved) {
-    switch (dialog.showMessageBox({
+    switch (dialog.showMessageBox(remote.getCurrentWindow(), {
       type: "question",
       buttons: ["Save", "Discard changes", "Cancel"],
       title: "You have unsaved changes",
