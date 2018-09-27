@@ -42,3 +42,4 @@ module.exports.addCSSToCurrentPage = () => {
 
 module.exports.blocksStyle = loadJSONStyle("block-style");
 module.exports.linkStyles = loadJSONStyle("link-style");
+module.exports.editorStyle = loadJSONStyle("editor-style");

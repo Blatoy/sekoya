@@ -1,0 +1,9 @@
+{
+  "scrollbars": {
+    "background": "#f1f1f1",
+    "foreground": "#c1c1c1",
+    "backgroundWidth": 20,
+    "sliderWidth": 16,
+    "sliderOffset": 2
+  }
+}

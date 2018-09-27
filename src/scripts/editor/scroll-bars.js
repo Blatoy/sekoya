@@ -1,4 +1,6 @@
-const size = 10;
+const size = themeLoader.editorStyle.scrollbars.backgroundWidth;
+const sliderSize = themeLoader.editorStyle.scrollbars.sliderWidth;
+const sliderOffset = themeLoader.editorStyle.scrollbars.sliderOffset;
 
 const SCROLL_STATES = {
   NONE_SELECTED: 0,
@@ -111,8 +113,8 @@ function isPositionOverHorizontalScrollBar(position) {
 }
 
 module.exports.render = (ctx) => {
-  const backgroundColor = "#282C34";
-  const foregroundColor = "#4B5362";
+  const backgroundColor = themeLoader.editorStyle.scrollbars.background;
+  const foregroundColor = themeLoader.editorStyle.scrollbars.foreground;
 
   const x = canvas.width - size;
   const y = canvas.height - size;
@@ -121,9 +123,9 @@ module.exports.render = (ctx) => {
   ctx.fillStyle = backgroundColor;
   // Scroll bar backgrounds (they still take all the place as we don't want a hole in the bottom part)
   // Vertical
-  ctx.fillRect(x + size / 5, 0, size, canvas.height);
+  ctx.fillRect(x, 0, size, canvas.height);
   // Horizontal
-  ctx.fillRect(0, y + size / 4, canvas.width, size);
+  ctx.fillRect(0, y, canvas.width, size);
 
   // Scroll bar foreground
   // Vertical
@@ -131,14 +133,14 @@ module.exports.render = (ctx) => {
   const scrollBarPositionY = getScrollBarPositionY();
   const scrollbarHeight = getScrollBarHeight();
   if (scrollbarHeight < getScrollBarDisplayHeight()) {
-    ctx.fillRect(x + size / 4, (scrollBarPositionY), size / 2, scrollbarHeight);
+    ctx.fillRect(x + sliderOffset, (scrollBarPositionY), sliderSize, scrollbarHeight);
   }
 
   // Horizontal
   const scrollBarPositionX = getScrollBarPositionX();
   const scrollbarWidth = getScrollBarWidth();
   if (scrollbarWidth < getScrollBarDisplayWidth()) {
-    ctx.fillRect((scrollBarPositionX), y + size / 4, scrollbarWidth, size / 2);
+    ctx.fillRect((scrollBarPositionX), y + sliderOffset, scrollbarWidth, sliderSize);
   }
 };
 
