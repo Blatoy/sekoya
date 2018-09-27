@@ -16,11 +16,11 @@ let clickOffsetX = 0;
 let scrollState = SCROLL_STATES.NONE_SELECTED;
 
 function getScrollBarDisplayHeight() {
-  return canvas.height - size;
+  return canvas.height;
 }
 
 function getScrollBarDisplayWidth() {
-  return canvas.width - size
+  return canvas.width;
 }
 
 // Vertical scroll bar
@@ -115,13 +115,13 @@ function isPositionOverHorizontalScrollBar(position) {
 module.exports.render = (ctx) => {
   const backgroundColor = themeLoader.editorStyle.scrollbars.background;
   const foregroundColor = themeLoader.editorStyle.scrollbars.foreground;
+  const cameraBounds = camera.getBounds();
 
   const x = canvas.width - size;
   const y = canvas.height - size;
 
 
   ctx.fillStyle = backgroundColor;
-  // Scroll bar backgrounds (they still take all the place as we don't want a hole in the bottom part)
   // Vertical
   ctx.fillRect(x, 0, size, canvas.height);
   // Horizontal
@@ -131,15 +131,22 @@ module.exports.render = (ctx) => {
   // Vertical
   ctx.fillStyle = foregroundColor;
   const scrollBarPositionY = getScrollBarPositionY();
-  const scrollbarHeight = getScrollBarHeight();
+  let scrollbarHeight = getScrollBarHeight();
+
   if (scrollbarHeight < getScrollBarDisplayHeight()) {
+    if(scrollbarHeight + scrollBarPositionY > cameraBounds.height - size) {
+      scrollbarHeight -= size;
+    }
     ctx.fillRect(x + sliderOffset, (scrollBarPositionY), sliderSize, scrollbarHeight);
   }
 
   // Horizontal
   const scrollBarPositionX = getScrollBarPositionX();
-  const scrollbarWidth = getScrollBarWidth();
+  let scrollbarWidth = getScrollBarWidth();
   if (scrollbarWidth < getScrollBarDisplayWidth()) {
+    if(scrollbarWidth + scrollBarPositionX > cameraBounds.width - size) {
+      scrollbarWidth -= size;
+    }
     ctx.fillRect((scrollBarPositionX), y + sliderOffset, scrollbarWidth, sliderSize);
   }
 };
