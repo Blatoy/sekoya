@@ -1279,30 +1279,38 @@ class Block {
     }
 
     if (!this.isRoot && this.isInView(camera)) {
-      if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName] && this.attributes["string"][config.commentAttributeName].value) {
-        if (this.style.comment.border.thickness > 0) {
-          ctx.fillStyle = this.style.comment.border.color;
-          ctx.fillRect(this.position.x - this.style.comment.border.thickness, this.position.y - this.style.comment.border.thickness,
-            this.size.width * this.style.comment.width + this.style.comment.border.thickness * 2, this.commentHeight + this.style.comment.border.thickness * 2);
-        }
-        ctx.font = this.style.font.size + "px " + this.style.font.family;
-        ctx.textBaseline = "top";
-        ctx.textAlign = "left";
-        ctx.fillStyle = this.style.comment.backgroundColor;
-        ctx.fillRect(this.position.x, this.position.y, this.size.width * this.style.comment.width, this.commentHeight);
-        ctx.fillStyle = this.style.comment.textColor;
+      // Block comment
+      if (camera.getScaling() > 0.07) {
+        if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName] && this.attributes["string"][config.commentAttributeName].value) {
+          if (this.style.comment.border.thickness > 0) {
+            ctx.fillStyle = this.style.comment.border.color;
+            ctx.fillRect(this.position.x - this.style.comment.border.thickness, this.position.y - this.style.comment.border.thickness,
+              this.size.width * this.style.comment.width + this.style.comment.border.thickness * 2, this.commentHeight + this.style.comment.border.thickness * 2);
+          }
 
-        let lines = this.getCommentLines(ctx);
-        for (let i = 0; i < lines.length; ++i) {
-          ctx.fillText(lines[i], this.position.x + this.style.comment.padding.left, this.position.y + i * this.style.font.size + this.style.comment.padding.top)
-        }
-      }
+          ctx.fillStyle = this.style.comment.backgroundColor;
+          ctx.fillRect(this.position.x, this.position.y, this.size.width * this.style.comment.width, this.commentHeight);
 
-      // Render block
-      if (this.style.border) {
-        ctx.fillStyle = this.style.border.color;
-        ctx.fillRect(this.position.x - this.style.border.thickness, this.getYPosition() - this.style.border.thickness,
-          this.size.width + this.style.border.thickness * 2, this.size.height + this.style.border.thickness * 2);
+          // Comment text
+          if (camera.getScaling() > 0.3) {
+            ctx.font = this.style.font.size + "px " + this.style.font.family;
+            ctx.textBaseline = "top";
+            ctx.textAlign = "left";
+            ctx.fillStyle = this.style.comment.textColor;
+
+            let lines = this.getCommentLines(ctx);
+            for (let i = 0; i < lines.length; ++i) {
+              ctx.fillText(lines[i], this.position.x + this.style.comment.padding.left, this.position.y + i * this.style.font.size + this.style.comment.padding.top)
+            }
+          }
+        }
+
+        // Render block
+        if (this.style.border) {
+          ctx.fillStyle = this.style.border.color;
+          ctx.fillRect(this.position.x - this.style.border.thickness, this.getYPosition() - this.style.border.thickness,
+            this.size.width + this.style.border.thickness * 2, this.size.height + this.style.border.thickness * 2);
+        }
       }
 
       if (this.selectedForGroupAction) {
@@ -1317,100 +1325,103 @@ class Block {
 
       ctx.fillRect(this.position.x, this.getYPosition() /** this.style.font.size*/ , this.size.width, this.size.height);
 
-      // Text is white or black depending on the colour of the block
-      const hexColor = ctx.fillStyle;
-      const red = parseInt(hexColor.slice(1, 3), 16);
-      const green = parseInt(hexColor.slice(3, 5), 16);
-      const blue = parseInt(hexColor.slice(5, 7), 16);
-      const gray = red * 0.299 + green * 0.587 + blue * 0.114;
-      const textColour = gray < 140 ? "white" : "black";
+      if (camera.getScaling() > 0.07) {
+        // Text is white or black depending on the colour of the block
+        const hexColor = ctx.fillStyle;
+        const red = parseInt(hexColor.slice(1, 3), 16);
+        const green = parseInt(hexColor.slice(3, 5), 16);
+        const blue = parseInt(hexColor.slice(5, 7), 16);
+        const gray = red * 0.299 + green * 0.587 + blue * 0.114;
+        const textColour = gray < 140 ? "white" : "black";
 
-      // Selection border
-      if (this.selected) {
-        ctx.setLineDash([this.style.selected.dashInterval]);
-        ctx.lineDashOffset = tick / this.style.selected.speedDivider;
-        ctx.lineWidth = this.style.selected.width;
+        // Selection border
+        if (this.selected) {
+          ctx.setLineDash([this.style.selected.dashInterval]);
+          ctx.lineDashOffset = tick / this.style.selected.speedDivider;
+          ctx.lineWidth = this.style.selected.width;
 
-        ctx.strokeRect(this.position.x - this.style.selected.padding,
-          this.getYPosition() - this.style.selected.padding,
-          this.size.width + this.style.selected.padding * 2,
-          this.size.height + this.style.selected.padding * 2);
+          ctx.strokeRect(this.position.x - this.style.selected.padding,
+            this.getYPosition() - this.style.selected.padding,
+            this.size.width + this.style.selected.padding * 2,
+            this.size.height + this.style.selected.padding * 2);
 
-        ctx.lineDashOffset = 0;
-      }
-
-
-      if (this.searchSelected) {
-        ctx.fillStyle = "rgba(255, 255, 255, " + Math.abs(Math.sin(tick * 0.05) * 0.8 + 0.1) + ")";
-        ctx.fillRect(this.position.x, this.getYPosition() /** this.style.font.size*/ , this.size.width, this.size.height);
-      }
-
-
-      if (this.children.length > 0 && this.minimized) {
-        // Draw an indicator that this block is minimized
-        ctx.fillStyle = this.style.collapseCross.color;
-        // -
-        ctx.fillRect(
-          this.position.x + this.size.width + this.style.collapseCross.padding / 2,
-          this.getYPosition() + (this.size.height - this.style.collapseCross.width) / 2,
-          this.style.collapseCross.size, this.style.collapseCross.width
-        );
-        // |
-        ctx.fillRect(
-          this.position.x + this.size.width + (this.style.collapseCross.padding - this.style.collapseCross.width + this.style.collapseCross.size) / 2,
-          this.getYPosition() + (this.size.height - (this.style.collapseCross.size)) / 2,
-          this.style.collapseCross.width, this.style.collapseCross.size
-        );
-      }
-
-      // Mouse over color
-      if (this.mouseOver) {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
-        ctx.fillRect(this.position.x, this.getYPosition(), this.size.width, this.size.height);
-      }
-
-      ctx.fillStyle = textColour;
-
-      // Text
-      if (camera.getScaling() > 0.3) {
-        ctx.font = this.style.font.size + "px " + this.style.font.family;
-        ctx.textBaseline = "middle";
-        ctx.textAlign = "center";
-
-        if (!global.debugEnabled) {
-          ctx.fillText(this.name, this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
-        } else {
-          ctx.fillText("[" + this.parent.children.indexOf(this) + "] " + this.name + " / " /*+ selectedBlock.isRecursiveChild(this)  + " - "*/ + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")", this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
+          ctx.lineDashOffset = 0;
         }
-      }
 
-      // DEBUG: Display blocks real height
-      if (global.debugEnabled) {
-        ctx.setLineDash([]);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "rgba(255, 0, 0, 0.4)";
-        ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getFullHeight());
-        ctx.strokeStyle = "rgba(50, 100, 250, 0.4)";
-        ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getMaxRecursiveHeight());
-      }
 
-      ctx.textAlign = "left";
-      ctx.fillStyle = this.style.attributeColor;
-      ctx.textBaseline = "top";
+        if (this.searchSelected) {
+          ctx.fillStyle = "rgba(255, 255, 255, " + Math.abs(Math.sin(tick * 0.05) * 0.8 + 0.1) + ")";
+          ctx.fillRect(this.position.x, this.getYPosition() /** this.style.font.size*/ , this.size.width, this.size.height);
+        }
 
-      let lineCounter = 0;
-      // Render attributes
-      for (let type in this.attributes) {
-        for (let i in this.attributes[type]) {
-          if (this.attributes[type][i].name !== config.commentAttributeName) {
-            // Draw rect instead of text when zoomed out too much to increase performances
-            if (camera.getScaling() < 0.4) {
-              ctx.fillRect(this.position.x, this.size.height + this.getYPosition() + this.style.font.size * lineCounter, this.attributes[type][i].name.length * 5, 2);
-            } else {
-              let value = this.attributes[type][i].value === undefined ? "" : this.attributes[type][i].value + "";
-              ctx.fillText((this.attributes[type][i].shortName || this.attributes[type][i].name) + ": " + value.slice(0, 15), this.position.x, this.size.height + this.getYPosition() + this.style.font.size * lineCounter);
+
+        if (this.children.length > 0 && this.minimized) {
+          // Draw an indicator that this block is minimized
+          ctx.fillStyle = this.style.collapseCross.color;
+          // -
+          ctx.fillRect(
+            this.position.x + this.size.width + this.style.collapseCross.padding / 2,
+            this.getYPosition() + (this.size.height - this.style.collapseCross.width) / 2,
+            this.style.collapseCross.size, this.style.collapseCross.width
+          );
+          // |
+          ctx.fillRect(
+            this.position.x + this.size.width + (this.style.collapseCross.padding - this.style.collapseCross.width + this.style.collapseCross.size) / 2,
+            this.getYPosition() + (this.size.height - (this.style.collapseCross.size)) / 2,
+            this.style.collapseCross.width, this.style.collapseCross.size
+          );
+        }
+
+        // Mouse over color
+        if (this.mouseOver) {
+          ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+          ctx.fillRect(this.position.x, this.getYPosition(), this.size.width, this.size.height);
+        }
+
+        ctx.fillStyle = textColour;
+
+        // Text
+        if (camera.getScaling() > 0.3) {
+          ctx.font = this.style.font.size + "px " + this.style.font.family;
+          ctx.textBaseline = "middle";
+          ctx.textAlign = "center";
+
+          if (!global.debugEnabled) {
+            ctx.fillText(this.name, this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
+          } else {
+            ctx.fillText("[" + this.parent.children.indexOf(this) + "] " + this.name + " / " /*+ selectedBlock.isRecursiveChild(this)  + " - "*/ + this.getMaxRecursiveHeight() + " (" + this.getFullHeight() + ")", this.position.x + this.size.width * 0.5, this.getYPosition() + this.size.height * 0.5);
+          }
+        }
+
+        // DEBUG: Display blocks real height
+        if (global.debugEnabled) {
+          ctx.setLineDash([]);
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = "rgba(255, 0, 0, 0.3)";
+          ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getFullHeight());
+          ctx.strokeStyle = "rgba(50, 100, 250, 0.4)";
+          ctx.strokeRect(this.position.x, this.position.y, this.size.width, this.getMaxRecursiveHeight());
+        }
+
+
+        ctx.textAlign = "left";
+        ctx.fillStyle = this.style.attributeColor;
+        ctx.textBaseline = "top";
+
+        let lineCounter = 0;
+        // Render attributes
+        for (let type in this.attributes) {
+          for (let i in this.attributes[type]) {
+            if (this.attributes[type][i].name !== config.commentAttributeName) {
+              // Draw rect instead of text when zoomed out too much to increase performances
+              if (camera.getScaling() < 0.4) {
+                ctx.fillRect(this.position.x, this.size.height + this.getYPosition() + this.style.font.size * lineCounter, this.attributes[type][i].name.length * 5, 2);
+              } else {
+                let value = this.attributes[type][i].value === undefined ? "" : this.attributes[type][i].value + "";
+                ctx.fillText((this.attributes[type][i].shortName || this.attributes[type][i].name) + ": " + value.slice(0, 15), this.position.x, this.size.height + this.getYPosition() + this.style.font.size * lineCounter);
+              }
+              lineCounter++;
             }
-            lineCounter++;
           }
         }
       }
