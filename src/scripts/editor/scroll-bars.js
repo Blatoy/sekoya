@@ -94,9 +94,11 @@ function isPositionOverVerticalScrollBar(position) {
   const scrollBarY = getScrollBarPositionY();
   const scrollbarHeight = getScrollBarHeight();
   if (position.x > canvas.width - size) {
-    if (position.y > scrollBarY && position.y < scrollBarY + scrollbarHeight) {
+    return true;
+    // This may be changed later if it doesn't feel right
+    /*if (position.y > scrollBarY && position.y < scrollBarY + scrollbarHeight) {
       return true;
-    }
+    }*/
   }
   return false;
 }
@@ -105,9 +107,11 @@ function isPositionOverHorizontalScrollBar(position) {
   const scrollBarX = getScrollBarPositionX();
   const scrollbarWidth = getScrollBarWidth();
   if (position.y > canvas.height - size) {
-    if (position.x > scrollBarX && position.x < scrollBarX + scrollbarWidth) {
+    return true;
+    // This may be changed later if it doesn't feel right
+    /*if (position.x > scrollBarX && position.x < scrollBarX + scrollbarWidth) {
       return true;
-    }
+    }*/
   }
   return false;
 }
