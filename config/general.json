@@ -1,7 +1,10 @@
 {
   "//": "Name of the theme located in themes, uses default values if not found",
     "theme": "dark",
-    "forceAutoLayout": true,
+  "//": "Can be 'none', 'children', 'auto', 'always'",
+    "autoLayoutLevel": "auto",
   "//": "Filename of the file to use in block-definitions",
-    "blockDefinitionFile": "awesomenauts.xml"
+    "blockDefinitionFile": "awesomenauts.xml",
+  "//": "",
+    "debugEnabled": true
 }

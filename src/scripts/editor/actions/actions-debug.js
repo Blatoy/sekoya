@@ -1,6 +1,6 @@
 const DISPLAY_DEBUG_COMMANDS = true;
 
-global.debugEnabled = false;
+global.debugEnabled = config.debugEnabled;
 
 module.exports.registerActions = () => {
   actionHandler.addAction({
