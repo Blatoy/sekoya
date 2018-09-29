@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<blockdefinitions>
+
+  <predefined_values id="bubbleType">
+    <value>default</value>
+    <value>exclamation</value>
+    <value>thinking</value>
+    <value>invisible</value>
+  </predefined_values>
+
+  <block_list>
+
+    <block_list name="adjustCharacterValue">
+      <string name="property" values="charactervaluesAdjustable" defaultvalue="health"/>
+      <float name="value"/>
+      <string name="adjust method" values="valueadjust" defaultvalue="set"/>
+    </block_list>
+
+  </block_list>
+
+</blockdefinitions>

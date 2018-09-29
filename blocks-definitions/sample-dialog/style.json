@@ -1,0 +1,30 @@
+{
+  "default": {
+    "blocks": {
+      "root": {
+        "color": "#6494ED"
+      },
+      "condition": {
+        "color": "#E2C08D"
+      },
+      "action": {
+        "color": "#9DA5B4"
+      },
+      "other": {
+        "color": "#FF6347"
+      },
+      "logic": {
+        "color": "#50F244"
+      }
+    },
+    "links": []
+  },
+  "dark": {
+    "blocks": [],
+    "links": []
+  },
+  "behaviour-tree-creator": {
+    "blocks": [],
+    "links": []
+  }
+}

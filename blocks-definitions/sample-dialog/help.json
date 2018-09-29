@@ -1,0 +1,1231 @@
+{
+  "addAmmo": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "amount": "",
+      "ammoSettingsIdentifier": ""
+    }
+  },
+  "adjustCounter": {
+    "description": "Creates or modifies a counter with <b>id</b> as identifier and changes its value.",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "id": "The ID used to identify the counter",
+      "value": "A value or a counter name. Supports basic arithmetic (+, -, *, /, ^)",
+      "adjust method": "The action to do with <b>value</b>"
+    }
+  },
+  "adjustMissionCounter": {
+    "incomplete": true,
+    "description": "Used for achievements tracking.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": true,
+    "properties": {
+      "id": "",
+      "value": "",
+      "adjust method": ""
+    }
+  },
+  "adjustCharacterValue": {
+    "description": "Changes character's solar or health",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "property": "The value to change",
+      "adjust method": "The action to do with <b>value</b>",
+      "value": "A value or a counter name. Supports basic arithmetic (+, -, *, /, ^)"
+    }
+  },
+  "aimStickAtTarget": {
+    "incomplete": true,
+    "description": "Make the bot AIM at the target. The bot may move automatically when this is called.",
+    "hostOnly": false,
+    "worksFor": "bot",
+    "useless": false,
+    "properties": {
+      "duration seconds": "How much time the bot should AIM at target after this block is called",
+      "min rotation speed per second in degrees": "",
+      "max rotation speed per second in degrees": "",
+      "use min rotation speed when angle to target under": "",
+      "use max rotation speed when angle to target over": "",
+      "only aim when needed": "",
+      "use rotation speed limits": ""
+    }
+  },
+  "buyUpgrade": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "upgrade name": "The dev name of the upgrade to buy."
+    }
+  },
+  "completeMission": {
+    "incomplete": true,
+    "description": "Used for achievements tracking.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": true,
+    "properties": {
+      "delay": ""
+    }
+  },
+  "enableUpgrade": {
+    "description": "Add or remove an upgrade.",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "condition": "<b>yes</b>: Add the upgrade. </b>no</b>: Remove the upgrade.",
+      "upgrade name": "The name of the upgrade. An upgrade may be a shop item or something like <i>LEVELCOOLDOWNREDUCTION</i>."
+    }
+  },
+  "emitMessageInArea": {
+    "description": "Send an invisible messages to other characters. Works only on characters spawned using <b>spawnCharacter</b> if you aren't the host. Doesn't send the message to other players if you are the host.",
+    "hostOnly": true,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "id": "The identifier for your message. Used by <b>receivedMessage</b>.",
+      "receive groups": "Who can receive the message.",
+      "receive relatives": "Spawned characters are the child of the character who spawned them (using spawnCharacter). The character who spawned a character is the parent of the spawned character",
+      "teams": "Teams who can receive the message",
+      "ignore invisibility": "Team mates can neve be invisible. Invisible enemies are considered visible if the AI collides with the enemy.",
+      "never detect invisible targets without character collision": "If set to yes, the AI will have to collide an invisible character to detect it.",
+      "check line of sight": "Check if there are obstacles between the target and the AI",
+      "xOffset": "Move the x coordinate of the center of the area check",
+      "yOffset": "Move the y coordinate of the center of the area check",
+      "width": "The width used to find a target. If set to 0, it will never find a target.",
+      "height": "The height used to find a target. If set to 0, it will never find a target."
+    }
+  },
+  "emitTargetInArea": {
+    "description": "Send the current target to other characters. Works only on characters spawned using <b>spawnCharacter</b> if you aren't the host. Doesn't send the message to other players if you are the host.",
+    "hostOnly": true,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "receive groups": "Who can receive the message.",
+      "teams": "Teams who can receive the message",
+      "xOffset": "Move the x coordinate of the center of the area check",
+      "yOffset": "Move the y coordinate of the center of the area check",
+      "width": "The width used to find a target. If set to 0, it will never find a target.",
+      "height": "The height used to find a target. If set to 0, it will never find a target."
+    }
+  },
+  "executeBehaviourTree": {
+    "description": "Import another AI to this one.",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "fileName": "You can import custom AI by setting fileName to: <i>(Mod) xxx</i> where xxx is the name of your file."
+    }
+  },
+  "missionGetScore": {
+    "incomplete": true,
+    "description": "Used for achievements tracking.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": true,
+    "properties": {
+      "class": "",
+      "type": "",
+      "store in": ""
+    }
+  },
+  "log": {
+    "description": "Adds a message to the log. This message can be seen when using the F4 debugger. Useful for figuring out which parts of the AI are executing. Can include bool and counter variables.",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "text": "The text to display.",
+      "counter": "The counter to display",
+      "bool": "The boolean to display"
+    }
+  },
+  "logMetric": {
+    "incomplete": true,
+    "description": "Used internally by Ronimo.",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": true,
+    "properties": {
+      "MetricIdentifier": "",
+      "AdditionalKeyValuePairsString": "",
+      "AdditionalKeyValuePairsInt": "",
+      "AdditionalKeyValuePairsBool": "",
+      "AdditionalKeyValuePairsFloat": "",
+      "addReplayID": "",
+      "countersToAdd": ""
+    }
+  },
+  "pauseGame": {
+    "incomplete": true,
+    "description": "Pause the game for the player.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": false,
+    "properties": {
+      "endOnButtonPress": "Unpause when a button is pressed.",
+      "endOnAnimationFinished": "Unpause when the animation if finished.",
+      "endOnTimeElapsed": "Unpaused after a certain time",
+      "animationName": "The name of the animation to play",
+      "loopAnimation": "The name of the animation to loop once the first animation is finished.",
+      "animationNameBasedOnInputHardware": "",
+      "animationTextsBasedOnInputHardware": "",
+      "endOnTimeElapsedTime": "",
+      "animationXPosition": "",
+      "animationYPosition": "",
+      "animationSize": "Change the scaling of the animation. If set to 0, the animation will be invisible"
+    }
+  },
+  "getTeamLevel": {
+    "description": "Return the team level minus one. (level 1 = 0, level 20 = 19) and store it in a counter",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "team": "The team where the level is get",
+      "counter": "The counter to use to store team level"
+    }
+  },
+  "playAnimation": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "animationName": "",
+      "location": "",
+      "dummyToFollow": "",
+      "mirrorX": "",
+      "team": "",
+      "addOverlayPrefix": "",
+      "allowRotating": "",
+      "textReplace1TextID": "",
+      "textReplace1Replacement": "",
+      "textReplace1ReplacementIsLocalizationID": "",
+      "textReplace2TextID": "",
+      "textReplace2Replacement": "",
+      "textReplace2ReplacementIsLocalizationID": "",
+      "textureReplace1VisualName": "",
+      "textureReplace1ReplacementName": "",
+      "textureReplace2VisualName": "",
+      "textureReplace2ReplacementName": "",
+      "xPosition": "",
+      "yPosition": "",
+      "xHudOnlyAnchorPosition": "",
+      "yHudOnlyAnchorPosition": "",
+      "scale": "",
+      "depth": ""
+    }
+  },
+  "playSound": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "soundGroup": "The sound to play. You can find a list of soundGroup <a href='https://awesomenauts.gamepedia.com/List_of_SoundGroups'>here</a>. Please note that each soundGroup contains multiples sounds and you can't choose which one to play.",
+      "forcePlay": "",
+      "duckingAmountSFX": "",
+      "duckingAmountVoice": "",
+      "duckingAmountAnnouncer": "",
+      "duckingAmountMusic": ""
+    }
+  },
+  "stopSound": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "soundGroup": ""
+    }
+  },
+  "pressButton": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "bot",
+    "useless": false,
+    "properties": {
+      "button": "",
+      "duration in seconds": ""
+    }
+  },
+  "pressStick": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "bot",
+    "useless": false,
+    "properties": {
+      "direction": "",
+      "duration in seconds": ""
+    }
+  },
+  "randomizeMissionCounter": {
+    "incomplete": true,
+    "description": "Used for achievements tracking.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": true,
+    "properties": {
+      "id": "",
+      "low": "",
+      "high": ""
+    }
+  },
+  "receiveTarget": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": true,
+    "worksFor": "bot",
+    "useless": false,
+    "properties": {}
+  },
+  "resetMissionVariables": {
+    "incomplete": true,
+    "description": "Used for achievements tracking.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": true,
+    "properties": {}
+  },
+  "removeTarget": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "bot",
+    "useless": false,
+    "properties": {}
+  },
+  "selectDestWaypoint": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "name": "",
+      "team": ""
+    }
+  },
+  "selectLocalPlayerTarget": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "localPlayerIndex": ""
+    }
+  },
+  "selectTarget": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "groups to select": "",
+      "teams": "",
+      "class": "",
+      "only check parent": "",
+      "remove if not found": "",
+      "compare method": "",
+      "distance check": "",
+      "check line of sight": "",
+      "ignore invisibility": "",
+      "never detect invisible targets without character collision": "",
+      "xOffset": "",
+      "yOffset": "",
+      "width": "",
+      "height": "",
+      "health value": ""
+    }
+  },
+  "selectPingWaypoint": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "ping": ""
+    }
+  },
+  "selectTargetWaypoint": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+
+    }
+  },
+  "setBool": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "id": "",
+      "value": ""
+    }
+  },
+  "setLevelButton": {
+    "incomplete": true,
+    "description": "Press / unpress a button on the map. Works only for the host.",
+    "hostOnly": true,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "button": "The name of the button you want to press.",
+      "down": "Set permanently the state of the button (except if someone )"
+    }
+  },
+  "setMissionBool": {
+    "incomplete": true,
+    "description": "Used for achievements tracking.",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": true,
+    "properties": {
+      "id": "",
+      "value": ""
+    }
+  },
+  "spawnCharacter": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "className": "",
+      "aiFileName": "",
+      "team": "",
+      "spawnPositionNodeID": "",
+      "count": "",
+      "spawnPositionOffsetX": "",
+      "spawnPositionOffsetY": ""
+    }
+  },
+  "stopAnimation": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "animationName": ""
+    }
+  },
+  "wait": {
+    "description": "Wait the specified time before doing the next action in a <b>sequence block</b>. Has no effect if not placed in a <b>sequence block</b>.",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "time": "The time to wait in second."
+    }
+  },
+  "writeToTextbox": {
+    "incomplete": true,
+    "description": "Display (localised) text in the top left corner of the screen. If no textures specified the background will be purple.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": false,
+    "properties": {
+      "localizationID": "",
+      "texture": "",
+      "transparency": "",
+      "duration": ""
+    }
+  },
+  "startCameraSequence": {
+    "incomplete": true,
+    "description": "Move the camera to each specified named area. Can be triggered only once (reset it by killing the player) and can't be canceled.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": false,
+    "properties": {
+      "areaNames": "The list of <a href='https://awesomenauts.gamepedia.com/NamedArea'>named areas</a> you want the camera to move to separated by a space.",
+      "transitionTimes": "",
+      "holdTimes": "",
+      "cameraHeights": ""
+    }
+  },
+  "lockPlayerInput": {
+    "description": "Prevent or allow the player to press all buttons",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": false,
+    "properties": {
+      "shouldLock": "Set this to true to lock all player or to false to unlock all inputs."
+    }
+  },
+  "lockPlayerInputSpecificButtons": {
+    "description": "Prevent or allow the player to press specified buttons.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": false,
+    "properties": {
+      "shouldLock": "",
+      "buttons to (un)lock": "Set this to true to lock all specified input or to false to unlock specified inputs."
+    }
+  },
+  "generateLoadout": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "isTutorial": "",
+      "className": ""
+    }
+  },
+  "canPayUpgrade": {
+    "description": "Returns yes if the player has enough solar to buy an upgrade",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "upgrade name": "The name of the upgrade to check the price."
+    }
+  },
+  "hasDestWaypoint": {
+    "incomplete": true,
+    "description": "Returns yes if the bot has a destination waypoint",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+
+    }
+  },
+  "hasTarget": {
+    "incomplete": true,
+    "description": "Returns yes if the bot has a target",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "condition": ""
+    }
+  },
+  "hasUpgrade": {
+    "incomplete": true,
+    "description": "Returns yes if a character has bought an upgrade. This block allows to check for other players",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "class": "",
+      "team": "",
+      "upgrade name": ""
+    }
+  },
+  "isAtDestWaypoint": {
+    "incomplete": true,
+    "description": "Returns yes if the AI reached the destination waypoint",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+
+    }
+  },
+  "isCharacterInArea": {
+    "incomplete": true,
+    "description": "Returns yes while specified objects are in a given range with the specified conditions.",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "groups": "",
+      "teams": "",
+      "class": "",
+      "only check parent": "",
+      "only check children": "",
+      "count characters out of combat": "",
+      "condition": "",
+      "comparison": "",
+      "character minimum": "",
+      "check line of sight": "",
+      "ignore invisibility": "",
+      "never detect invisible targets without character collision": "",
+      "value": "",
+      "xOffset": "",
+      "yOffset": "",
+      "width": "",
+      "height": ""
+    }
+  },
+  "isNextWaypointInArea": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "xOffset": "",
+      "yOffset": "",
+      "width": "",
+      "height": ""
+    }
+  },
+  "isOnGround": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "condition": "",
+      "check on": ""
+    }
+  },
+  "isTargetInArea": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "condition": "",
+      "check line of sight": "",
+      "ignore invisibility": "",
+      "never detect invisible targets without character collision": "",
+      "xOffset": "",
+      "yOffset": "",
+      "width": "",
+      "height": ""
+    }
+  },
+  "isTargetPosition": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "condition": "",
+      "target position": ""
+    }
+  },
+  "isTargetType": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "condition": "",
+      "target groups": ""
+    }
+  },
+  "isTurretInArea": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "teams": "",
+      "health comparison": "",
+      "check line of sight": "",
+      "health": "",
+      "xOffset": "",
+      "yOffset": "",
+      "width": "",
+      "height": ""
+    }
+  },
+  "isUpgradeEnabled": {
+    "incomplete": true,
+    "description": "Returns yes if the character has an upgrade. You can only check for yourself using this block.",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "condition": "",
+      "upgrade name": ""
+    }
+  },
+  "once": {
+    "description": "Returns yes the first time the block is called. Can be called again after the character dies.",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {}
+  },
+  "areGoldCoinsInArea": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "compare value": "",
+      "xOffset": "",
+      "yOffset": "",
+      "width": "",
+      "height": "",
+      "compare method": "",
+      "check line of sight": ""
+    }
+  },
+  "branch": {
+    "description": "This block has no uses but can be used to structure your AI",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {}
+  },
+  "checkCharacterValue": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "property": "",
+      "compare method": "",
+      "check on": "",
+      "value": ""
+    }
+  },
+  "checkCharacterFlag": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "property": "",
+      "condition": "",
+      "check on": ""
+    }
+  },
+  "checkClass": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "check on": "",
+      "class": ""
+    }
+  },
+  "checkSkin": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "check on": "",
+      "class": "",
+      "skinIdentifier": ""
+    }
+  },
+  "checkBaseHealth": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "BaseTeam": "",
+      "check health percentage": "",
+      "comparison": "",
+      "value": ""
+    }
+  },
+  "checkTurretHealth": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "TurretLocation": "",
+      "TurretTeam": "",
+      "check health percentage": "",
+      "comparison": "",
+      "value": ""
+    }
+  },
+  "checkTurretArea": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "minimum Count For Success": "",
+      "result counter": "",
+      "TurretLocations": "",
+      "TurretTeams": "",
+      "Live Turrets Only": "",
+      "surroundingGroups": "",
+      "surroundingTeams": "",
+      "surroundingClasses": "",
+      "count characters out of combat": "",
+      "check line of sight": "",
+      "ignore invisibility": "",
+      "never detect invisible targets without character collision": ""
+    }
+  },
+  "checkCounter": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "id": "",
+      "value": "",
+      "compare method": ""
+    }
+  },
+  "checkGameTime": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "time in seconds": "",
+      "compare method": ""
+    }
+  },
+  "checkMissionCounter": {
+    "incomplete": true,
+    "description": "Used for achievements tracking.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": true,
+    "properties": {
+      "id": "",
+      "value": "",
+      "compare method": ""
+    }
+  },
+  "compareBools": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "id1": "",
+      "id2": ""
+    }
+  },
+  "compareCounters": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "counter1": "",
+      "comparison": "",
+      "counter2": ""
+    }
+  },
+  "compareMissionBools": {
+    "incomplete": true,
+    "description": "Used for achievements tracking.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": true,
+    "properties": {
+      "id1": "",
+      "id2": ""
+    }
+  },
+  "doesClassExist": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "teams": "",
+      "class": ""
+    }
+  },
+  "directionToEnemyBase": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "direction": ""
+    }
+  },
+  "onEffectivePrestigeLevel": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "compare method": "",
+      "value": ""
+    }
+  },
+  "getBoolEquals": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "id": "",
+      "value": ""
+    }
+  },
+  "getMissionBoolEquals": {
+    "incomplete": true,
+    "description": "Used for achievements tracking.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": true,
+    "properties": {
+      "id": "",
+      "value": ""
+    }
+  },
+  "isButtonDown": {
+    "description": "Returns yes if the specified button is down",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "button": "The button to check",
+      "actionButton": "Contains more button than <b>button</b>. If set, overrides the <b>button</b> field."
+    }
+  },
+  "isFromTeam": {
+    "description": "Returns yes if the user is from the specified team.",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "team": "",
+      "check on": ""
+    }
+  },
+  "isInArea": {
+    "incomplete": true,
+    "description": "Returns yes while specified objects are in a given range.",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "condition": "",
+      "collision groups": "",
+      "check green obstacles only": "",
+      "count characters out of combat": "",
+      "teams": "",
+      "areaName": "",
+      "check line of sight": "",
+      "ignore invisibility": "",
+      "never detect invisible targets without character collision": "",
+      "xOffset": "",
+      "yOffset": "",
+      "width": "",
+      "height": ""
+    }
+  },
+  "isInNamedArea": {
+    "incomplete": true,
+    "description": "Returns true if the target is in a named area",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "area name": "",
+      "team": "",
+      "who": ""
+    }
+  },
+  "IsLevelButtonDown": {
+    "incomplete": true,
+    "description": "Returns true if the specified buttons are pressed.",
+    "hostOnly": true,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "buttons": ""
+    }
+  },
+  "isMissionCompleted": {
+    "incomplete": true,
+    "description": "Used for achievements tracking.",
+    "hostOnly": false,
+    "worksFor": "player",
+    "useless": true,
+    "properties": {
+      "mission": ""
+    }
+  },
+  "isNextWaypointPosition": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "position": ""
+    }
+  },
+  "isOnCreepTurner": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "condition": "",
+      "direction": ""
+    }
+  },
+  "isPickupAtWaypoint": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "name": "",
+      "team": ""
+    }
+  },
+  "isSkillOnButtonAvailable": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "button": ""
+    }
+  },
+  "isShopOpen": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+
+    }
+  },
+  "onGameStarted": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+
+    }
+  },
+  "onGoldCollected": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "collector": "",
+      "team": "",
+      "class": "",
+      "type": "",
+      "compare method": "",
+      "value": "",
+      "store in": ""
+    }
+  },
+  "onGoldSpent": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "spender": "",
+      "team": "",
+      "class": "",
+      "compare method": "",
+      "value": "",
+      "store in": ""
+    }
+  },
+  "onKill": {
+    "incomplete": true,
+    "description": "Returns yes if someone matching the critteria above dies.",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "killer": "",
+      "killer team": "",
+      "killer class": "",
+      "killer skin": "",
+      "victim": "",
+      "victim team": "",
+      "victim class": "",
+      "victim skin": "",
+      "compare method": "",
+      "value": "",
+      "store in": ""
+    }
+  },
+  "onWin": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "team": ""
+    }
+  },
+  "random": {
+    "description": "This generates a random number every time it is checked, between 1 to whatever the user puts in as the amount, inclusive. If the generated number is 1, returns yes.",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "amount": "Example: putting in 4 as the amount would yield a 25% chance for the block to return yes every time it is checked."
+    }
+  },
+  "receivedMessage": {
+    "incomplete": true,
+    "description": "Returns yes if the AI received a message having the same ID as specified",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "id": ""
+    }
+  },
+  "receivedPing": {
+    "incomplete": true,
+    "description": "Returns yes if the AI received a specific ping",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "ping": ""
+    }
+  },
+  "receivedTarget": {
+    "incomplete": true,
+    "description": "Returns yes if the AI has received a message sent using <b>emitTargetInArea</b>",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "if of group": ""
+    }
+  },
+  "skin": {
+    "incomplete": true,
+    "description": "Returns yes if the AI has the specified skin index",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "skinIndex": "",
+      "condition": "",
+      "check on": ""
+    }
+  },
+  "timePassed": {
+    "incomplete": true,
+    "description": "Returns yes if the specified time is passed.",
+    "hostOnly": false,
+    "worksFor": "needTest",
+    "useless": false,
+    "properties": {
+      "timeunit": "",
+      "time": ""
+    }
+  },
+  "timer": {
+    "incomplete": true,
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {
+      "timeunit": "",
+      "execute first time": "",
+      "time": ""
+    }
+  },
+  "isOnlineMatch": {
+    "description": "Returns yes if the game is played on a ranked match",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {}
+  },
+  "isPracticeMatch": {
+    "description": "Returns yes if the game is played on a practice match",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {}
+  },
+  "isTutorialMatch": {
+    "description": "",
+    "hostOnly": false,
+    "worksFor": "Returns yes if the game is played on the tutorial",
+    "useless": true,
+    "properties": {}
+  },
+  "isCustomMatch": {
+    "description": "Returns yes if the game is played in a custom match",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {}
+  },
+  "isSlowWolfUnlocked": {
+    "description": "Returns yes if the Slow Wolf announcer is unlocked",
+    "hostOnly": false,
+    "worksFor": "all",
+    "useless": false,
+    "properties": {}
+  }
+}

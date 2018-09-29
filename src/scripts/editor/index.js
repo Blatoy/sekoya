@@ -30,7 +30,7 @@ const {
 } = require(editorFolderPath + "classes/block.js");
 
 themeLoader.addCSSToCurrentPage();
-blockLoader.loadBlockDefinitions(() => {
+blockLoader.loadBlockDefinitions().then(() => {
   require(editorFolderPath + "display/block-list-display.js").addBlocksToLeftMenu();
   tabManager.init();
 });
