@@ -1,21 +1,23 @@
-const {
-  dialog
-} = require('electron').remote;
+return false;
 
+const dialog = require('electron').remote.dialog;
 const fs = require("fs");
 const xmlConverter = require("xml-js");
 const path = require("path");
 const remote = require('electron').remote;
 
+const blocksParser = require(basePath + "/blocks-parsers/" + config.blockParser);
+
 let canOpenDialog = true;
 
+// Open the "Save as" dialog and saves the file
 function saveAs(tab, callback = () => {}) {
   dialog.showSaveDialog(remote.getCurrentWindow(), {
     title: "Save as...",
     defaultPath: tab.getFileLocation(),
     filters: [{
       name: "",
-      extensions: ['xml']
+      extensions: blocksParser.FILE_EXTENSIONS
     }]
   }, (location) => {
     if (location) {
@@ -27,27 +29,17 @@ function saveAs(tab, callback = () => {}) {
   });
 }
 
+// Save the file using the current blocks parser
 function save(tab, path = false, callback = () => {}) {
+  // Check if file location exists
   fs.lstat(path, (err, stats) => {
     if (!stats && tab.fileLocation === "") {
       saveAs(tab, callback);
     } else {
-      let xmlData = '<?xml version="1.0" ?>';
 
-      if (config.topLevelBlocksContainer.length > 0) {
-        xmlData += "<" + config.topLevelBlocksContainer[0] + ">";
-      }
+      const stringToSave = blocksParser.convertToString();
 
-      for (let i = 0; i < tab.blocks.length; ++i) {
-        xmlData += getXMLRecursively(tab.blocks[i]);
-      }
-
-      if (config.topLevelBlocksContainer.length > 0) {
-        xmlData += "</" + config.topLevelBlocksContainer[0] + ">";
-      }
-
-      // console.log(xmlData);
-      fs.writeFile(path, xmlData, function() {
+      fs.writeFile(path, stringToSave, function() {
         tab.setSaved(true);
         tabManager.notifyTabDisplayer();
         callback();
@@ -56,91 +48,14 @@ function save(tab, path = false, callback = () => {}) {
   });
 }
 
-function getXMLRecursively(block, depth = 0) {
-  {
-    let blockData = "";
 
-    if (depth + 1 < config.topLevelBlocksContainer.length) {
-      blockData += "<" + config.topLevelBlocksContainer[depth + 1] + ">";
-    }
-
-    if(block.commented) {
-      blockData += "<!--";
-    }
-
-    if (blockLoader.getDefinitionByName(block.name).useNameAttributeAsTagName) {
-      blockData += "<" + block.name + ' id="' + block.name + '">';
-    } else {
-      blockData += "<" + block.type + ' id="' + block.name + '">';
-    }
-
-    for (let type in block.attributes) {
-      for (let attribute in block.attributes[type]) {
-        blockData += '<' + type + ' id="' + block.attributes[type][attribute].name + '">' + encodeXML(block.attributes[type][attribute].value) + '</' + type + '>';
-      }
-      if (config.minimizedAttributeName !== "") {
-        if (block.minimized) {
-          blockData += '<string id="' + config.minimizedAttributeName + '">yes</string>';
-        }
-      }
-    }
-    if (block.children.length > 0) {
-      let previousLinkToParentType = block.children[0].linkToParentType;
-      blockData += "<" + previousLinkToParentType + ">";
-
-      for (let i = 0; i < block.children.length; ++i) {
-        if (previousLinkToParentType != block.children[i].linkToParentType) {
-          blockData += "</" + previousLinkToParentType + ">";
-
-          previousLinkToParentType = block.children[i].linkToParentType;
-          blockData += "<" + block.children[i].linkToParentType + ">";
-        }
-
-        blockData += getXMLRecursively(block.children[i], depth + 1);
-      }
-      blockData += "</" + previousLinkToParentType + ">";
-    }
-
-    if (blockLoader.getDefinitionByName(block.name).useNameAttributeAsTagName) {
-      blockData += "</" + block.name + '>';
-    } else {
-      blockData += "</" + block.type + '>';
-    }
-
-    if(block.commented) {
-      blockData += "-->";
-    }
-
-    if (depth + 1 < config.topLevelBlocksContainer.length) {
-      blockData += "</" + config.topLevelBlocksContainer[depth + 1] + ">";
-    }
-
-    return blockData;
-  }
-}
-
-function cleanTopLevelContainers(elements, targetDepth, depth = 1) {
-  let elementsClean = [];
-
-  for (let i = 0; i < elements.length; ++i) {
-    if (depth >= targetDepth) {
-      for (let j = 0; j < elements[i].elements.length; ++j) {
-        elementsClean.push(elements[i].elements[j]);
-      }
-    } else {
-      elementsClean.push.apply(elementsClean, cleanTopLevelContainers(elements[i].elements, targetDepth, depth + 1));
-    }
-  }
-
-  return elementsClean;
-}
-
+/*
 
 let validLinkTypes = [];
 for (let i = 0; i < config.connectionsTypes.length; ++i) {
   validLinkTypes.push(config.connectionsTypes[i].name);
 }
-
+*/
 function createBlockRecursively(element, parentBlock, linkToParentType) {
   let isCommented = false;
   if (element.type === "comment") {
