@@ -28,12 +28,16 @@ function switchTab(direction = 0) {
   selectTab(selectedTabIndex + direction);
 }
 
-function newTab(name = "", blocks = [], fileLocation = "", selected = true) {
+function newTab(name = "", blockDefinition = undefined, blocks = [], fileLocation = "", selected = true) {
   if (name === "") {
     name = DEFAULT_TAB_NAME + tabs.length + DEFAULT_TAB_EXTENSION;
   }
 
-  let tab = new Tab(name, blocks, fileLocation, selected);
+  if(blockDefinition === undefined) {
+    blockDefinition = blockLoader.getBlocksDefinitionsList()[0];
+  }
+
+  let tab = new Tab(name, blockDefinition, blocks, fileLocation, selected);
 
   tabs.push(tab);
 
@@ -212,13 +216,15 @@ function selectTab(index) {
     }
   }
 
-
   selectedTabIndex = index;
+
+  rootBlock.blockDefinition = tabs[index].blockDefinition;
 
   camera.setPosition(newSelectedTab.cameraState.x, newSelectedTab.cameraState.y);
   camera.setScaling(newSelectedTab.cameraState.scaling);
 
   newSelectedTab.setSelected(true);
+  // TODO: Clean the whole block class, find a better way to give blocks info about the block config....
   rootBlock.children = newSelectedTab.blocks;
 
   if (newSelectedTab.selectedBlock) {

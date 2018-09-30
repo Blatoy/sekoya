@@ -17,14 +17,14 @@
         "color": "#50F244"
       }
     },
-    "links": []
+    "links": {}
   },
   "dark": {
-    "blocks": [],
-    "links": []
+    "blocks": {},
+    "links": {}
   },
   "behaviour-tree-creator": {
-    "blocks": [],
-    "links": []
+    "blocks": {},
+    "links": {}
   }
 }

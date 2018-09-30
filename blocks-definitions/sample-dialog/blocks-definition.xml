@@ -9,14 +9,49 @@
     <value>invisible</value>
   </predefined_values>
 
-  <block_list>
+  <predefined_values id="textSpeed">
+    <value>default</value>
+    <value>slow</value>
+    <value>fast</value>
+    <value>very slow</value>
+  </predefined_values>
 
-    <block_list name="adjustCharacterValue">
-      <string name="property" values="charactervaluesAdjustable" defaultvalue="health"/>
-      <float name="value"/>
-      <string name="adjust method" values="valueadjust" defaultvalue="set"/>
-    </block_list>
 
-  </block_list>
+  <text>
+
+    <dialog name="normal">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+
+    <dialog name="branchSelectorWithText">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+
+
+    <dialog name="branchSelector">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+
+  </text>
+
+  <branch>
+    <dialog name="textBranch">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+
+    <dialog name="merchantBranch">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+
+    <dialog name="goBackBranch">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+  </branch>
 
 </blockdefinitions>

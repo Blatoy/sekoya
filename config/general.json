@@ -3,8 +3,10 @@
     "theme": "dark",
   "//": "Can be 'none', 'children', 'auto', 'always'",
     "autoLayoutLevel": "auto",
-  "//": "Filename of the file to use in block-definitions",
-    "blockDefinitionFile": "awesomenauts.xml",
-  "//": "",
+  "//": "Name of the file in blocks-parsers.js to use when saving / reading files",
+    "blockParser": "xml-parser.js",
+  "//": "Folder name of the default block definition to display when opening sekoyao",
+    "defaultBlocksDefinition": "awesomenauts",
+  "//": "Displays debug info, enables CTRL-R to reload without saving.",
     "debugEnabled": true
 }

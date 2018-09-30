@@ -13,15 +13,19 @@ module.exports.registerActions = () => {
   });
 
   // We want an action for each user defined type
-  for (let i = 0; i < config.connectionsTypes.length; ++i) {
-    actionHandler.addAction({
-      name: "quick access bar: display add linked " + config.connectionsTypes[i].name + " block dialog",
-      priority: 500,
-      action: () => {
-        return quickAccessBlocks.displayLinked(i);
-      },
-    });
-  }
+  // TODO: Find a way to display only the one for the current file type
+  blockLoader.getBlocksDefinitionsList().forEach((blocksDefinition) => {
+    for (let i = 0; i < blocksDefinition.config.connectionsTypes.length; ++i) {
+      actionHandler.addAction({
+        name: "quick access bar: display add linked " + blocksDefinition.config.connectionsTypes[i].name + " block dialog",
+        priority: 500,
+        action: () => {
+          return quickAccessBlocks.displayLinked(i);
+        },
+      });
+    }
+  });
+
 
   actionHandler.addAction({
     name: "quick access bar: display execute action dialog",
