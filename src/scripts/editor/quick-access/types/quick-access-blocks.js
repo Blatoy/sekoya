@@ -4,7 +4,7 @@ let linkType = "";
 
 function getSourceArray() {
   let sourceArray = [];
-  let blockDefinitions = blockLoader.getBlockDefinitions();
+  let blockDefinitions = rootBlock.blockDefinition.blocks;
 
   for (let actionType in blockDefinitions) {
     for (let blockName in blockDefinitions[actionType]) {
@@ -22,7 +22,8 @@ function getSourceArray() {
 
 function displayLinked(index) {
   lastLinkedIndex = index;
-  linkType = config.connectionsTypes[index].name;
+  linkType = rootBlock.blockDefinition.config.connectionsTypes[index].name;
+  
   if(!Block.getSelectedBlock().linkableTo(linkType) || Block.getSelectedBlock().isTerminalNode()) {
     return false;
   }
@@ -38,7 +39,8 @@ function display() {
 
 function onResultSelected(blockName) {
   let selectedBlock = Block.getSelectedBlock();
-  let newBlock = new Block(blockLoader.getDefinitionByName(blockName), false, false, [], {
+
+  let newBlock = new Block(blockLoader.findBlockInDefinition(rootBlock.blockDefinition, blockName), false, false, [], {
     x: selectedBlock.style.margin.x + selectedBlock.position.x,
     y: selectedBlock.children.length > 0 ? selectedBlock.getYPosition() + selectedBlock.getMaxRecursiveHeight() : selectedBlock.getYPosition()
   });
