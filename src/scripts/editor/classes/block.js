@@ -33,11 +33,30 @@ function compare(a, b) {
 }
 
 function getLinkStyleProperty(type, property) {
-  if (STYLE.LINKS[type] && STYLE.LINKS[type][property] !== undefined) {
-    return STYLE.LINKS[type][property];
-  } else {
-    return STYLE.LINKS["all"][property];
+  let blockDefinitionStyle = root ? root.blockDefinition.style : false;
+
+  if (blockDefinitionStyle !== false) {
+    // Block definition supports theme and has link
+    if (
+      blockDefinitionStyle[config.theme] !== undefined &&
+      blockDefinitionStyle[config.theme].links[type] !== undefined &&
+      blockDefinitionStyle[config.theme].links[type][property] !== undefined
+    ) {
+      return blockDefinitionStyle[config.theme].links[type][property];
+    }
+
+    // Block definition doesn't support theme but has default style
+    if (
+      blockDefinitionStyle["default"] !== undefined &&
+      blockDefinitionStyle["default"].links[type] !== undefined &&
+      blockDefinitionStyle["default"].links[type][property] !== undefined
+    ) {
+      return blockDefinitionStyle["default"].links[type][property];
+    }
   }
+
+  // Default fallback, no style,
+  return STYLE.LINKS["all"][property];
 }
 
 function getBlockStyleProperty(type, property) {
