@@ -126,11 +126,11 @@ function loadBlocksDefinitions() {
 
                           blockDefinition.blocks[blockType][blockName] = {
                             name: blockName,
-                            displayName: element.attributes.displayName ? element.attributes.displayName : blockName,
+                            displayName: element.attributes.displayName ? element.attributes.displayName : undefined,
                             hidden: element.attributes.hidden ? true : false,
                             useNameAttributeAsTagName: element.attributes.useNameAttributeAsTagName === "1" ? true : false,
                             blockPropertiesGroupedByType: propertiesGroupedByType,
-                            type: blockType,
+                            type: element.name,
                             preventInteraction: element.attributes.preventInteraction ? true : false
                           };
                         });
@@ -157,12 +157,22 @@ function loadBlocksDefinitions() {
       });
 
       Promise.all(blockDefinitionLoadingPromises).then(() => {
-        console.log("Loaded all block");
         resolve(blocksDefinitionList);
       });
     });
   });
 }
+
+module.exports.findBlockInDefinition = (blockDefinition, searchedBlockName) => {
+  for(let type in blockDefinition.blocks) {
+    for(let blockName in blockDefinition.blocks[type]) {
+      if(searchedBlockName === blockName) {
+        return blockDefinition.blocks[type][blockName];
+      }
+    }
+  }
+  return false;
+};
 
 module.exports.loadBlocksDefinitions = loadBlocksDefinitions;
 
