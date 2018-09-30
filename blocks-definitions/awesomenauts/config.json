@@ -8,7 +8,7 @@
       {"name": "or", "linkableTo":  ["logic"], "sortOrder": 0, "allowedChildTypes": ["condition"], "childrenAreTerminalNodes": 1}
     ],
   "//" : "The name of the block that will be added by default when creating a new file, leave empty for none",
-    "defaultBlock": "Root",
+    "defaultBlock": "root",
   "//" : "Name of the tag used for values definitions",
     "predefinedValuesTagName": "predefined_values",
   "//": "Adds encapsulating blocks to top levels blocks. Array index = recursive depth. Check an Awesomenauts AI to see why this is done",
