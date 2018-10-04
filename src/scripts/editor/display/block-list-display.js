@@ -11,7 +11,6 @@ module.exports.setLeftMenuBlocks = (definitionName) => {
   let blockDefinitions = false;
 
   blockLoader.getBlocksDefinitionsList().forEach((blockDefinition) => {
-    console.log(blockDefinition);
     if (blockDefinition.name === definitionName) {
       blockDefinitions = blockDefinition.blocks;
     }

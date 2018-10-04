@@ -188,7 +188,18 @@ function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false,
       parameters = args;
     }
 
+    if(!actions[name].executionState) {
+      actions[name].executionState = 1;
+    }
+
     let actionReturnedValue = actions[name].doAction(parameters, actionHandlerParameters);
+
+    if(actionReturnedValue !== false) {
+      actions[name].executionState = 2;
+    }
+    else if(!actions[name].executionState) {
+      actions[name].executionState = 3;
+    }
 
     if (action.undoAction)
       if (!actionHandlerParameters.cancelUndo &&
@@ -248,6 +259,7 @@ function addAction(name, action, setData = () => {}, undoAction = false, priorit
   if (typeof name === "object") {
     actions[name.name] = {
       name: name.name,
+      debug: name.debug === undefined ? false : name.debug,
       doAction: name.action,
       setData: name.setData === undefined ? false : name.setData,
       undoAction: name.undoAction === undefined ? false : name.undoAction,
