@@ -570,7 +570,7 @@ class Block {
     if (this.preventInteraction) {
       return false;
     }
-    let copiedBlock = new Block(blockLoader.getDefinitionByName(this.name));
+    let copiedBlock = new Block(blockLoader.findBlockInDefinition(rootBlock.blockDefinition, this.name));
 
     for (let attributeType in this.attributes) {
       copiedBlock.attributes[attributeType] = {};
