@@ -1,7 +1,9 @@
 const quickAccessDisplay = require("./quick-access-display.js");
 
 let selectedIndex = 0;
-let sourceArray = [], onResultSelected = () => {}, caption = "";
+let sourceArray = [],
+  onResultSelected = () => {},
+  caption = "";
 
 function attachType(caption_, sourceArray_, onResultSelected_) {
   sourceArray = sourceArray_;
@@ -12,15 +14,13 @@ function attachType(caption_, sourceArray_, onResultSelected_) {
 function compareByScore(a, b) {
   if (a.score > b.score) {
     return -1;
-  } else if(a.score === b.score) {
-    if(a.displayName.length > b.displayName.length) {
+  } else if (a.score === b.score) {
+    if (a.displayName.length > b.displayName.length) {
       return 1;
-    }
-    else {
+    } else {
       return -1;
     }
-  }
-  else {
+  } else {
     return 1;
   }
 }
@@ -47,10 +47,9 @@ function switchSelectedResult(direction) {
 
 function executeSelectedAction(displayName = false) {
   let selectedAction = displayName || quickAccessDisplay.getSelectedResultAction();
-  if(!selectedAction) {
+  if (!selectedAction) {
     return false;
-  }
-  else {
+  } else {
     hide();
     onResultSelected(selectedAction);
     return true;
@@ -82,8 +81,7 @@ function getSearchScoreAndCharactersMatchIndexes(search, text) {
       score: Infinity,
       characterMatchIndexes: [...Array(text.length).keys()] // Generate an array containing [1, 2, 3, ..., text.length - 1]
     };
-  }
-  else if(text.includes(search)) {
+  } else if (text.includes(search)) {
     // Bonus points if the text is included, no matter the position
     score++;
   }

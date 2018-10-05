@@ -1,4 +1,7 @@
-const {app, BrowserWindow} = require('electron');
+const {
+  app,
+  BrowserWindow
+} = require('electron');
 
 global.BASE_PATH = app.getAppPath();
 

@@ -49,14 +49,14 @@ require(utilsFolderPath + "event-handler.js").addEditorEvents();
 require(editorFolderPath + "quick-access/quick-access-display.js").addEvents();
 require(editorFolderPath + "/menus/menu-top-bar.js").setMenu();
 
-if(!localStorage.firstLaunchDone) {
+if (!localStorage.firstLaunchDone) {
   document.getElementById("about-background").style.display = "block";
 }
 
 window.onerror = (msg, script, line) => {
   let errorMessage = (new Date()) + " " + script + ":" + line + " --- " + msg + "\n";
 
-  fs.appendFile('sekoya-errors.log', errorMessage, function (err) {
+  fs.appendFile('sekoya-errors.log', errorMessage, function(err) {
     if (err) throw err;
   });
 };

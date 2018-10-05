@@ -1524,11 +1524,11 @@ Block.getLinkStyleProperty = getLinkStyleProperty;
 
 module.exports.init = () => {
   blockLoader.getBlocksDefinitionsList().forEach((blockDefinition) => {
-     if (blockDefinition.name === config.defaultBlocksDefinition) {
-       root.blockDefinition = blockDefinition;
-     }
-   });
-   root.autoLayout(true);
+    if (blockDefinition.name === config.defaultBlocksDefinition) {
+      root.blockDefinition = blockDefinition;
+    }
+  });
+  root.autoLayout(true);
 };
 
 root = new Block({

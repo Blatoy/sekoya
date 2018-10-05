@@ -164,9 +164,9 @@ function loadBlocksDefinitions() {
 }
 
 module.exports.findBlockInDefinition = (blockDefinition, searchedBlockName) => {
-  for(let type in blockDefinition.blocks) {
-    for(let blockName in blockDefinition.blocks[type]) {
-      if(searchedBlockName === blockName) {
+  for (let type in blockDefinition.blocks) {
+    for (let blockName in blockDefinition.blocks[type]) {
+      if (searchedBlockName === blockName) {
         return blockDefinition.blocks[type][blockName];
       }
     }

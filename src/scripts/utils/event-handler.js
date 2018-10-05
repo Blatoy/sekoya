@@ -55,7 +55,7 @@ module.exports.addEditorEvents = () => {
   });
 
   window.addEventListener("dblclick", (e) => {
-    if(Block.getSelectedBlock().isPositionOver(global.mouse.cameraX, global.mouse.cameraY)) {
+    if (Block.getSelectedBlock().isPositionOver(global.mouse.cameraX, global.mouse.cameraY)) {
       actionHandler.trigger("blocks: display settings for selected block")
     }
   });
@@ -112,11 +112,11 @@ module.exports.addEditorEvents = () => {
 
     tabManager.savePathsInLocalStorage();
 
-    if(global.forceAppReload) {
+    if (global.forceAppReload) {
       return true;
     }
 
-    if(!closeAllowed) {
+    if (!closeAllowed) {
       event.returnValue = true;
     }
 

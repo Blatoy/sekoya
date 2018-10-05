@@ -124,10 +124,10 @@ module.exports.registerActions = () => {
         let children = [];
         let selectedBlock = selectedBlocks[i];
 
-        if(selectedBlock.preventInteraction) {
+        if (selectedBlock.preventInteraction) {
           continue;
         }
-        
+
         // We have to restore it at the right position
         let blockIndex = selectedBlock.parent.children.indexOf(selectedBlock);
         selectedBlock.selectedForGroupAction = false;
@@ -309,11 +309,11 @@ module.exports.registerActions = () => {
     name: "blocks: toggle commented",
     mergeUndoByDefault: true,
     action: (data, actionHandlerParameter) => {
-      if(!data.noUndoMerge) {
+      if (!data.noUndoMerge) {
         actionHandler.separateMergeUndo();
         tabManager.setFileModified();
       }
-      if(data.block && !data.block.isRoot && !data.block.isRecursiveParentCommented()) {
+      if (data.block && !data.block.isRoot && !data.block.isRecursiveParentCommented()) {
         data.block.uncommentAllChildren();
         data.block.commented = !data.block.commented;
         return true;
@@ -322,11 +322,16 @@ module.exports.registerActions = () => {
       actionHandlerParameter.cancelUndo = true;
       return false;
     },
-    setData: (data = {noUndoMerge: false}) => {
-      if(data.block === undefined) {
+    setData: (data = {
+      noUndoMerge: false
+    }) => {
+      if (data.block === undefined) {
         data.block = Block.getSelectedBlock();
       }
-      return {block: data.block, noUndoMerge: data.noUndoMerge};
+      return {
+        block: data.block,
+        noUndoMerge: data.noUndoMerge
+      };
     },
     undoAction: (data) => {
       data.block.commented = !data.block.commented;
@@ -477,7 +482,7 @@ module.exports.registerActions = () => {
       copiedBlocks = [];
       for (let i = 0; i < selectedBlocks.length; ++i) {
         let copiedBlock = selectedBlocks[i].getCopy();
-        if(copiedBlock !== false) {
+        if (copiedBlock !== false) {
           copiedBlocks.push(copiedBlock);
         }
       }
