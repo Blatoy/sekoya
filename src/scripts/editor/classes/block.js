@@ -216,6 +216,10 @@ class Block {
     let spanPropertiesCaption = document.getElementById("block-properties-caption");
     spanPropertiesCaption.textContent = "Block properties - " + this.name;
 
+    let spanBlockDescription = document.createElement("span");
+    spanBlockDescription.classList.add("block-description");
+    spanBlockDescription.innerHTML = rootBlock.blockDefinition.help[this.name].description;
+    spanPropertiesCaption.append(spanBlockDescription);
     // Properties container
     let divPropertiesInputList = document.getElementById("block-properties-inputs");
     divPropertiesInputList.innerHTML = "";
