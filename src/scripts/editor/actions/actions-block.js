@@ -105,11 +105,18 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "blocks: delete selected",
     action: (data, actionHandlerParameters) => {
+      let anyBlockModified = false;
       for (let i = 0; i < data.length; ++i) {
-        data[i].block.delete();
+        if (data[i].block.delete()) {
+          anyBlockModified = true;
+        }
       }
 
-      tabManager.setFileModified();
+      if (!anyBlockModified) {
+        actionHandlerParameters.cancelUndo = true;
+      } else {
+        tabManager.setFileModified();
+      }
     },
     setData: () => {
       let selectedBlocks = rootBlock.getSelectedForGroupAction();
@@ -151,7 +158,6 @@ module.exports.registerActions = () => {
         });
       }
 
-      tabManager.setFileModified();
       return deletedBlocks;
     },
     undoAction: (data) => {
