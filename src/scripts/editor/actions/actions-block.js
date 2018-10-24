@@ -171,10 +171,12 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction({
     name: "blocks: delete selected and children",
-    action: (data) => {
-      data.block.deleteRecursive();
-      tabManager.setFileModified();
-      //rootBlock.autoLayout();
+    action: (data, actionHandlerParameters) => {
+      if (data.block.deleteRecursive()) {
+        tabManager.setFileModified();
+      } else {
+        actionHandlerParameters.cancelUndo = true;
+      }
     },
     setData: () => {
       let selectedBlock = Block.getSelectedBlock();

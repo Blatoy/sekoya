@@ -597,7 +597,7 @@ class Block {
   // Removes the block and all children
   deleteRecursive() {
     // root cannot be deleted
-    if (this.parent) {
+    if (this.parent && !this.preventInteraction) {
       this.isDeleted = true; // Used by undo add block to track what wants to be done
       if (this.selected) {
         let nextSibling = this.getSibling(1);
@@ -610,6 +610,8 @@ class Block {
       }
 
       return this.parent.children.splice(this.parent.children.indexOf(this), 1);
+    } else {
+      return false;
     }
   }
 
