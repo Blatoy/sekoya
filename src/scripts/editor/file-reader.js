@@ -1,53 +1,14 @@
-return false;
-
 const dialog = require('electron').remote.dialog;
 const fs = require("fs");
-const xmlConverter = require("xml-js");
 const path = require("path");
 const remote = require('electron').remote;
 
-const blocksParser = require(basePath + "/blocks-parsers/" + config.blockParser);
 
-let canOpenDialog = true;
-
-// Open the "Save as" dialog and saves the file
-function saveAs(tab, callback = () => {}) {
-  dialog.showSaveDialog(remote.getCurrentWindow(), {
-    title: "Save as...",
-    defaultPath: tab.getFileLocation(),
-    filters: [{
-      name: "",
-      extensions: blocksParser.FILE_EXTENSIONS
-    }]
-  }, (location) => {
-    if (location) {
-      tab.fileLocation = path.dirname(location) + path.sep;
-      tab.name = path.basename(location);
-
-      save(tab, location, callback);
-    }
-  });
-}
-
-// Save the file using the current blocks parser
-function save(tab, path = false, callback = () => {}) {
-  // Check if file location exists
-  fs.lstat(path, (err, stats) => {
-    if (!stats && tab.fileLocation === "") {
-      saveAs(tab, callback);
-    } else {
-
-      const stringToSave = blocksParser.convertToString();
-
-      fs.writeFile(path, stringToSave, function() {
-        tab.setSaved(true);
-        tabManager.notifyTabDisplayer();
-        callback();
-      });
-    }
-  });
-}
-
+// TODO:
+// - Display open dialog
+// - Read file
+// - Parse file using a parser (on "runtime" using extension? / using config? / asking user?)
+// - Create new tab and add blocks from the file parser objejct 
 
 /*
 
@@ -115,6 +76,8 @@ function createBlockRecursively(element, parentBlock, linkToParentType) {
     }
   }
 }
+
+
 
 function open(file) {
   fs.readFile(file, 'utf-8', function(err, xml) {
@@ -188,6 +151,3 @@ function encodeXML(str = "") {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
 };
-
-module.exports.save = save;
-module.exports.saveAs = saveAs;

@@ -1,3 +1,5 @@
+const xmlConverter = require("xml-js");
+
 /**
  * The extension of the file that can be loaded using this parser
  */
