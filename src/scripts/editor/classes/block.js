@@ -218,7 +218,10 @@ class Block {
 
     let spanBlockDescription = document.createElement("span");
     spanBlockDescription.classList.add("block-description");
-    spanBlockDescription.innerHTML = rootBlock.blockDefinition.help[this.name].description;
+    if (rootBlock.blockDefinition.help && rootBlock.blockDefinition.help[this.name]) {
+      spanBlockDescription.innerHTML = rootBlock.blockDefinition.help[this.name].description;
+    }
+
     spanPropertiesCaption.append(spanBlockDescription);
     // Properties container
     let divPropertiesInputList = document.getElementById("block-properties-inputs");
