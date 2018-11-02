@@ -168,7 +168,7 @@ module.exports.closeAll = closeAll;
 module.exports.handleNewTab = (fileName, fileLocation) => {
   let tabIndex = getTabIndexFromFileLocation(fileLocation + fileName);
   if (tabIndex === -1) {
-    tabManager.newTab(fileName, [], fileLocation);
+    tabManager.newTab(fileName, undefined, [], fileLocation);
     return true;
   } else {
     selectTab(tabIndex);
