@@ -11,7 +11,6 @@ const actionsFolderPath = basePath + "/src/scripts/editor/actions/";
 const actionHandler = require(basePath + "/src/scripts/utils/action-handler.js");
 const themeLoader = require(basePath + '/src/scripts/utils/theme-loader.js');
 const blockLoader = require(editorFolderPath + "block-loader.js");
-const fileManager = require(editorFolderPath + "file-manager.js");
 const camera = require(editorFolderPath + "camera.js");
 const scrollBars = require(editorFolderPath + "scroll-bars.js");
 
@@ -27,6 +26,7 @@ const STYLE = {
 const Block = require(editorFolderPath + "classes/block.js").Block;
 const rootBlock = require(editorFolderPath + "classes/block.js").rootBlock;
 const selectedBlock = require(editorFolderPath + "classes/block.js").selectedBlock;
+const fileManager = require(editorFolderPath + "file-manager.js");
 
 themeLoader.addCSSToCurrentPage();
 blockLoader.loadBlocksDefinitions().then(() => {
