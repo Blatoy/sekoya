@@ -42,6 +42,8 @@ function setCanvasSize() {
   canvas.height = canvas.parentElement.clientHeight;
 }
 
+module.exports.setCanvasSize = setCanvasSize;
+
 module.exports.addEditorEvents = () => {
   window.addEventListener("mousedown", (e) => {
     camera.onMouseDown(e.which);
