@@ -352,28 +352,43 @@ module.exports.registerActions = () => {
         actionHandler.separateMergeUndo();
         tabManager.setFileModified();
       }
-      if (data.block && !data.block.isRoot && !data.block.isRecursiveParentCommented()) {
-        data.block.uncommentAllChildren();
-        data.block.commented = !data.block.commented;
-        return true;
+      let anyBlockModified = false;
+      for (let k in data.blocks) {
+        let block = data.blocks[k];
+        if (block && !block.isRoot && !block.isRecursiveParentCommented()) {
+          block.uncommentAllChildren();
+          block.commented = !block.commented;
+          anyBlockModified = true;
+        }
       }
 
-      actionHandlerParameter.cancelUndo = true;
-      return false;
+      if (!anyBlockModified) {
+        actionHandlerParameter.cancelUndo = true;
+        return false;
+      }
+      return true;
     },
     setData: (data = {
       noUndoMerge: false
     }) => {
       if (data.block === undefined) {
-        data.block = Block.getSelectedBlock();
+        data.blocks = rootBlock.getSelectedForGroupAction();
+        if (data.blocks.length == 0) {
+          data.blocks = [Block.getSelectedBlock()];
+        }
+      } else {
+        data.blocks = [data.block];
       }
       return {
-        block: data.block,
+        blocks: data.blocks,
         noUndoMerge: data.noUndoMerge
       };
     },
     undoAction: (data) => {
-      data.block.commented = !data.block.commented;
+      for (let k in data.blocks) {
+        let block = data.blocks[k];
+        block.commented = !block.commented;
+      }
     }
   });
 
