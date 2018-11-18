@@ -278,6 +278,37 @@ module.exports.registerActions = () => {
     }
   });
 
+  actionHandler.addAction({
+    name: "blocks: link to suitable parent",
+    action: () => {
+      let currentSelectedBlock = Block.getSelectedBlock();
+      currentSelectedBlock.moveSelectedUpDown(-1);
+
+      let nearestBlockAbove = Block.getSelectedBlock();
+      console.log(nearestBlockAbove.linkToParentType);
+      if (nearestBlockAbove.linkableTo(nearestBlockAbove.linkToParentType)) {
+        actionHandler.trigger("blocks: link block", {
+          parentBlock: nearestBlockAbove,
+          targetBlock: currentSelectedBlock,
+          linkType: nearestBlockAbove.linkToParentType
+        });
+      } else if (nearestBlockAbove.parent) {
+        actionHandler.trigger("blocks: link block", {
+          parentBlock: nearestBlockAbove.parent,
+          targetBlock: currentSelectedBlock,
+          linkType: nearestBlockAbove.linkToParentType
+        });
+      }
+
+      currentSelectedBlock.setSelected(true);
+
+      /*  actionHandler.trigger("blocks: link block", {
+          parentBlock: rootBlock,
+          targetBlock: Block.getSelectedBlock()
+        });*/
+    }
+  });
+
 
   actionHandler.addAction({
     name: "blocks: link block",

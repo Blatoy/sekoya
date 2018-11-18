@@ -132,6 +132,13 @@
     "action": "blocks: delete selected and children"
   },
   {
+    "key": "KeyT",
+    "ctrl": false,
+    "alt": false,
+    "shift": false,
+    "action": "blocks: link to suitable parent"
+  },
+  {
     "key": "Delete",
     "ctrl": false,
     "alt": true,
