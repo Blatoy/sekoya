@@ -457,7 +457,7 @@ module.exports.registerActions = () => {
             if (!attributes[lastType]) {
               attributes[lastType] = {};
             }
-            attributes[lastType][lastName] = checkedValues.join(config.multiSelectSeparator);
+            attributes[lastType][lastName] = checkedValues.join(rootBlock.blockDefinition.config.multiSelectSeparator);
             checkedValues = [];
           }
           lastName = checkbox.dataset.attributeName;
@@ -472,7 +472,7 @@ module.exports.registerActions = () => {
         if (!attributes[lastType]) {
           attributes[lastType] = {};
         }
-        attributes[lastType][lastName] = checkedValues.join(config.multiSelectSeparator);
+        attributes[lastType][lastName] = checkedValues.join(rootBlock.blockDefinition.config.multiSelectSeparator);
       }
 
       return {

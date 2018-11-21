@@ -120,6 +120,10 @@ function loadBlocksDefinitions() {
                                 propertyAttributes.defaultvalue = element.attributes.defaultvalue;
                               }
 
+                              if (element.attributes.multiselect) {
+                                propertyAttributes.multiselect = element.attributes.multiselect;
+                              }
+
                               propertiesGroupedByType[element.name].push(propertyAttributes);
                             });
                           }
