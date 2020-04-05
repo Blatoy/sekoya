@@ -8,7 +8,10 @@ let targetPosition = {
   y: 0
 };
 
-let mouseDownPosition = {x: 0, y: 0};
+let mouseDownPosition = {
+  x: 0,
+  y: 0
+};
 let moveFast = false;
 
 let renderedSegments = {};
@@ -46,7 +49,7 @@ module.exports.drawSegment = (ctx, x1, y1, x2, y2) => {
   }
 
   //if (x1 > bounds.x && x2 > bounds.x && x1 < bounds.x + bounds.width && x2 < bounds.x + bounds.width) {
-  if (x2 > bounds.x && x1 < bounds.x + bounds.width ) {
+  if (x2 > bounds.x && x1 < bounds.x + bounds.width) {
     if (y1 < bounds.y + bounds.height && y2 > bounds.y) {
       x1 = Math.max(bounds.x, x1);
       x2 = Math.max(bounds.x, x2);
@@ -54,7 +57,7 @@ module.exports.drawSegment = (ctx, x1, y1, x2, y2) => {
       y2 = Math.min(bounds.y + bounds.height, y2);
       let key = x1 + "_" + x2 + "_" + y1 + "_" + y2;
 
-      if(!renderedSegments[key]) {
+      if (!renderedSegments[key]) {
         ctx.moveTo(x1, y1);
         ctx.lineTo(x1, y1);
         ctx.lineTo(x2, y2);
@@ -126,7 +129,7 @@ module.exports.getBounds = getBounds;
 
 
 module.exports.onMouseDown = (buttonIndex) => {
-  if(buttonIndex === 2) {
+  if (buttonIndex === 2) {
     mouseDownPosition.x = global.mouse.cameraX * scaling;
     mouseDownPosition.y = global.mouse.cameraY * scaling;
     // urgh why am i mixing stuff like that, i'm going to regret this when I'll try to clean this stuff
@@ -174,14 +177,14 @@ module.exports.update = () => {
   if (moveLeft) setPosition(position.x - SPEED * (1 + 4 * moveFast), position.y);
   if (moveRight) setPosition(position.x + SPEED * (1 + 4 * moveFast), position.y);
 
-  if(global.mouse.buttons["2"]) {
+  if (global.mouse.buttons["2"]) {
     position.x = targetPosition.x = mouseDownPosition.x - global.mouse.canvasX;
-    position.y =targetPosition.y = mouseDownPosition.y - global.mouse.canvasY;
+    position.y = targetPosition.y = mouseDownPosition.y - global.mouse.canvasY;
   }
 
   position.x += (targetPosition.x - position.x) * speed;
   position.y += (targetPosition.y - position.y) * speed;
-  
+
   position.x = Math.max(position.x, 0);
   position.y = Math.max(position.y, 0);
 
@@ -190,7 +193,7 @@ module.exports.update = () => {
 };
 
 module.exports.applyTransforms = (ctx) => {
-  renderedSegments ={};
+  renderedSegments = {};
 
   global.camera.scaling = scaling;
   global.camera.bounds = getBounds();

@@ -1,16 +1,17 @@
 const ctx = canvas.getContext("2d");
 
-let fps = 0, displayedFps = 0;
+let fps = 0,
+  displayedFps = 0;
 global.tick = 0;
 
 function mainLoop() {
   global.tick++,
 
-  rootBlock.update();
+    rootBlock.update();
   camera.update();
   scrollBars.update();
 
-  if(document.hasFocus() || global.tick % 10 === 0 || global.tabDown) {
+  if (document.hasFocus() || global.tick % 10 === 0 || global.tabDown) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     camera.applyTransforms(ctx);
@@ -21,10 +22,13 @@ function mainLoop() {
     camera.resetTransforms(ctx);
     scrollBars.render(ctx);
 
-    if(global.debugEnabled) {
+    if (global.debugEnabled) {
       fps++;
 
-      let currentHistory = actionHandler.setHistory({undo: [], redo: []});
+      let currentHistory = actionHandler.setHistory({
+        undo: [],
+        redo: []
+      });
       let lineCount = 1;
 
       ctx.fillStyle = "gray";
@@ -34,9 +38,9 @@ function mainLoop() {
       lineCount++;
       ctx.fillText("== HISTORY ==", canvas.width - 10, lineCount++ * 10);
 
-      for(let i = 0; i < currentHistory.undo.length; ++i) {
-        if(currentHistory.undo[i]) {
-          ctx.fillText(" ("+i+") " + (currentHistory.undo[i].actionName || currentHistory.undo[i][0].actionName), canvas.width - 10, lineCount++ * 10)
+      for (let i = 0; i < currentHistory.undo.length; ++i) {
+        if (currentHistory.undo[i]) {
+          ctx.fillText(" (" + i + ") " + (currentHistory.undo[i].actionName || currentHistory.undo[i][0].actionName), canvas.width - 10, lineCount++ * 10)
         }
       }
       actionHandler.setHistory(currentHistory);

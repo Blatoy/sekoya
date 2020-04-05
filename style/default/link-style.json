@@ -1,0 +1,10 @@
+{
+  "all": {
+    "lineWidth": 2,
+    "color": "black",
+    "dashInterval": 0,
+    "baseLength": 40,
+    "firstBlockMargin" : 0,
+    "displayBelowParent": false
+  }
+}

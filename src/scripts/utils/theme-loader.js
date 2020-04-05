@@ -1,12 +1,16 @@
-const config = require(basePath + "/config/general.json");
 const fs = require("fs");
 
 const CSS_THEME_FILES = ["main", "editor", "welcome"];
 
+const THEME_FOLDER_PATH = basePath + "/style/themes/" + config.theme + "/";
+const DEFAULT_THEME_PATH = basePath + "/style/default/";
+
+// TODO: Check at the external location as well
+
 function loadJSONStyle(fileName) {
-  let object = require(basePath + "/src/style/common/" + fileName + ".json");
-  if (fs.existsSync(basePath + "/src/style/themes/" + config.theme + "/" + fileName + ".json")) {
-    overrideObjectProperties(object, require(basePath + "/src/style/themes/" + config.theme + "/" + fileName + ".json"));
+  let object = require(DEFAULT_THEME_PATH + fileName + ".json");
+  if (fs.existsSync(THEME_FOLDER_PATH + fileName + ".json")) {
+    overrideObjectProperties(object, require(THEME_FOLDER_PATH + fileName + ".json"));
   }
   return object;
 }
@@ -34,7 +38,7 @@ module.exports.addCSSToCurrentPage = () => {
       link.rel = "stylesheet";
       link.type = "text/css";
       link.medial = "all";
-      link.href = basePath + "/src/style/themes/" + config.theme + "/" + CSS_THEME_FILES[i] + ".css";
+      link.href = THEME_FOLDER_PATH + CSS_THEME_FILES[i] + ".css";
       head.appendChild(link);
     }
   }

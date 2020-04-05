@@ -33,19 +33,57 @@ function compare(a, b) {
 }
 
 function getLinkStyleProperty(type, property) {
-  if (STYLE.LINKS[type] && STYLE.LINKS[type][property] !== undefined) {
-    return STYLE.LINKS[type][property];
-  } else {
-    return STYLE.LINKS["all"][property];
+  let blockDefinitionStyle = root ? root.blockDefinition.style : false;
+
+  if (blockDefinitionStyle !== false) {
+    // Block definition supports theme and has link
+    if (
+      blockDefinitionStyle[config.theme] !== undefined &&
+      blockDefinitionStyle[config.theme].links[type] !== undefined &&
+      blockDefinitionStyle[config.theme].links[type][property] !== undefined
+    ) {
+      return blockDefinitionStyle[config.theme].links[type][property];
+    }
+
+    // Block definition doesn't support theme but has default style
+    if (
+      blockDefinitionStyle["default"] !== undefined &&
+      blockDefinitionStyle["default"].links[type] !== undefined &&
+      blockDefinitionStyle["default"].links[type][property] !== undefined
+    ) {
+      return blockDefinitionStyle["default"].links[type][property];
+    }
   }
+
+  // Default fallback, no style,
+  return STYLE.LINKS["all"][property];
 }
 
 function getBlockStyleProperty(type, property) {
-  if (STYLE.BLOCKS[type] && STYLE.BLOCKS[type][property] !== undefined) {
-    return STYLE.BLOCKS[type][property];
-  } else {
-    return STYLE.BLOCKS["all"][property];
+  let blockDefinitionStyle = root ? root.blockDefinition.style : false;
+
+  if (blockDefinitionStyle !== false) {
+    // Block definition supports theme and has block
+    if (
+      blockDefinitionStyle[config.theme] !== undefined &&
+      blockDefinitionStyle[config.theme].blocks[type] !== undefined &&
+      blockDefinitionStyle[config.theme].blocks[type][property] !== undefined
+    ) {
+      return blockDefinitionStyle[config.theme].blocks[type][property];
+    }
+
+    // Block definition doesn't support theme but has default style
+    if (
+      blockDefinitionStyle["default"] !== undefined &&
+      blockDefinitionStyle["default"].blocks[type] !== undefined &&
+      blockDefinitionStyle["default"].blocks[type][property] !== undefined
+    ) {
+      return blockDefinitionStyle["default"].blocks[type][property];
+    }
   }
+
+  // Default fallback, no style,
+  return STYLE.BLOCKS["all"][property];
 }
 
 class Block {
@@ -127,8 +165,8 @@ class Block {
         let defaultValue = templateAttribute.defaultvalue;
 
         if (!templateAttribute.defaultvalue) {
-          if (config.defaultEmptyValues[type] !== undefined) {
-            defaultValue = config.defaultEmptyValues[type];
+          if (rootBlock.blockDefinition.config.defaultEmptyValues[type] !== undefined) {
+            defaultValue = rootBlock.blockDefinition.config.defaultEmptyValues[type];
           } else {
             defaultValue = "";
           }
@@ -149,15 +187,15 @@ class Block {
     }
 
     // Eventually add a comment attribute
-    if (config.commentAttributeName !== "") {
+    if (!this.isRoot && rootBlock.blockDefinition.config.commentAttributeName !== "") {
       if (this.attributes["string"] === undefined) {
         this.attributes["string"] = [];
       }
 
       this.attributeCount++;
-      this.attributes["string"][config.commentAttributeName] = ({
+      this.attributes["string"][rootBlock.blockDefinition.config.commentAttributeName] = ({
         value: "",
-        name: config.commentAttributeName
+        name: rootBlock.blockDefinition.config.commentAttributeName
       });
     }
   }
@@ -178,6 +216,13 @@ class Block {
     let spanPropertiesCaption = document.getElementById("block-properties-caption");
     spanPropertiesCaption.textContent = "Block properties - " + this.name;
 
+    let spanBlockDescription = document.createElement("span");
+    spanBlockDescription.classList.add("block-description");
+    if (rootBlock.blockDefinition.help && rootBlock.blockDefinition.help[this.name]) {
+      spanBlockDescription.innerHTML = rootBlock.blockDefinition.help[this.name].description;
+    }
+
+    spanPropertiesCaption.append(spanBlockDescription);
     // Properties container
     let divPropertiesInputList = document.getElementById("block-properties-inputs");
     divPropertiesInputList.innerHTML = "";
@@ -201,7 +246,7 @@ class Block {
 
         divPropertyContainer.appendChild(labelPropertyName);
 
-        let predefinedValues = blockLoader.getPredefinedValues()[attribute.predefinedValues];
+        let predefinedValues = rootBlock.blockDefinition.predefinedValues[attribute.predefinedValues];
         // The block has predefined values, it's either a select or checkboxes
         if (predefinedValues) {
           // Check boxes
@@ -209,7 +254,7 @@ class Block {
             let divCheckboxGroup = document.createElement("div");
             divCheckboxGroup.classList.add("checkbox-group");
 
-            let selectedValues = attribute.value.split(config.multiSelectSeparator);
+            let selectedValues = attribute.value.split(rootBlock.blockDefinition.config.multiSelectSeparator);
 
             // Makes sure we don't accidently delete any custom attributes that wouldn't be in the block definition
             for (let i = 0; i < selectedValues.length; ++i) {
@@ -288,7 +333,7 @@ class Block {
             divPropertyContainer.appendChild(select);
           }
         } else {
-          if (name === config.commentAttributeName) {
+          if (name === rootBlock.blockDefinition.config.commentAttributeName) {
             hasComment = true;
             commentValue = attribute.value;
             continue;
@@ -324,7 +369,7 @@ class Block {
 
       let labelPropertyName = document.createElement("label");
       labelPropertyName.classList.add("property-label");
-      labelPropertyName.textContent = config.commentAttributeName;
+      labelPropertyName.textContent = rootBlock.blockDefinition.config.commentAttributeName;
 
       divPropertyContainer.appendChild(labelPropertyName);
 
@@ -333,7 +378,7 @@ class Block {
       textareaComment.classList.add("property-textarea");
       textareaComment.classList.add("__property-value")
       textareaComment.dataset.attributeType = "string";
-      textareaComment.dataset.attributeName = config.commentAttributeName;
+      textareaComment.dataset.attributeName = rootBlock.blockDefinition.config.commentAttributeName;
 
       divPropertyContainer.appendChild(textareaComment);
       divPropertiesInputList.appendChild(divPropertyContainer);
@@ -396,12 +441,12 @@ class Block {
 
   // Returns true if linkType can be a child link of this block
   linkableTo(linkType) {
-    if (config.connectionsTypes.length === 0) {
+    if (rootBlock.blockDefinition.config.connectionsTypes.length === 0) {
       return true;
     } else {
-      for (let i = 0; i < config.connectionsTypes.length; ++i) {
-        if (config.connectionsTypes[i].name === linkType) {
-          return config.connectionsTypes[i].linkableTo.includes(this.type);
+      for (let i = 0; i < rootBlock.blockDefinition.config.connectionsTypes.length; ++i) {
+        if (rootBlock.blockDefinition.config.connectionsTypes[i].name === linkType) {
+          return rootBlock.blockDefinition.config.connectionsTypes[i].linkableTo.includes(this.type);
         }
       }
     }
@@ -454,18 +499,22 @@ class Block {
   // Changes the link linking this block to its parent
   // Note that a "false" link doesn't means there's no link
   setLinkToParentType(linkToParentType = false) {
+    if (this.isRoot) {
+      return false;
+    }
+
     if (!linkToParentType) {
       // If not link specified, use the default one or false
-      if (config.connectionsTypes[0]) {
-        this.linkToParentType = config.connectionsTypes[0].name;
-        this.linkToParentProperties = config.connectionsTypes[0];
+      if (rootBlock.blockDefinition.config.connectionsTypes[0]) {
+        this.linkToParentType = rootBlock.blockDefinition.config.connectionsTypes[0].name;
+        this.linkToParentProperties = rootBlock.blockDefinition.config.connectionsTypes[0];
       } else {
         this.linkToParentType = false;
       }
     } else {
-      for (let i = 0; i < config.connectionsTypes.length; ++i) {
-        if (config.connectionsTypes[i].name === linkToParentType) {
-          this.linkToParentProperties = config.connectionsTypes[i];
+      for (let i = 0; i < rootBlock.blockDefinition.config.connectionsTypes.length; ++i) {
+        if (rootBlock.blockDefinition.config.connectionsTypes[i].name === linkToParentType) {
+          this.linkToParentProperties = rootBlock.blockDefinition.config.connectionsTypes[i];
           break;
         }
       }
@@ -525,10 +574,10 @@ class Block {
   }
 
   getCopy() {
-    if(this.preventInteraction) {
+    if (this.preventInteraction) {
       return false;
     }
-    let copiedBlock = new Block(blockLoader.getDefinitionByName(this.name));
+    let copiedBlock = new Block(blockLoader.findBlockInDefinition(rootBlock.blockDefinition, this.name));
 
     for (let attributeType in this.attributes) {
       copiedBlock.attributes[attributeType] = {};
@@ -551,7 +600,7 @@ class Block {
   // Removes the block and all children
   deleteRecursive() {
     // root cannot be deleted
-    if (this.parent) {
+    if (this.parent && !this.preventInteraction) {
       this.isDeleted = true; // Used by undo add block to track what wants to be done
       if (this.selected) {
         let nextSibling = this.getSibling(1);
@@ -564,6 +613,8 @@ class Block {
       }
 
       return this.parent.children.splice(this.parent.children.indexOf(this), 1);
+    } else {
+      return false;
     }
   }
 
@@ -746,19 +797,19 @@ class Block {
     // TODO: Check for stuff like orblock that also has terminal nodes
     // and implement htis in the linking part
     //  let isTerminalNode = true;
-    if (config.connectionsTypes.length <= 0) {
+    if (rootBlock.blockDefinition.config.connectionsTypes.length <= 0) {
       return false;
     } else {
       // Is terminal node because of childrenAreTerminalNodes ?
-      for (let i = 0; i < config.connectionsTypes.length; ++i) {
-        if (this.linkToParentType === config.connectionsTypes[i].name && config.connectionsTypes[i].childrenAreTerminalNodes) {
+      for (let i = 0; i < rootBlock.blockDefinition.config.connectionsTypes.length; ++i) {
+        if (this.linkToParentType === rootBlock.blockDefinition.config.connectionsTypes[i].name && rootBlock.blockDefinition.config.connectionsTypes[i].childrenAreTerminalNodes) {
           return true;
         }
       }
 
       // Can this be linked to anything?
-      for (let i = 0; i < config.connectionsTypes.length; ++i) {
-        if (config.connectionsTypes[i].linkableTo.includes(this.type)) {
+      for (let i = 0; i < rootBlock.blockDefinition.config.connectionsTypes.length; ++i) {
+        if (rootBlock.blockDefinition.config.connectionsTypes[i].linkableTo.includes(this.type)) {
           return false;
         }
       }
@@ -767,17 +818,17 @@ class Block {
   }
 
   switchLinkingLinkType() {
-    if (!this.linkingInProgress || config.connectionsTypes.length <= 0) {
+    if (!this.linkingInProgress || rootBlock.blockDefinition.config.connectionsTypes.length <= 0) {
       return false;
     }
 
     do {
       this.linkingLinkTypeIndex++;
-      if (this.linkingLinkTypeIndex >= config.connectionsTypes.length) {
+      if (this.linkingLinkTypeIndex >= rootBlock.blockDefinition.config.connectionsTypes.length) {
         this.linkingLinkTypeIndex = 0;
       }
 
-    } while (!config.connectionsTypes[this.linkingLinkTypeIndex].linkableTo.includes(this.type));
+    } while (!rootBlock.blockDefinition.config.connectionsTypes[this.linkingLinkTypeIndex].linkableTo.includes(this.type));
   }
 
   // ooof it's way too late i'm probaly doing zork
@@ -982,7 +1033,7 @@ class Block {
               let linkChanged = actionHandler.trigger("blocks: link block", {
                 targetBlock: this,
                 parentBlock: selectedBlock,
-                linkType: config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : false
+                linkType: rootBlock.blockDefinition.config.connectionsTypes[selectedBlock.linkingLinkTypeIndex] ? rootBlock.blockDefinition.config.connectionsTypes[selectedBlock.linkingLinkTypeIndex].name : false
               });
 
               if (!global.metaKeys.ctrl && linkChanged) {
@@ -1068,7 +1119,7 @@ class Block {
         this.getYPosition() < y2 &&
         !global.dialogOpen
       ) {
-        if(this.preventInteraction === false) {
+        if (this.preventInteraction === false) {
           this.selectedForGroupAction = true;
         }
       } else {
@@ -1145,7 +1196,7 @@ class Block {
 
   renderConnections(ctx) {
     if (this.linkingInProgress) {
-      const linkingType = config.connectionsTypes[this.linkingLinkTypeIndex] ? config.connectionsTypes[this.linkingLinkTypeIndex].name : "all";
+      const linkingType = rootBlock.blockDefinition.config.connectionsTypes[this.linkingLinkTypeIndex] ? rootBlock.blockDefinition.config.connectionsTypes[this.linkingLinkTypeIndex].name : "all";
       const dashInterval = getLinkStyleProperty(linkingType, "dashInterval");
       const baseLinkLength = getLinkStyleProperty(linkingType, "baseLength");
 
@@ -1221,10 +1272,10 @@ class Block {
   getCommentLines(ctx) {
     let lines = [];
 
-    if (!this.attributes["string"] || !this.attributes["string"][config.commentAttributeName] || this.attributes["string"][config.commentAttributeName].value === "") {
+    if (!this.attributes["string"] || !this.attributes["string"][rootBlock.blockDefinition.config.commentAttributeName] || this.attributes["string"][rootBlock.blockDefinition.config.commentAttributeName].value === "") {
       return lines;
     } else {
-      let words = this.attributes["string"][config.commentAttributeName].value.split(" ");
+      let words = this.attributes["string"][rootBlock.blockDefinition.config.commentAttributeName].value.split(" ");
 
       let currentLine = "";
       for (let i = 0; i < words.length; ++i) {
@@ -1286,7 +1337,7 @@ class Block {
     if (!this.isRoot && this.isInView(camera)) {
       // Block comment
       if (camera.getScaling() > 0.07) {
-        if (this.attributes["string"] && this.attributes["string"][config.commentAttributeName] && this.attributes["string"][config.commentAttributeName].value) {
+        if (this.attributes["string"] && this.attributes["string"][rootBlock.blockDefinition.config.commentAttributeName] && this.attributes["string"][rootBlock.blockDefinition.config.commentAttributeName].value) {
           if (this.style.comment.border.thickness > 0) {
             ctx.fillStyle = this.style.comment.border.color;
             ctx.fillRect(this.position.x - this.style.comment.border.thickness, this.position.y - this.style.comment.border.thickness,
@@ -1417,7 +1468,7 @@ class Block {
         // Render attributes
         for (let type in this.attributes) {
           for (let i in this.attributes[type]) {
-            if (this.attributes[type][i].name !== config.commentAttributeName) {
+            if (this.attributes[type][i].name !== rootBlock.blockDefinition.config.commentAttributeName) {
               // Draw rect instead of text when zoomed out too much to increase performances
               if (camera.getScaling() < 0.4) {
                 ctx.fillRect(this.position.x, this.size.height + this.getYPosition() + this.style.font.size * lineCounter, this.attributes[type][i].name.length * 5, 2);
@@ -1480,13 +1531,20 @@ Block.getSelectedBlock = () => {
 
 Block.getLinkStyleProperty = getLinkStyleProperty;
 
+module.exports.init = () => {
+  blockLoader.getBlocksDefinitionsList().forEach((blockDefinition) => {
+    if (blockDefinition.name === config.defaultBlocksDefinition) {
+      root.blockDefinition = blockDefinition;
+    }
+  });
+  root.autoLayout(true);
+};
+
 root = new Block({
   name: "root",
   type: "root",
   isRoot: true
 }, false);
-
-root.autoLayout(true);
 
 selectedBlock = root;
 

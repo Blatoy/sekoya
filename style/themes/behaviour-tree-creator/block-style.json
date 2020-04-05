@@ -34,20 +34,5 @@
       "x": 20,
       "y": 50
     }
-  },
-  "root": {
-    "color": "blue"
-  },
-  "condition": {
-    "color": "black"
-  },
-  "action": {
-    "color": "#808080"
-  },
-  "other": {
-    "color": "red"
-  },
-  "logic": {
-    "color": "#00FF00"
   }
 }

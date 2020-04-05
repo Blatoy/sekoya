@@ -4,11 +4,11 @@ let linkType = "";
 
 function getSourceArray() {
   let sourceArray = [];
-  let blockDefinitions = blockLoader.getBlockDefinitions();
+  let blockDefinitions = rootBlock.blockDefinition.blocks;
 
   for (let actionType in blockDefinitions) {
     for (let blockName in blockDefinitions[actionType]) {
-      if(!blockDefinitions[actionType][blockName].hidden) {
+      if (!blockDefinitions[actionType][blockName].hidden) {
         sourceArray.push({
           displayName: blockDefinitions[actionType][blockName].displayName || blockDefinitions[actionType][blockName].name,
           actionName: blockDefinitions[actionType][blockName].name
@@ -22,8 +22,9 @@ function getSourceArray() {
 
 function displayLinked(index) {
   lastLinkedIndex = index;
-  linkType = config.connectionsTypes[index].name;
-  if(!Block.getSelectedBlock().linkableTo(linkType) || Block.getSelectedBlock().isTerminalNode()) {
+  linkType = rootBlock.blockDefinition.config.connectionsTypes[index].name;
+
+  if (!Block.getSelectedBlock().linkableTo(linkType) || Block.getSelectedBlock().isTerminalNode()) {
     return false;
   }
   quickAccess.attachType("Add \"" + linkType + "\" block", getSourceArray(), onResultSelected);
@@ -38,16 +39,23 @@ function display() {
 
 function onResultSelected(blockName) {
   let selectedBlock = Block.getSelectedBlock();
-  let newBlock = new Block(blockLoader.getDefinitionByName(blockName), false, false, [], {
+
+  let newBlock = new Block(blockLoader.findBlockInDefinition(rootBlock.blockDefinition, blockName), false, false, [], {
     x: selectedBlock.style.margin.x + selectedBlock.position.x,
-    y: selectedBlock.children.length > 0 ? selectedBlock.getYPosition() + selectedBlock.getMaxRecursiveHeight() : selectedBlock.getYPosition()
+    y: selectedBlock.children.length > 0 ?
+      selectedBlock.getYPosition() + selectedBlock.getMaxRecursiveHeight() : selectedBlock.getYPosition()
   });
 
-  if(lastLinkedIndex === -1) {
-    actionHandler.trigger("blocks: add block", {block: newBlock}, false, true);
-  }
-  else {
-    actionHandler.trigger("blocks: add block", {block: newBlock, parent: Block.getSelectedBlock(), linkType: linkType}, false, true);
+  if (lastLinkedIndex === -1) {
+    actionHandler.trigger("blocks: add block", {
+      block: newBlock
+    }, false, true);
+  } else {
+    actionHandler.trigger("blocks: add block", {
+      block: newBlock,
+      parent: Block.getSelectedBlock(),
+      linkType: linkType
+    }, false, true);
   }
 
 }

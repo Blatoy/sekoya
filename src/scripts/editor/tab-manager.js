@@ -15,25 +15,28 @@ function init() {
   newTab();
   try {
     let savedTabs = JSON.parse(localStorage.openedTabPaths);
-    if(savedTabs.length > 0) {
+    if (savedTabs.length > 0) {
       savedTabs.forEach((tabPath) => {
         fileManager.open(tabPath);
       });
     }
-  }
-  catch(e) {}
+  } catch (e) {}
 }
 
 function switchTab(direction = 0) {
   selectTab(selectedTabIndex + direction);
 }
 
-function newTab(name = "", blocks = [], fileLocation = "", selected = true) {
+function newTab(name = "", blockDefinition = undefined, blocks = [], fileLocation = "", selected = true) {
   if (name === "") {
     name = DEFAULT_TAB_NAME + tabs.length + DEFAULT_TAB_EXTENSION;
   }
 
-  let tab = new Tab(name, blocks, fileLocation, selected);
+  if (blockDefinition === undefined) {
+    blockDefinition = blockLoader.getBlocksDefinitionsList()[0];
+  }
+
+  let tab = new Tab(name, blockDefinition, blocks, fileLocation, selected);
 
   tabs.push(tab);
 
@@ -45,10 +48,13 @@ function newTab(name = "", blocks = [], fileLocation = "", selected = true) {
   }
 
   if (!fileLocation) {
-    if (config.defaultBlock) {
-      new Block(blockLoader.getDefinitionByName(config.defaultBlock));
+    if (blockDefinition.config.defaultBlock) {
+      let rootBlockDefinition = blockLoader.findBlockInDefinition(blockDefinition, blockDefinition.config.defaultBlock);
+      if (rootBlockDefinition) {
+        new Block(rootBlockDefinition);
+        rootBlock.autoLayout(true);
+      }
     }
-    rootBlock.autoLayout(true);
   }
 
   tab.setSaved(true);
@@ -114,8 +120,8 @@ function closeTab(index = 0, callback = () => {}, saveAndCloseCallback = () => {
 
 module.exports.savePathsInLocalStorage = () => {
   let openedTabPaths = [];
-  for(let i = 0; i < tabs.length; ++i) {
-    if(tabs[i].fileLocation) {
+  for (let i = 0; i < tabs.length; ++i) {
+    if (tabs[i].fileLocation) {
       openedTabPaths.push(tabs[i].getFileLocation());
     }
   }
@@ -140,20 +146,18 @@ function closeAll(onAllClosed) {
     let status = closeTab(i, () => {
       tabsClosedCount++;
 
-      if(tabsClosedCount >= tabsCount) {
+      if (tabsClosedCount >= tabsCount) {
         onAllClosed();
       }
     }, () => {
       closeAll(onAllClosed);
     });
 
-    if(status === "cancel") {
+    if (status === "cancel") {
       break;
-    }
-    else if(status === "closed") {
+    } else if (status === "closed") {
       i--;
-    }
-    else if(status === "saveAndClose") {
+    } else if (status === "saveAndClose") {
       return false;
     }
   }
@@ -164,7 +168,7 @@ module.exports.closeAll = closeAll;
 module.exports.handleNewTab = (fileName, fileLocation) => {
   let tabIndex = getTabIndexFromFileLocation(fileLocation + fileName);
   if (tabIndex === -1) {
-    tabManager.newTab(fileName, [], fileLocation);
+    tabManager.newTab(fileName, undefined, [], fileLocation);
     return true;
   } else {
     selectTab(tabIndex);
@@ -212,13 +216,15 @@ function selectTab(index) {
     }
   }
 
-
   selectedTabIndex = index;
+
+  rootBlock.blockDefinition = tabs[index].blockDefinition;
 
   camera.setPosition(newSelectedTab.cameraState.x, newSelectedTab.cameraState.y);
   camera.setScaling(newSelectedTab.cameraState.scaling);
 
   newSelectedTab.setSelected(true);
+  // TODO: Clean the whole block class, find a better way to give blocks info about the block config....
   rootBlock.children = newSelectedTab.blocks;
 
   if (newSelectedTab.selectedBlock) {

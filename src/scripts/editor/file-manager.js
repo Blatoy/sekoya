@@ -33,16 +33,16 @@ function save(tab, path = false, callback = () => {}) {
     } else {
       let xmlData = '<?xml version="1.0" ?>';
 
-      if (config.topLevelBlocksContainer.length > 0) {
-        xmlData += "<" + config.topLevelBlocksContainer[0] + ">";
+      if (rootBlock.blockDefinition.config.topLevelBlocksContainer.length > 0) {
+        xmlData += "<" + rootBlock.blockDefinition.config.topLevelBlocksContainer[0] + ">";
       }
 
       for (let i = 0; i < tab.blocks.length; ++i) {
         xmlData += getXMLRecursively(tab.blocks[i]);
       }
 
-      if (config.topLevelBlocksContainer.length > 0) {
-        xmlData += "</" + config.topLevelBlocksContainer[0] + ">";
+      if (rootBlock.blockDefinition.config.topLevelBlocksContainer.length > 0) {
+        xmlData += "</" + rootBlock.blockDefinition.config.topLevelBlocksContainer[0] + ">";
       }
 
       // console.log(xmlData);
@@ -59,15 +59,15 @@ function getXMLRecursively(block, depth = 0) {
   {
     let blockData = "";
 
-    if (depth + 1 < config.topLevelBlocksContainer.length) {
-      blockData += "<" + config.topLevelBlocksContainer[depth + 1] + ">";
+    if (depth + 1 < rootBlock.blockDefinition.config.topLevelBlocksContainer.length) {
+      blockData += "<" + rootBlock.blockDefinition.config.topLevelBlocksContainer[depth + 1] + ">";
     }
 
-    if(block.commented) {
+    if (block.commented) {
       blockData += "<!--";
     }
 
-    if (blockLoader.getDefinitionByName(block.name).useNameAttributeAsTagName) {
+    if (blockLoader.findBlockInDefinition(rootBlock.blockDefinition, block.name).useNameAttributeAsTagName) {
       blockData += "<" + block.name + ' id="' + block.name + '">';
     } else {
       blockData += "<" + block.type + ' id="' + block.name + '">';
@@ -77,9 +77,9 @@ function getXMLRecursively(block, depth = 0) {
       for (let attribute in block.attributes[type]) {
         blockData += '<' + type + ' id="' + block.attributes[type][attribute].name + '">' + encodeXML(block.attributes[type][attribute].value) + '</' + type + '>';
       }
-      if (config.minimizedAttributeName !== "") {
+      if (rootBlock.blockDefinition.config.minimizedAttributeName !== "") {
         if (block.minimized) {
-          blockData += '<string id="' + config.minimizedAttributeName + '">yes</string>';
+          blockData += '<string id="' + rootBlock.blockDefinition.config.minimizedAttributeName + '">yes</string>';
         }
       }
     }
@@ -100,18 +100,18 @@ function getXMLRecursively(block, depth = 0) {
       blockData += "</" + previousLinkToParentType + ">";
     }
 
-    if (blockLoader.getDefinitionByName(block.name).useNameAttributeAsTagName) {
+    if (blockLoader.findBlockInDefinition(rootBlock.blockDefinition, block.name).useNameAttributeAsTagName) {
       blockData += "</" + block.name + '>';
     } else {
       blockData += "</" + block.type + '>';
     }
 
-    if(block.commented) {
+    if (block.commented) {
       blockData += "-->";
     }
 
-    if (depth + 1 < config.topLevelBlocksContainer.length) {
-      blockData += "</" + config.topLevelBlocksContainer[depth + 1] + ">";
+    if (depth + 1 < rootBlock.blockDefinition.config.topLevelBlocksContainer.length) {
+      blockData += "</" + rootBlock.blockDefinition.config.topLevelBlocksContainer[depth + 1] + ">";
     }
 
     return blockData;
@@ -136,11 +136,14 @@ function cleanTopLevelContainers(elements, targetDepth, depth = 1) {
 
 
 let validLinkTypes = [];
-for (let i = 0; i < config.connectionsTypes.length; ++i) {
-  validLinkTypes.push(config.connectionsTypes[i].name);
-}
 
 function createBlockRecursively(element, parentBlock, linkToParentType) {
+  if (validLinkTypes.length === 0) {
+    for (let i = 0; i < rootBlock.blockDefinition.config.connectionsTypes.length; ++i) {
+      validLinkTypes.push(rootBlock.blockDefinition.config.connectionsTypes[i].name);
+    }
+  }
+
   let isCommented = false;
   if (element.type === "comment") {
     try {
@@ -158,8 +161,13 @@ function createBlockRecursively(element, parentBlock, linkToParentType) {
   }
 
   let blockName = element.attributes ? (element.attributes.id || element.name) : element.name;
-  let newBlock = new Block(blockLoader.getDefinitionByName(blockName), parentBlock, linkToParentType);
-
+  let newBlock = new Block(blockLoader.findBlockInDefinition(rootBlock.blockDefinition, blockName), parentBlock, linkToParentType);
+  /*
+  constructor(blockDefinition, parent = false, linkToParentType = false, children = [], position = {
+    x: 0,
+    y: 0
+  }) {
+    */
   newBlock.commented = isCommented;
 
   if (element.elements) {
@@ -173,7 +181,7 @@ function createBlockRecursively(element, parentBlock, linkToParentType) {
           createBlockRecursively(childElement.elements[j], newBlock, childName);
         }
       } else {
-        if (config.minimizedAttributeName !== "" && childName !== config.minimizedAttributeName) {
+        if (rootBlock.blockDefinition.config.minimizedAttributeName !== "" && childName !== rootBlock.blockDefinition.config.minimizedAttributeName) {
           // This is an attribute of newBlock
           if (!newBlock.attributes[childElement.name]) {
             newBlock.attributes[childElement.name] = {};
@@ -191,7 +199,7 @@ function createBlockRecursively(element, parentBlock, linkToParentType) {
             }
           }
         } else {
-          if (childName === config.minimizedAttributeName) {
+          if (childName === rootBlock.blockDefinition.config.minimizedAttributeName) {
             newBlock.minimized = true;
           }
         }
@@ -205,6 +213,7 @@ function open(file) {
     let JSONData = xmlConverter.xml2js(xml, {
       compact: false
     });
+
     if (JSONData.elements) {
       // Make sure we don't have 2 tabs with the same file / location
       // Note: we don't check that sooner because readFile is async and we don't want to change tab before all the blocks
@@ -213,7 +222,8 @@ function open(file) {
         return false;
       }
 
-      let elements = cleanTopLevelContainers(JSONData.elements, config.topLevelBlocksContainer.length);
+      //console.log(rootBlock.blockDefinition);
+      let elements = cleanTopLevelContainers(JSONData.elements, rootBlock.blockDefinition.config.topLevelBlocksContainer.length);
 
       for (let i = 0; i < elements.length; ++i) {
         createBlockRecursively(elements[i], rootBlock, "normal");

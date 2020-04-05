@@ -106,14 +106,14 @@ function undo() {
     let actionHistory = undoStack.pop();
     redoStack.push(actionHistory);
 
-    while(actionHistory && actionHistory.isDummy) {
+    while (actionHistory && actionHistory.isDummy) {
       actionHistory = undoStack.pop();
-      if(actionHistory !== undefined) {
+      if (actionHistory !== undefined) {
         redoStack.push(actionHistory);
       }
     }
 
-    if(actionHistory !== undefined) {
+    if (actionHistory !== undefined) {
       if (!Array.isArray(actionHistory)) {
         actions[actionHistory.actionName].undoAction(actionHistory.parameters);
       } else {
@@ -130,16 +130,16 @@ function redo() {
     let actionHistory = redoStack.pop();
     undoStack.push(actionHistory);
 
-    while(actionHistory && actionHistory.isDummy) {
+    while (actionHistory && actionHistory.isDummy) {
       actionHistory = redoStack.pop();
-      if(actionHistory !== undefined) {
+      if (actionHistory !== undefined) {
         undoStack.push(actionHistory);
       }
     }
 
-    if(actionHistory !== undefined) {
+    if (actionHistory !== undefined) {
       if (!Array.isArray(actionHistory)) {
-          actions[actionHistory.actionName].doAction(actionHistory.parameters);
+        actions[actionHistory.actionName].doAction(actionHistory.parameters);
       } else {
         for (let i = 0; i < actionHistory.length; ++i) {
           actions[actionHistory[0].actionName].doAction(actionHistory[i].parameters);
@@ -150,7 +150,10 @@ function redo() {
 }
 
 function separateMergeUndo() {
-    undoStack.push({actionName: "dummy", isDummy: true});
+  undoStack.push({
+    actionName: "dummy",
+    isDummy: true
+  });
 }
 
 function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false, mergeUndo = false) {
@@ -188,7 +191,17 @@ function trigger(name, args, ignoreCommandHistory = false, bypassChecks = false,
       parameters = args;
     }
 
+    if (!actions[name].executionState) {
+      actions[name].executionState = 1;
+    }
+
     let actionReturnedValue = actions[name].doAction(parameters, actionHandlerParameters);
+
+    if (actionReturnedValue !== false) {
+      actions[name].executionState = 2;
+    } else if (!actions[name].executionState) {
+      actions[name].executionState = 3;
+    }
 
     if (action.undoAction)
       if (!actionHandlerParameters.cancelUndo &&
@@ -248,11 +261,12 @@ function addAction(name, action, setData = () => {}, undoAction = false, priorit
   if (typeof name === "object") {
     actions[name.name] = {
       name: name.name,
+      debug: name.debug === undefined ? false : name.debug,
       doAction: name.action,
       setData: name.setData === undefined ? false : name.setData,
       undoAction: name.undoAction === undefined ? false : name.undoAction,
       priority: name.priority || 0,
-      mergeUndoByDefault: name.mergeUndoByDefault === undefined ? false: name.mergeUndoByDefault,
+      mergeUndoByDefault: name.mergeUndoByDefault === undefined ? false : name.mergeUndoByDefault,
       displayable: name.displayable === undefined ? true : name.displayable,
       onShortcutRelease: name.onShortcutRelease || (() => {}),
       preventTriggerWhenInputFocused: name.preventTriggerWhenInputFocused === undefined ? true : name.preventTriggerWhenInputFocused,
@@ -295,7 +309,7 @@ function getAccelerator(keybind, prettyPrint = false) {
   if (keybind.shift) accelerator += !prettyPrint ? "Shift+" : "Shift + ";
 
   let key = keybind.key.replace(/key/i, "");
-  if(prettyPrint && key.length == 1) {
+  if (prettyPrint && key.length == 1) {
     key = key.toUpperCase();
   }
   accelerator += key;

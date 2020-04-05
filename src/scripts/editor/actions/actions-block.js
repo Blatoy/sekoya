@@ -105,11 +105,18 @@ module.exports.registerActions = () => {
   actionHandler.addAction({
     name: "blocks: delete selected",
     action: (data, actionHandlerParameters) => {
+      let anyBlockModified = false;
       for (let i = 0; i < data.length; ++i) {
-        data[i].block.delete();
+        if (data[i].block.delete()) {
+          anyBlockModified = true;
+        }
       }
 
-      tabManager.setFileModified();
+      if (!anyBlockModified) {
+        actionHandlerParameters.cancelUndo = true;
+      } else {
+        tabManager.setFileModified();
+      }
     },
     setData: () => {
       let selectedBlocks = rootBlock.getSelectedForGroupAction();
@@ -124,10 +131,10 @@ module.exports.registerActions = () => {
         let children = [];
         let selectedBlock = selectedBlocks[i];
 
-        if(selectedBlock.preventInteraction) {
+        if (selectedBlock.preventInteraction) {
           continue;
         }
-        
+
         // We have to restore it at the right position
         let blockIndex = selectedBlock.parent.children.indexOf(selectedBlock);
         selectedBlock.selectedForGroupAction = false;
@@ -151,7 +158,6 @@ module.exports.registerActions = () => {
         });
       }
 
-      tabManager.setFileModified();
       return deletedBlocks;
     },
     undoAction: (data) => {
@@ -171,10 +177,12 @@ module.exports.registerActions = () => {
 
   actionHandler.addAction({
     name: "blocks: delete selected and children",
-    action: (data) => {
-      data.block.deleteRecursive();
-      tabManager.setFileModified();
-      //rootBlock.autoLayout();
+    action: (data, actionHandlerParameters) => {
+      if (data.block.deleteRecursive()) {
+        tabManager.setFileModified();
+      } else {
+        actionHandlerParameters.cancelUndo = true;
+      }
     },
     setData: () => {
       let selectedBlock = Block.getSelectedBlock();
@@ -270,6 +278,37 @@ module.exports.registerActions = () => {
     }
   });
 
+  actionHandler.addAction({
+    name: "blocks: link to suitable parent",
+    action: () => {
+      let currentSelectedBlock = Block.getSelectedBlock();
+      currentSelectedBlock.moveSelectedUpDown(-1);
+
+      let nearestBlockAbove = Block.getSelectedBlock();
+      console.log(nearestBlockAbove.linkToParentType);
+      if (nearestBlockAbove.linkableTo(nearestBlockAbove.linkToParentType)) {
+        actionHandler.trigger("blocks: link block", {
+          parentBlock: nearestBlockAbove,
+          targetBlock: currentSelectedBlock,
+          linkType: nearestBlockAbove.linkToParentType
+        });
+      } else if (nearestBlockAbove.parent) {
+        actionHandler.trigger("blocks: link block", {
+          parentBlock: nearestBlockAbove.parent,
+          targetBlock: currentSelectedBlock,
+          linkType: nearestBlockAbove.linkToParentType
+        });
+      }
+
+      currentSelectedBlock.setSelected(true);
+
+      /*  actionHandler.trigger("blocks: link block", {
+          parentBlock: rootBlock,
+          targetBlock: Block.getSelectedBlock()
+        });*/
+    }
+  });
+
 
   actionHandler.addAction({
     name: "blocks: link block",
@@ -309,27 +348,47 @@ module.exports.registerActions = () => {
     name: "blocks: toggle commented",
     mergeUndoByDefault: true,
     action: (data, actionHandlerParameter) => {
-      if(!data.noUndoMerge) {
+      if (!data.noUndoMerge) {
         actionHandler.separateMergeUndo();
         tabManager.setFileModified();
       }
-      if(data.block && !data.block.isRoot && !data.block.isRecursiveParentCommented()) {
-        data.block.uncommentAllChildren();
-        data.block.commented = !data.block.commented;
-        return true;
+      let anyBlockModified = false;
+      for (let k in data.blocks) {
+        let block = data.blocks[k];
+        if (block && !block.isRoot && !block.isRecursiveParentCommented()) {
+          block.uncommentAllChildren();
+          block.commented = !block.commented;
+          anyBlockModified = true;
+        }
       }
 
-      actionHandlerParameter.cancelUndo = true;
-      return false;
-    },
-    setData: (data = {noUndoMerge: false}) => {
-      if(data.block === undefined) {
-        data.block = Block.getSelectedBlock();
+      if (!anyBlockModified) {
+        actionHandlerParameter.cancelUndo = true;
+        return false;
       }
-      return {block: data.block, noUndoMerge: data.noUndoMerge};
+      return true;
+    },
+    setData: (data = {
+      noUndoMerge: false
+    }) => {
+      if (data.block === undefined) {
+        data.blocks = rootBlock.getSelectedForGroupAction();
+        if (data.blocks.length == 0) {
+          data.blocks = [Block.getSelectedBlock()];
+        }
+      } else {
+        data.blocks = [data.block];
+      }
+      return {
+        blocks: data.blocks,
+        noUndoMerge: data.noUndoMerge
+      };
     },
     undoAction: (data) => {
-      data.block.commented = !data.block.commented;
+      for (let k in data.blocks) {
+        let block = data.blocks[k];
+        block.commented = !block.commented;
+      }
     }
   });
 
@@ -398,7 +457,7 @@ module.exports.registerActions = () => {
             if (!attributes[lastType]) {
               attributes[lastType] = {};
             }
-            attributes[lastType][lastName] = checkedValues.join(config.multiSelectSeparator);
+            attributes[lastType][lastName] = checkedValues.join(rootBlock.blockDefinition.config.multiSelectSeparator);
             checkedValues = [];
           }
           lastName = checkbox.dataset.attributeName;
@@ -413,7 +472,7 @@ module.exports.registerActions = () => {
         if (!attributes[lastType]) {
           attributes[lastType] = {};
         }
-        attributes[lastType][lastName] = checkedValues.join(config.multiSelectSeparator);
+        attributes[lastType][lastName] = checkedValues.join(rootBlock.blockDefinition.config.multiSelectSeparator);
       }
 
       return {
@@ -477,7 +536,7 @@ module.exports.registerActions = () => {
       copiedBlocks = [];
       for (let i = 0; i < selectedBlocks.length; ++i) {
         let copiedBlock = selectedBlocks[i].getCopy();
-        if(copiedBlock !== false) {
+        if (copiedBlock !== false) {
           copiedBlocks.push(copiedBlock);
         }
       }

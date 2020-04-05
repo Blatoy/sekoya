@@ -13,6 +13,13 @@
     "action": "core: redo"
   },
   {
+    "key": "F11",
+    "ctrl": false,
+    "alt": false,
+    "shift": false,
+    "action": "core: toggle block list"
+  },
+  {
     "key": "s",
     "ctrl": true,
     "alt": false,
@@ -123,6 +130,13 @@
     "alt": false,
     "shift": false,
     "action": "blocks: delete selected and children"
+  },
+  {
+    "key": "KeyT",
+    "ctrl": false,
+    "alt": false,
+    "shift": false,
+    "action": "blocks: link to suitable parent"
   },
   {
     "key": "Delete",

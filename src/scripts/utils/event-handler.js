@@ -42,6 +42,8 @@ function setCanvasSize() {
   canvas.height = canvas.parentElement.clientHeight;
 }
 
+module.exports.setCanvasSize = setCanvasSize;
+
 module.exports.addEditorEvents = () => {
   window.addEventListener("mousedown", (e) => {
     camera.onMouseDown(e.which);
@@ -55,7 +57,7 @@ module.exports.addEditorEvents = () => {
   });
 
   window.addEventListener("dblclick", (e) => {
-    if(Block.getSelectedBlock().isPositionOver(global.mouse.cameraX, global.mouse.cameraY)) {
+    if (Block.getSelectedBlock().isPositionOver(global.mouse.cameraX, global.mouse.cameraY)) {
       actionHandler.trigger("blocks: display settings for selected block")
     }
   });
@@ -112,11 +114,11 @@ module.exports.addEditorEvents = () => {
 
     tabManager.savePathsInLocalStorage();
 
-    if(global.forceAppReload) {
+    if (global.forceAppReload) {
       return true;
     }
 
-    if(!closeAllowed) {
+    if (!closeAllowed) {
       event.returnValue = true;
     }
 

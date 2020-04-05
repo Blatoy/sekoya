@@ -138,7 +138,8 @@ module.exports.render = (ctx) => {
   let scrollbarHeight = getScrollBarHeight();
 
   if (scrollbarHeight < getScrollBarDisplayHeight()) {
-    if(scrollbarHeight + scrollBarPositionY > cameraBounds.height - size) {
+    // Prevent scrollbars being drawn on top of each other
+    if (scrollbarHeight + scrollBarPositionY > cameraBounds.height * global.camera.scaling - size) {
       scrollbarHeight -= size;
     }
     ctx.fillRect(x + sliderOffset, (scrollBarPositionY), sliderSize, scrollbarHeight);
@@ -148,7 +149,8 @@ module.exports.render = (ctx) => {
   const scrollBarPositionX = getScrollBarPositionX();
   let scrollbarWidth = getScrollBarWidth();
   if (scrollbarWidth < getScrollBarDisplayWidth()) {
-    if(scrollbarWidth + scrollBarPositionX > cameraBounds.width - size) {
+    // Prevent scrollbars being drawn on top of each other
+    if (scrollbarWidth + scrollBarPositionX > cameraBounds.width * global.camera.scaling - size) {
       scrollbarWidth -= size;
     }
     ctx.fillRect((scrollBarPositionX), y + sliderOffset, scrollbarWidth, sliderSize);
@@ -164,16 +166,16 @@ module.exports.SCROLL_STATES = SCROLL_STATES;
 module.exports.update = () => {
   switch (scrollState) {
     case SCROLL_STATES.VERTICAL_SELECTED:
-    camera.setPosition(
-      global.camera.bounds.x * global.camera.scaling,
-      Math.max(
-        Math.min(
-          (global.mouse.canvasY - clickOffsetY) / canvas.height * getMaximumHeight(true) * global.camera.scaling,
-          (getMaximumHeight(true)) * global.camera.scaling - canvas.height
-        ),
-        0
-      )
-    );
+      camera.setPosition(
+        global.camera.bounds.x * global.camera.scaling,
+        Math.max(
+          Math.min(
+            (global.mouse.canvasY - clickOffsetY) / canvas.height * getMaximumHeight(true) * global.camera.scaling,
+            (getMaximumHeight(true)) * global.camera.scaling - canvas.height
+          ),
+          0
+        )
+      );
       break;
     case SCROLL_STATES.HORIZONTAL_SELECTED:
       camera.setPosition(

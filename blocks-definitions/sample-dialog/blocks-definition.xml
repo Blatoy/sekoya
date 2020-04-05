@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<blockdefinitions>
+
+  <predefined_values id="bubbleType">
+    <value>default</value>
+    <value>exclamation</value>
+    <value>thinking</value>
+    <value>invisible</value>
+  </predefined_values>
+
+  <predefined_values id="textSpeed">
+    <value>default</value>
+    <value>slow</value>
+    <value>fast</value>
+    <value>very slow</value>
+  </predefined_values>
+
+
+  <text>
+
+    <dialog name="normal">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+
+    <dialog name="branchSelectorWithText">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+
+
+    <dialog name="branchSelector">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+
+  </text>
+
+  <branch>
+    <dialog name="textBranch">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+
+    <dialog name="merchantBranch">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+
+    <dialog name="goBackBranch">
+      <string name="Text"/>
+      <string name="Bubble type" values="bubbleType" defaultvalue="default"/>
+    </dialog>
+  </branch>
+
+</blockdefinitions>

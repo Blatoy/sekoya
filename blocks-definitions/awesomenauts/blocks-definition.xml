@@ -1032,7 +1032,7 @@
     <other name="sequence" useNameAttributeAsTagName="1" displayName="Sequence">
       <string name="Is blocking" values="yesno" defaultvalue="no"/>
     </other>
-    <root name="root" hidden="1" useNameAttributeAsTagName="1" preventInteraction="1">
+      <root name="root" hidden="1" useNameAttributeAsTagName="1" preventInteraction="1">
     </root>
   </other>
 

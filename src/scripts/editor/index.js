@@ -11,10 +11,10 @@ const actionsFolderPath = basePath + "/src/scripts/editor/actions/";
 const actionHandler = require(basePath + "/src/scripts/utils/action-handler.js");
 const themeLoader = require(basePath + '/src/scripts/utils/theme-loader.js');
 const blockLoader = require(editorFolderPath + "block-loader.js");
-const tabManager = require(editorFolderPath + "tab-manager.js");
-const fileManager = require(editorFolderPath + "file-manager.js");
 const camera = require(editorFolderPath + "camera.js");
 const scrollBars = require(editorFolderPath + "scroll-bars.js");
+
+const tabManager = require(editorFolderPath + "tab-manager.js");
 
 const fs = require('fs');
 
@@ -23,16 +23,19 @@ const STYLE = {
   LINKS: themeLoader.linkStyles
 };
 
-const {
-  Block,
-  rootBlock,
-  selectedBlock
-} = require(editorFolderPath + "classes/block.js");
+const Block = require(editorFolderPath + "classes/block.js").Block;
+const rootBlock = require(editorFolderPath + "classes/block.js").rootBlock;
+const selectedBlock = require(editorFolderPath + "classes/block.js").selectedBlock;
+const fileManager = require(editorFolderPath + "file-manager.js");
 
 themeLoader.addCSSToCurrentPage();
-blockLoader.loadBlockDefinitions(() => {
-  require(editorFolderPath + "display/block-list-display.js").addBlocksToLeftMenu();
+blockLoader.loadBlocksDefinitions().then(() => {
+  require(editorFolderPath + "classes/block.js").init();
+
+  require(editorFolderPath + "display/block-list-display.js").setLeftMenuBlocks(config.defaultBlocksDefinition);
+  require(actionsFolderPath + "actions-quick-access.js").registerActions();
   tabManager.init();
+  require(editorFolderPath + "main-loop.js").startMainLoop();
 });
 
 require(actionsFolderPath + "actions-tab.js").registerActions();
@@ -41,24 +44,19 @@ require(actionsFolderPath + "actions-block.js").registerActions();
 require(actionsFolderPath + "actions-search.js").registerActions();
 require(actionsFolderPath + "actions-core.js").registerActions();
 require(actionsFolderPath + "actions-file.js").registerActions();
-require(actionsFolderPath + "actions-quick-access.js").registerActions();
 require(actionsFolderPath + "actions-camera.js").registerActions();
 require(utilsFolderPath + "event-handler.js").addEditorEvents();
 require(editorFolderPath + "quick-access/quick-access-display.js").addEvents();
-require(editorFolderPath + "main-loop.js").startMainLoop();
 require(editorFolderPath + "/menus/menu-top-bar.js").setMenu();
-// It's not really planned to add the context menu back because right click is
-// already used to link blocks
-// require(editorFolderPath + "/menus/menu-context.js").setMenu();
 
-if(!localStorage.firstLaunchDone) {
+if (!localStorage.firstLaunchDone) {
   document.getElementById("about-background").style.display = "block";
 }
 
 window.onerror = (msg, script, line) => {
   let errorMessage = (new Date()) + " " + script + ":" + line + " --- " + msg + "\n";
 
-  fs.appendFile('sekoya-errors.log', errorMessage, function (err) {
+  fs.appendFile('sekoya-errors.log', errorMessage, function(err) {
     if (err) throw err;
   });
 };

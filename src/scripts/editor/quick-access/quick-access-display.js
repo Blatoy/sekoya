@@ -136,8 +136,8 @@ function displaySearchResults(results) {
     }
 
     let accelerator = actionHandler.getActionAccelerator(result.actionName, true);
-    if(accelerator != "") {
-      divResult.innerHTML =divResult.innerHTML + ("<span class='quick-access-shortcut shortcut-background'>" + accelerator +"</span>")
+    if (accelerator != "") {
+      divResult.innerHTML = divResult.innerHTML + ("<span class='quick-access-shortcut shortcut-background'>" + accelerator + "</span>")
     }
 
     elementResults.append(divResult);
