@@ -2,6 +2,8 @@
 Sekoya is a XML tree editor that supports "branching" (like conditions)
 Its main goal is to provide a software that is easier and more "comfortable" to use than the BehaviourTreeCreator made by Ronimo Games by adding a lot of shortcuts and the ability to do everything without a mouse. Even if the software has currently all the blocks required to works for Awesomenauts, it's easy to change the block definition file to use it for any other purpose.
 
+![Screenshot of Sekoya](https://orikaru.net/dl/sekoya-demo.png)
+
 # How can I help?
 The software is still in alpha and the code is a HUGE mess so I will gladly take any suggestion but at the moment I prefer to finish it and clean it before accepting code contributions.
 
