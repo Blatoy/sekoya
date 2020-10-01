@@ -21,8 +21,6 @@ let moveUp = false,
   moveDown = false,
   moveRight = false,
   moveLeft = false;
-const SPEED = 10;
-const SCROLL_SPEED = 50;
 const ZOOM_VELOCITY = 0.1;
 
 module.exports.getPosition = () => {
@@ -172,10 +170,12 @@ module.exports.setMoveFast = (moveFast_) => {
 };
 
 module.exports.update = () => {
-  if (moveUp) setPosition(position.x, position.y - SPEED * (1 + 4 * moveFast));
-  if (moveDown) setPosition(position.x, position.y + SPEED * (1 + 4 * moveFast));
-  if (moveLeft) setPosition(position.x - SPEED * (1 + 4 * moveFast), position.y);
-  if (moveRight) setPosition(position.x + SPEED * (1 + 4 * moveFast), position.y);
+  let scrollSpeed = (config.keyScrollSpeed || 10) * (1 + 4 * moveFast);
+
+  if (moveUp) setPosition(position.x, position.y - scrollSpeed);
+  if (moveDown) setPosition(position.x, position.y + scrollSpeed);
+  if (moveLeft) setPosition(position.x - scrollSpeed, position.y);
+  if (moveRight) setPosition(position.x + scrollSpeed, position.y);
 
   if (global.mouse.buttons["2"]) {
     position.x = targetPosition.x = mouseDownPosition.x - global.mouse.canvasX;
