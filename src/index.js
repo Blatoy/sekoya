@@ -14,7 +14,10 @@ function createWindow() {
     width: 800,
     height: 600,
     icon: 'src/images/icon.png',
-    show: false
+	show: false,
+	webPreferences: {
+		nodeIntegration: true
+	}
   });
 
   win.maximize();
