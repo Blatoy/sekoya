@@ -8,5 +8,7 @@
   "//": "Folder name of the default block definition to display when opening sekoyao",
     "defaultBlocksDefinition": "awesomenauts",
   "//": "Displays debug info, enables CTRL-R to reload without saving.",
-    "debugEnabled": true
+    "debugEnabled": true,
+  "//": "Scrolling speed when using the directional camera movement keys.",
+    "keyScrollSpeed": 10
 }
