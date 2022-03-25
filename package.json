@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/Blatoy/sekoya#readme",
   "devDependencies": {
-    "electron": "^9.4.0"
+    "electron": "^13.6.6"
   },
   "dependencies": {
     "xml-js": "^1.6.7",
